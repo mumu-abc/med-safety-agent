@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="dcFSkN3wOBmCGuWLXZSGZs">
+<head data-page-node-id="5XpkF7xIJRQLX7W2Fe4jWG">
+<meta charset="UTF-8" data-page-node-id="22KeamIcJgm4wngnxumJDh">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="L1UEq4mejHDfYEaKMzHL5u">
+<title>MedSafe · 智能用药安全审查平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" data-page-node-id="iGXdyRfiKUFkpCmFacMdwP">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin data-page-node-id="x3Eagm6CInonrCh6C0AT47">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" data-page-node-id="FBRc9dlhWCukJRmGr156er">
+<style>
+:root {
+  --ink: #0a1a30;
+  --ink-2: #2c405e;
+  --body-c: #46587a;
+  --muted: #7e92b1;
+  --faint: #a5b6cd;
+  --primary: #2563eb;
+  --primary-deep: #1d4ed8;
+  --primary-ink: #173db0;
+  --cyan: #0891b2;
+  --teal: #0e9384;
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #f8fafd;
+  --line: rgba(13, 38, 76, 0.09);
+  --line-light: rgba(13, 38, 76, 0.06);
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --red-100: #fee2e2;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --amber-100: #fef3c7;
+  --green: #059669;
+  --green-light: #ecfdf5;
+  --green-100: #d1fae5;
+  --r: 18px;
+  --r-sm: 12px;
+  --r-xs: 8px;
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04), 0 10px 28px -12px rgba(16, 24, 40, 0.12);
+  --shadow: 0 2px 4px rgba(16, 24, 40, 0.04), 0 16px 40px -16px rgba(29, 78, 216, 0.22);
+  --shadow-lg: 0 24px 60px -24px rgba(29, 78, 216, 0.3);
+  --grad: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #0ea5e9 130%);
+  --transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --serif: "Noto Serif SC", "Songti SC", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink-2);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection { background: rgba(37, 99, 235, 0.16); }
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb { background: #c3cfe0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a9b9d0; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ═══════════════ Hero ═══════════════ */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 460px at 88% -10%, rgba(14, 165, 233, 0.12), transparent 60%),
+    radial-gradient(760px 420px at -8% 8%, rgba(37, 99, 235, 0.10), transparent 60%),
+    linear-gradient(180deg, #f2f6fd 0%, #f6f8fc 78%);
+}
+.hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(13, 38, 76, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13, 38, 76, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 0%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 0%, #000 30%, transparent 78%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 64px 24px 40px;
+  display: grid; grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px; align-items: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  box-shadow: var(--shadow-xs);
+  font-size: 12.5px; font-weight: 600; color: var(--primary-deep);
+  letter-spacing: 0.02em; margin-bottom: 26px;
+}
+.hero-badge .hb-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--primary); animation: pulse 2.2s infinite;
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4.6vw, 56px);
+  font-weight: 900; line-height: 1.22;
+  letter-spacing: 0.01em; color: var(--ink);
+  margin-bottom: 20px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(120deg, #1d4ed8 10%, #2563eb 45%, #0891b2 90%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 16px; color: var(--body-c);
+  max-width: 520px; margin-bottom: 32px; line-height: 1.85;
+}
+.hero-sub b { color: var(--ink); font-weight: 600; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+.btn-hero {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 13px;
+  font-size: 14.5px; font-weight: 700; text-decoration: none;
+  transition: var(--transition); cursor: pointer;
+}
+.btn-hero.primary {
+  color: #fff; background: var(--grad);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 12px 28px -10px rgba(29, 78, 216, 0.55);
+}
+.btn-hero.primary:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 18px 36px -12px rgba(29, 78, 216, 0.6); }
+.btn-hero.ghost {
+  color: var(--ink-2); background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-xs);
+}
+.btn-hero.ghost:hover { border-color: rgba(37, 99, 235, 0.4); color: var(--primary-deep); transform: translateY(-2px); }
+.hero-feats { display: flex; gap: 22px; flex-wrap: wrap; }
+.hf { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); font-weight: 500; }
+.hf svg { flex-shrink: 0; }
+
+.hero-art { position: relative; display: flex; justify-content: center; }
+.hero-art::before {
+  content: ""; position: absolute; inset: 6% 4%;
+  background: radial-gradient(closest-side, rgba(37, 99, 235, 0.14), transparent 72%);
+  filter: blur(12px); border-radius: 50%;
+}
+.hero-art img {
+  position: relative; width: 100%; max-width: 470px;
+  border-radius: 24px;
+  filter: drop-shadow(0 32px 48px rgba(29, 78, 216, 0.18));
+  animation: heroFloat 7s ease-in-out infinite;
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+/* ═══════════════ Hero Stats ═══════════════ */
+.hero-stats {
+  position: relative; z-index: 2;
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 24px 56px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+.ss-item {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  outline: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 20px 22px; display: flex; align-items: center; gap: 15px;
+  transition: var(--transition); position: relative; overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+.ss-item::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+  background: var(--grad);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ss-item:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.ss-item:hover::before { transform: scaleX(1); }
+.ss-item .ss-ic {
+  width: 46px; height: 46px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(14, 165, 233, 0.12));
+  color: var(--primary-deep);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;
+}
+.ss-item .ss-val {
+  font-size: 27px; font-weight: 800; color: var(--ink); line-height: 1.3;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.ss-item .ss-lbl {
+  font-size: 11px; color: var(--muted); margin-top: 5px;
+  font-weight: 600; letter-spacing: 0.14em;
+}
+
+/* ═══════════════ Nav ═══════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px) saturate(1.4);
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow var(--transition);
+}
+.nav.scrolled { box-shadow: 0 8px 30px -16px rgba(16, 24, 40, 0.18); }
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; height: 66px; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand { display: flex; align-items: center; gap: 12px; }
+.nav-brand .logo {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: var(--grad);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; position: relative; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 16px -6px rgba(29, 78, 216, 0.5);
+}
+.nav-brand .logo::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 28% 26%, rgba(255, 255, 255, 0.45), transparent 58%);
+}
+.nav-brand .name {
+  font-size: 18px; font-weight: 800; letter-spacing: -0.03em;
+  background: linear-gradient(120deg, var(--ink), var(--primary-deep));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.nav-brand .sub {
+  font-size: 12px; color: var(--muted); font-weight: 500;
+  padding-left: 12px; border-left: 1px solid var(--line); margin-left: 4px;
+  letter-spacing: 0.06em;
+}
+.nav-status {
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--body-c);
+  padding: 7px 16px; background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: var(--shadow-xs); font-weight: 500;
+}
+.nav-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+.nav-status .dot.off { background: var(--red); animation: none; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15); }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(1.25); } }
+
+/* ═══════════════ Layout ═══════════════ */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 86px 24px 48px; position: relative; z-index: 1; }
+.cols { display: grid; grid-template-columns: 400px 1fr; gap: 22px; align-items: start; }
+
+.section-head { margin-bottom: 26px; }
+.section-head .eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+  color: var(--primary-deep); text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.section-head .eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--grad); border-radius: 2px; }
+.section-head h2 {
+  font-family: var(--serif);
+  font-size: 27px; font-weight: 900; color: var(--ink); letter-spacing: 0.01em;
+}
+.section-head .sd { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+/* ═══════════════ Card ═══════════════ */
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  overflow: hidden; transition: var(--transition);
+  box-shadow: var(--shadow-xs);
+}
+.card:hover { box-shadow: var(--shadow-soft); }
+.card-head {
+  padding: 17px 22px; border-bottom: 1px solid var(--line-light);
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, var(--surface-2), rgba(248, 250, 253, 0));
+}
+.card-head h2 { font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+.card-body { padding: 22px; }
+
+/* ═══════════════ Form ═══════════════ */
+.field { margin-bottom: 16px; }
+.field-label {
+  font-size: 12px; font-weight: 700; color: var(--ink-2);
+  margin-bottom: 8px; display: block; letter-spacing: 0.03em;
+}
+.input, .select, .textarea {
+  width: 100%; border: 1.5px solid #dde6f2; border-radius: var(--r-sm);
+  padding: 12px 14px; font-size: 13px; font-family: inherit; color: var(--ink);
+  background: var(--surface); transition: var(--transition);
+  box-shadow: var(--shadow-xs);
+}
+.input::placeholder, .textarea::placeholder { color: var(--faint); }
+.input:focus, .select:focus, .textarea:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+.textarea { min-height: 150px; resize: vertical; line-height: 1.75; background: var(--surface-2); }
+.textarea:focus { background: var(--surface); }
+.select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237e92b1' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px;
+}
+
+.seg {
+  display: flex; background: #eef2f9; border-radius: var(--r-sm); padding: 4px;
+  margin-bottom: 18px; border: 1px solid var(--line-light); gap: 3px;
+}
+.seg button {
+  flex: 1; padding: 10px 6px; border: none; border-radius: 9px; cursor: pointer;
+  font-size: 12px; font-weight: 600; background: transparent; color: var(--muted);
+  transition: var(--transition); font-family: inherit;
+}
+.seg button.active {
+  background: var(--surface); color: var(--primary-deep);
+  box-shadow: 0 2px 10px -2px rgba(16, 24, 40, 0.14);
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: none; border-radius: var(--r-sm); cursor: pointer; font-size: 13px;
+  font-weight: 700; transition: var(--transition); text-decoration: none; font-family: inherit;
+}
+.btn-fill {
+  background: var(--grad); color: white; padding: 13px 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 20px -8px rgba(29, 78, 216, 0.55);
+}
+.btn-fill:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 12px 26px -8px rgba(29, 78, 216, 0.6); filter: brightness(1.06); }
+.btn-fill:disabled { background: #c3cfe0; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
+.btn-line { background: var(--surface); border: 1.5px solid #dde6f2; color: var(--body-c); padding: 13px 18px; }
+.btn-line:hover { border-color: rgba(37, 99, 235, 0.45); color: var(--primary-deep); background: rgba(37, 99, 235, 0.04); }
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn-fill { flex: 1; }
+
+details { margin-top: 16px; }
+details summary {
+  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--primary-deep); user-select: none;
+  padding: 6px 0; letter-spacing: 0.02em;
+}
+details summary:hover { color: var(--primary); }
+.ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.ex-item {
+  padding: 11px 13px; border: 1px solid var(--line); border-radius: var(--r-xs);
+  cursor: pointer; background: var(--surface-2); transition: var(--transition);
+}
+.ex-item:hover { border-color: rgba(37, 99, 235, 0.4); background: #fff; transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.ex-item .ex-t { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
+.ex-item .ex-d { font-size: 10px; color: var(--muted); }
+
+/* ═══════════════ Empty State ═══════════════ */
+.empty { text-align: center; padding: 76px 20px; }
+.empty .ei {
+  font-size: 46px; margin-bottom: 18px; width: 88px; height: 88px; line-height: 88px;
+  margin-left: auto; margin-right: auto; border-radius: 28px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(14, 165, 233, 0.09));
+  opacity: 1;
+}
+.empty .et { font-size: 15.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 5px; }
+.empty .ed { font-size: 13px; color: var(--muted); }
+
+/* ═══════════════ Pipeline ═══════════════ */
+.pipe { display: flex; align-items: center; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+.pipe-n {
+  display: flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; background: var(--surface-2); color: var(--faint);
+  border: 1px solid var(--line-light); transition: var(--transition);
+}
+.pipe-n.active {
+  background: rgba(37, 99, 235, 0.07); color: var(--primary-deep);
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  animation: pipeGlow 1.6s ease-in-out infinite;
+}
+@keyframes pipeGlow { 0%, 100% { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08); } 50% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.04); } }
+.pipe-n.done { background: var(--green-light); color: var(--green); border-color: rgba(5, 150, 105, 0.2); }
+.pipe-a { color: #c4d1e3; font-size: 9px; }
+
+/* ═══════════════ Risk Banner ═══════════════ */
+.rbanner {
+  border-radius: var(--r); padding: 22px 24px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 18px; border: 1px solid;
+  transition: var(--transition); box-shadow: var(--shadow-xs);
+}
+.rbanner.critical { background: var(--red-light); border-color: var(--red-100); }
+.rbanner.high, .rbanner.medium { background: var(--amber-light); border-color: var(--amber-100); }
+.rbanner.low { background: var(--green-light); border-color: var(--green-100); }
+.rbanner.safe { background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), #fff); border-color: rgba(37, 99, 235, 0.15); }
+.rb-ring {
+  width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center;
+  justify-content: center; font-size: 25px; flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+}
+.rbanner.critical .rb-ring { background: var(--red-100); }
+.rbanner.high .rb-ring, .rbanner.medium .rb-ring { background: var(--amber-100); }
+.rbanner.low .rb-ring { background: var(--green-100); }
+.rbanner.safe .rb-ring { background: rgba(37, 99, 235, 0.1); }
+.rb-lvl { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.rbanner.critical .rb-lvl { color: var(--red); }
+.rbanner.high .rb-lvl, .rbanner.medium .rb-lvl { color: var(--amber); }
+.rbanner.low .rb-lvl { color: var(--green); }
+.rbanner.safe .rb-lvl { color: var(--primary-deep); }
+.rb-sum { font-size: 13px; color: var(--body-c); margin-top: 3px; line-height: 1.7; }
+
+/* ═══════════════ Tiles ═══════════════ */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.tile {
+  border: 1px solid var(--line); border-radius: var(--r-sm); padding: 18px 14px;
+  background: linear-gradient(180deg, var(--surface-2), #fff); transition: var(--transition); text-align: center;
+  box-shadow: var(--shadow-xs);
+}
+.tile:hover { border-color: rgba(37, 99, 235, 0.3); box-shadow: var(--shadow-soft); transform: translateY(-3px); }
+.tile .tv {
+  font-size: 27px; font-weight: 800; line-height: 1;
+  background: linear-gradient(120deg, var(--primary-deep), var(--cyan));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.tile .tl { font-size: 10px; color: var(--muted); margin-top: 7px; font-weight: 700; letter-spacing: 0.14em; }
+
+/* ═══════════════ Tabs ═══════════════ */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 18px; overflow-x: auto; }
+.tabs button {
+  padding: 12px 16px; border: none; background: none; cursor: pointer; font-size: 12.5px;
+  font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent;
+  margin-bottom: -1px; white-space: nowrap; transition: var(--transition);
+  display: flex; align-items: center; gap: 6px; font-family: inherit;
+}
+.tabs button.active { color: var(--primary-deep); border-bottom-color: var(--primary); }
+.tabs button:hover:not(.active) { color: var(--ink-2); }
+.tb-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 8px;
+  background: #edf1f8; color: var(--muted);
+}
+.tabs button.active .tb-badge { background: rgba(37, 99, 235, 0.1); color: var(--primary-deep); }
+.tp { display: none; }
+.tp.active { display: block; animation: fade 0.3s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════ Info Cards ═══════════════ */
+.ic {
+  border: 1px solid var(--line); border-radius: var(--r-sm); padding: 16px; margin-bottom: 9px;
+  background: var(--surface-2); transition: var(--transition);
+}
+.ic:hover { border-color: rgba(37, 99, 235, 0.28); background: #fff; box-shadow: var(--shadow-soft); }
+.ic.danger { border-color: var(--red-100); background: var(--red-light); }
+.ic-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ic-t { font-size: 13px; font-weight: 700; color: var(--ink); }
+.ic-b { font-size: 12px; color: var(--body-c); line-height: 1.7; }
+.ic-tip {
+  margin-top: 9px; padding: 9px 13px; background: rgba(37, 99, 235, 0.05); border-radius: var(--r-xs);
+  font-size: 11px; color: var(--primary-deep); border-left: 3px solid var(--primary);
+  line-height: 1.65;
+}
+.ic-meta { font-size: 10px; color: var(--faint); margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line-light); }
+
+.pill {
+  display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.pill.critical { background: var(--red-100); color: var(--red); }
+.pill.high, .pill.medium { background: var(--amber-100); color: var(--amber); }
+.pill.low { background: var(--green-100); color: var(--green); }
+.pill.safe { background: rgba(37, 99, 235, 0.1); color: var(--primary-deep); }
+
+.alt-c {
+  border: 1px solid rgba(37, 99, 235, 0.14); border-radius: var(--r-sm); padding: 16px; margin-bottom: 9px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.045), #fff);
+  transition: var(--transition);
+}
+.alt-c:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); }
+.alt-c .ac-o { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+.alt-c .ac-r { font-size: 12px; color: var(--body-c); margin-bottom: 10px; line-height: 1.7; }
+.alt-c .ac-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.alt-tag {
+  padding: 6px 12px; background: #fff; border: 1px solid var(--line);
+  border-radius: var(--r-xs); font-size: 12px; transition: var(--transition); font-weight: 500;
+}
+.alt-tag:hover { border-color: rgba(37, 99, 235, 0.45); color: var(--primary-deep); box-shadow: var(--shadow-xs); }
+.alt-tag .at-c { font-size: 10px; color: var(--faint); }
+
+.report {
+  white-space: pre-wrap; font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 12px; line-height: 1.8; background: #0b1730; color: #c8d6ec;
+  padding: 22px; border-radius: var(--r-sm); max-height: 480px; overflow-y: auto;
+  border: 1px solid #14224a;
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.report::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); }
+
+.chain { display: flex; gap: 13px; margin-bottom: 10px; }
+.chain .cn {
+  width: 32px; height: 32px; border-radius: 10px; background: var(--grad);
+  color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;
+  font-weight: 800; flex-shrink: 0;
+  box-shadow: 0 5px 12px -5px rgba(29, 78, 216, 0.5);
+}
+.chain .cb { flex: 1; padding: 13px 15px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px solid var(--line-light); transition: var(--transition); }
+.chain .cb:hover { border-color: rgba(37, 99, 235, 0.25); background: #fff; }
+.chain .cl { font-size: 12.5px; font-weight: 700; margin-bottom: 3px; color: var(--ink); }
+.chain .cd { font-size: 11.5px; color: var(--body-c); line-height: 1.7; }
+
+/* ═══════════════ Graph ═══════════════ */
+.gbox {
+  width: 100%; height: 420px; border: 1px solid var(--line); border-radius: var(--r-sm);
+  overflow: hidden; position: relative; background: linear-gradient(180deg, var(--surface-2), #fff);
+  box-shadow: var(--shadow-xs);
+}
+.gbox canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.gbox canvas:active { cursor: grabbing; }
+.gbtns { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 5; }
+.gbtns button {
+  width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 9px;
+  background: rgba(255, 255, 255, 0.95); cursor: pointer; font-size: 14px; color: var(--body-c);
+  box-shadow: var(--shadow-soft); transition: var(--transition);
+}
+.gbtns button:hover { border-color: rgba(37, 99, 235, 0.45); color: var(--primary-deep); }
+.gleg {
+  position: absolute; bottom: 12px; left: 12px; background: rgba(255, 255, 255, 0.92);
+  padding: 10px 14px; border-radius: var(--r-xs); font-size: 10px; border: 1px solid var(--line);
+  backdrop-filter: blur(8px); color: var(--body-c); font-weight: 500;
+}
+.gleg-r { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.gleg-r:last-child { margin-bottom: 0; }
+.gleg-d { width: 8px; height: 8px; border-radius: 50%; }
+.ginfo { margin-top: 11px; font-size: 11.5px; color: var(--muted); }
+
+/* ═══════════════ HITL ═══════════════ */
+.hitl {
+  background: var(--amber-light); border: 1px solid var(--amber-100); border-radius: var(--r);
+  padding: 17px 22px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+  box-shadow: var(--shadow-xs);
+}
+.hitl-t { font-size: 13px; color: #92400e; font-weight: 600; }
+.btn-amb {
+  padding: 11px 22px; border: none; border-radius: var(--r-sm); cursor: pointer;
+  font-size: 12px; font-weight: 700; color: white; background: linear-gradient(135deg, #d97706, #f59e0b);
+  transition: var(--transition); box-shadow: 0 6px 16px -6px rgba(217, 119, 6, 0.5); font-family: inherit;
+}
+.btn-amb:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -6px rgba(217, 119, 6, 0.55); filter: brightness(1.05); }
+
+/* ═══════════════ Feedback ═══════════════ */
+.fb { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line-light); }
+.stars { display: flex; gap: 4px; margin: 8px 0; }
+.star { background: none; border: none; font-size: 24px; cursor: pointer; color: #dfe6f0; transition: all 0.12s; }
+.star.on, .star:hover { color: #f5b301; transform: scale(1.15); }
+
+/* ═══════════════ Spinner / Error ═══════════════ */
+.spin { text-align: center; padding: 52px 20px; }
+.spin-r {
+  width: 38px; height: 38px; border: 3px solid rgba(37, 99, 235, 0.15); border-top-color: var(--primary);
+  border-radius: 50%; display: inline-block; animation: sp 0.7s linear infinite;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+.spin p { margin-top: 16px; font-size: 13px; color: var(--muted); }
+
+.err {
+  text-align: center; padding: 34px 20px; background: var(--red-light);
+  border: 1px solid var(--red-100); border-radius: var(--r);
+}
+.err .ei { font-size: 28px; margin-bottom: 8px; }
+.err .em { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 4px; }
+.err .eh { font-size: 12px; color: var(--muted); }
+
+/* ═══════════════ Bottom ═══════════════ */
+.bgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px; }
+.prow {
+  display: flex; align-items: center; gap: 13px; padding: 13px; border: 1px solid var(--line);
+  border-radius: var(--r-sm); margin-bottom: 8px; background: var(--surface); transition: var(--transition);
+  box-shadow: var(--shadow-xs);
+}
+.prow:hover { border-color: rgba(37, 99, 235, 0.3); box-shadow: var(--shadow-soft); transform: translateY(-2px); }
+.pa {
+  width: 42px; height: 42px; border-radius: 13px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.09), rgba(14, 165, 233, 0.11));
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.pn { font-size: 13px; font-weight: 700; color: var(--ink); }
+.pm { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.ptags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.ptag { font-size: 9px; padding: 2px 8px; border-radius: 6px; background: rgba(37, 99, 235, 0.07); color: var(--primary-deep); font-weight: 600; }
+.pbtn {
+  padding: 7px 14px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--body-c);
+  transition: var(--transition); font-family: inherit;
+}
+.pbtn:hover { border-color: rgba(37, 99, 235, 0.45); color: var(--primary-deep); background: rgba(37, 99, 235, 0.04); }
+.pempty { text-align: center; padding: 32px; color: var(--faint); font-size: 12px; }
+
+.arch { display: flex; flex-direction: column; gap: 8px; }
+.arch-s {
+  display: flex; align-items: center; gap: 13px; padding: 14px; border: 1px solid var(--line);
+  border-radius: var(--r-sm); background: var(--surface-2); transition: var(--transition);
+}
+.arch-s:hover { border-color: rgba(37, 99, 235, 0.3); background: #fff; box-shadow: var(--shadow-soft); transform: translateX(3px); }
+.arch-s .ai {
+  width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center;
+  justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.arch-s .an { font-size: 13px; font-weight: 700; color: var(--ink); }
+.arch-s .ad { font-size: 11px; color: var(--muted); }
+.arch-c { text-align: center; color: #b6c5da; font-size: 12px; }
+
+.erow {
+  display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
+  background: var(--surface-2); border-radius: var(--r-sm); border: 1px solid var(--line-light);
+  margin-bottom: 6px; transition: var(--transition);
+}
+.erow:hover { border-color: rgba(37, 99, 235, 0.25); background: #fff; }
+.erow .el { font-size: 12px; color: var(--body-c); font-weight: 500; }
+.erow .ev {
+  font-size: 15px; font-weight: 800; color: var(--primary-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.mem {
+  padding: 12px; border: 1px solid var(--line); border-radius: var(--r-sm); margin-bottom: 6px;
+  cursor: pointer; background: var(--surface-2); transition: var(--transition);
+}
+.mem:hover { border-color: rgba(37, 99, 235, 0.3); background: #fff; box-shadow: var(--shadow-soft); }
+.mem .mh { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.mem .ml { font-size: 11px; font-weight: 700; color: var(--ink); }
+.mem .md { font-size: 10px; color: var(--faint); }
+.mem .mt { font-size: 10px; color: var(--body-c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ═══════════════ Footer ═══════════════ */
+.foot {
+  margin-top: 72px; position: relative; z-index: 1;
+  background: #0a1a30; color: rgba(226, 236, 250, 0.75);
+  padding: 44px 24px 36px;
+}
+.foot-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+.foot-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+.foot-brand .logo {
+  width: 34px; height: 34px; border-radius: 10px; background: var(--grad);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.foot-brand .fname { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+.foot-tag { font-size: 13px; color: rgba(226, 236, 250, 0.55); margin-bottom: 20px; }
+.foot-stack { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.foot-stack span {
+  font-size: 11px; font-weight: 600; padding: 5px 13px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(226, 236, 250, 0.7); letter-spacing: 0.04em;
+}
+.foot-copy { font-size: 11.5px; color: rgba(226, 236, 250, 0.35); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 20px; }
+
+/* ═══════════════ Reveal Animation ═══════════════ */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 980px) {
+  .hero-inner { grid-template-columns: 1fr; padding-top: 44px; gap: 30px; }
+  .hero-art { display: none; }
+  .hero-stats { grid-template-columns: 1fr 1fr; margin-top: 10px; padding-bottom: 0; }
+  .wrap { padding-top: 36px; }
+}
+@media (max-width: 900px) {
+  .cols { grid-template-columns: 1fr; }
+  .bgrid { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr 1fr; }
+  .ex-grid { grid-template-columns: 1fr; }
+  .nav-brand .sub { display: none; }
+}
+@media (max-width: 500px) {
+  .hero-stats { grid-template-columns: 1fr; }
+  .nav-inner, .wrap, .hero-inner, .hero-stats { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body data-page-node-id="bC7QrXjkoXsZfvuvRrzpZy">
+
+<!-- Nav -->
+<div class="nav" id="nav" data-page-node-id="Yv1Fa1ozTC7kH1zVFfCJ20">
+  <div class="nav-inner" data-page-node-id="GLRXsMaH4kamJ0Z3KoDDmG">
+    <div class="nav-brand" data-page-node-id="W4CRFX4uZ6nt2UXMCStCBF">
+      <div class="logo" data-page-node-id="1MvIIboxlpsqG3fFUQQxsw">💊</div>
+      <span class="name" data-page-node-id="WMHUMs6CtCdV7iSsM8O62B">MedSafe</span>
+      <span class="sub" data-page-node-id="Ot05FbRNwofvI4YrDarGh7">智能用药安全审查平台</span>
+    </div>
+    <div class="nav-status" data-page-node-id="Wz6moYqqGa5LmG3y9C6tDv"><span class="dot" id="statusDot" data-page-node-id="F7mhBJU5fCk6wsEhAdRNHj"></span><span id="statusText" data-page-node-id="OHGtANiJzeFB3MMJHONJRO">系统就绪</span></div>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero" data-page-node-id="jeh1qpUyDUcQcpjif74jMX">
+  <div class="hero-inner" data-page-node-id="x3uIa1R68vdvGPZcKS702R">
+    <div class="hero-copy" data-page-node-id="RDXWqY6KRvMG2jK9W8vnS3">
+      <div class="hero-badge" data-page-node-id="F6ql2WfI1nUB0H7wp9w6XO"><span class="hb-dot" data-page-node-id="T1zKXrcMFLcKmjYOkU03Md"></span>AI 驱动 · 三层处方安全审查引擎</div>
+      <h1 data-page-node-id="YhSsdtMBpVE2thk8WXPrAt">让每一次用药<br data-page-node-id="4TuPEcAmfHdx6G6Gzgs017"><em data-page-node-id="pH8Q5P5uDFmjxd4AWhlHmR">安全有据可循</em></h1>
+      <p class="hero-sub" data-page-node-id="sijrFwpwLtRJHDyXvKvHsr">融合 <b data-page-node-id="0rmeACC7p0qXJZmGfx0fZd">药物知识图谱</b>、<b data-page-node-id="EsyTPx5SnsDaEWNr4OXOhA">41+ 安全规则引擎</b> 与 <b data-page-node-id="wCNsOzCGkCvpkFzrEV9IEP">大模型智能推理</b> 的三层审查架构,秒级识别处方风险,给出可解释的审查结论与替代用药方案。</p>
+      <div class="hero-cta" data-page-node-id="rbFowuWCT9PaaYUht8PfbG">
+        <a class="btn-hero primary" href="#workbench" data-page-node-id="SAYsweAYoM2yX0GZBmyzrl">🔍 开始审查处方</a>
+        <a class="btn-hero ghost" href="#architecture" data-page-node-id="wwzaG1XDLfQaoqYwpC3LVZ">了解三层架构 ↓</a>
+      </div>
+      <div class="hero-feats" data-page-node-id="YMsb6j2Rcmlhm3KrwIxZPP">
+        <span class="hf" data-page-node-id="FFyOVKDFi2I65zSHzpEX5p"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" data-page-node-id="O7THJU4WCkcJwT3MWTB6zh"><circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="1.5" data-page-node-id="lM9uEpQl3uFaubRXwE8upb"/><path d="M5 8.2l2 2 4-4.4" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="M6uE732xWXXY2VC1maz2S0"/></svg>毫秒级图谱检测</span>
+        <span class="hf" data-page-node-id="ClKvO7nvnFW1YWTTm7OD98"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" data-page-node-id="C8b1xLdvEUEghqLKqA9HJ0"><circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="1.5" data-page-node-id="GuA4mgX01GB2dkXmCu4zBv"/><path d="M5 8.2l2 2 4-4.4" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="TdEYHvYdv35EsUEvwdWWgF"/></svg>11 类安全规则</span>
+        <span class="hf" data-page-node-id="dOBEnEDvWD5yGIk1HwJaEC"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" data-page-node-id="K2FPwct1BKpAJHL50C9gLZ"><circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="1.5" data-page-node-id="HXqLBVADezVpnUEZ5hzr4N"/><path d="M5 8.2l2 2 4-4.4" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="JbSnTbQHuxHcHTOO5EYg0K"/></svg>LLM 可解释推理</span>
+      </div>
+    </div>
+    <div class="hero-art" data-page-node-id="K0YCh2PysaEQxmGdqgLC8w">
+      <img src="medsafe_hero.jpg" alt="MedSafe 用药安全" data-page-node-id="hYJEdnTCZ2qWRa5Z8zkyrE">
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="hero-stats" data-page-node-id="Mun63Mw1S79GvLExJA1zwK">
+    <div class="ss-item" data-page-node-id="D5zmOJD2nSbYPSaXYrGE4M"><div class="ss-ic" data-page-node-id="NA6fumGMjocvPmnaDXk6D4">💊</div><div data-page-node-id="m7Zs8AlGZzVbmP31ysBQHH"><div class="ss-val" id="statDrugs" data-page-node-id="3AtE214P2qmqhNenhbl6a9">—</div><div class="ss-lbl" data-page-node-id="OGIsSTvIlKXK2N7hlPsqyJ">药物节点</div></div></div>
+    <div class="ss-item" data-page-node-id="3HQ6FsGSAsWokhFjznyThK"><div class="ss-ic" data-page-node-id="KpaF10vu9rFlftPSkKQIST">🔗</div><div data-page-node-id="FqyBuGZrCsxpiJCwBHFcIL"><div class="ss-val" id="statInteractions" data-page-node-id="AByvllUXGhNG8YTlRPre3S">—</div><div class="ss-lbl" data-page-node-id="LCC6F5HeuhlJ7DyioGr4fl">交互关系</div></div></div>
+    <div class="ss-item" data-page-node-id="mRNtcl1M5xR6uPZkopyHZy"><div class="ss-ic" data-page-node-id="71Kui2FNEp8v5sHrV1xYqG">📐</div><div data-page-node-id="R7tFt53iwHx3w0jsExTnZF"><div class="ss-val" id="statRules" data-page-node-id="mWfUm2jEF4EaYZV2Evn1Ed">—</div><div class="ss-lbl" data-page-node-id="JIG7ZM5BofLzDvwa54n9Ra">审查规则</div></div></div>
+    <div class="ss-item" data-page-node-id="bszHoOlPC7jp1KjvKFLWzR"><div class="ss-ic" data-page-node-id="gN8E69F2sekB8FnvhLv2DK">👤</div><div data-page-node-id="wErFEOxHOnVDSmbWLkfHSW"><div class="ss-val" id="statPatients" data-page-node-id="Mgb7RTyUpEfOGbufojfDV0">—</div><div class="ss-lbl" data-page-node-id="QV3R5GPrvQWbUAjTDFuDTt">患者档案</div></div></div>
+  </div>
+</section>
+
+<!-- Main -->
+<div class="wrap" id="workbench" data-page-node-id="CgrMFHMj0x7TyEQSoSItTX">
+  <div class="section-head reveal" data-page-node-id="GmuwqsD75bLQlDEiGQ3LiH">
+    <div class="eyebrow" data-page-node-id="40nLrhMQzG6PZAcHILzUpM">Review Workspace</div>
+    <h2 data-page-node-id="kdkWesNzpN0hcWuW6gg0kv">智能审查工作台</h2>
+    <div class="sd" data-page-node-id="7S52aNYW1mMkepYbzb4kvj">录入处方,系统将自动完成解析 → 交互检测 → 规则检查 → 风险评估 → 替代方案 → 报告生成的完整审查链路</div>
+  </div>
+
+  <div class="cols" data-page-node-id="fT7JslEeyKqW4DjXASGt93">
+
+    <!-- Input -->
+    <div class="card reveal" data-page-node-id="6zBC2Ls9UqX51SM1V8BUF7">
+      <div class="card-head" data-page-node-id="Ot0wGuxBXzzug5Imjb8UGO"><h2 data-page-node-id="xmZIWdFfhNpA1OwJPXhJ58">📋 处方录入</h2></div>
+      <div class="card-body" data-page-node-id="eMgBlEpovJt3NRGi315eNO">
+        <div class="field" data-page-node-id="RzLj2DeBGeumi3lkzM9zAD">
+          <label class="field-label" data-page-node-id="aQUrhYCjXbRGiv8sUtV0jp">患者档案(可选)</label>
+          <select class="select" id="patient-select" data-page-node-id="CokNE7E7eYhN6HQaIZSISl"><option value="" data-page-node-id="3uu1fTtAZZhvBhSfadGRPI">— 自动提取 —</option></select>
+        </div>
+        <div class="field" data-page-node-id="MkBcdj0AGNLd5w4IrBsuv3">
+          <label class="field-label" data-page-node-id="MWaUoGe0QBZss6xW5ZJq5M">处方文本</label>
+          <textarea class="textarea" id="prescription" placeholder="粘贴处方,支持自由格式...
+
+示例:
+患者张某,男,65岁
+诊断:高血压
+处方:
+1. 华法林 2.5mg qd
+2. 阿司匹林 100mg qd"></textarea>
+        </div>
+        <div class="seg" data-page-node-id="FW00WUHgB86Vz22531DLON">
+          <button class="active" data-mode="auto" onclick="switchMode('auto')" data-page-node-id="EQ5HqNf0EuC2r5a0DegHjG">🔍 自动审查</button>
+          <button data-mode="hitl" onclick="switchMode('hitl')" data-page-node-id="OWxN7yn9pxJnEenBu5Xx7t">👨‍⚕️ 药师审核</button>
+          <button data-mode="multi" onclick="switchMode('multi')" data-page-node-id="uXx2M2zPkHTAFVFOfdjKVu">🤝 多智能体</button>
+        </div>
+        <div class="btn-row" data-page-node-id="1I51nIxEjIcX21SonOUFne">
+          <button class="btn btn-fill" id="submitBtn" onclick="submitReview()" data-page-node-id="FBliL0kpR53CASyCE3K6Pc">🔍 开始审查</button>
+          <button class="btn btn-line" onclick="clearAll()" data-page-node-id="fDxGmlqDvfT19LFmGcaJ8Q">清空</button>
+        </div>
+        <details data-page-node-id="kpde5LXdgK4qoqU4BRsBru"><summary data-page-node-id="dET19ziXXr7nw59fvX7iY6">📌 示例处方</summary>
+          <div class="ex-grid" data-page-node-id="y5BKkBaoHzF7J7EGEzy3rD">
+            <div class="ex-item" onclick="loadExample(0)" data-page-node-id="0cgEGFVNQFN77G3UG8BYL7"><div class="ex-t" style="color:var(--red)" data-page-node-id="HR57XAmhULmwYUonMfQfgF">🔴 高危出血</div><div class="ex-d" data-page-node-id="5Q6CWhgzJw9fkHA5tTtus8">华法林+阿司匹林+布洛芬</div></div>
+            <div class="ex-item" onclick="loadExample(1)" data-page-node-id="mZNwHug2B72LV1jKi8wyaX"><div class="ex-t" style="color:var(--amber)" data-page-node-id="OD0t9xIMgaIqHU3c0Lb4TZ">🟠 老年多药</div><div class="ex-d" data-page-node-id="DL33SICmVy0n0dEj9sAB9Z">地西泮+布洛芬+他汀</div></div>
+            <div class="ex-item" onclick="loadExample(2)" data-page-node-id="4UOwRxhUKH6lflU4eFp39S"><div class="ex-t" style="color:var(--amber)" data-page-node-id="to1rGduPtkOSEgzcbilJjl">🟡 孕妇禁忌</div><div class="ex-d" data-page-node-id="T3Dk7Ok3l32uOLL9th7EBa">氯沙坦+辛伐他汀</div></div>
+            <div class="ex-item" onclick="loadExample(3)" data-page-node-id="HGHoH8iBVtNpBy6aEkqjcF"><div class="ex-t" style="color:var(--red)" data-page-node-id="jlu6OH2X6E0UDwU00scnVz">🔴 肝损+他汀</div><div class="ex-d" data-page-node-id="iBzttFoKovwkhesQThDO05">对乙酰氨基酚+辛伐他汀</div></div>
+            <div class="ex-item" onclick="loadExample(4)" data-page-node-id="ULN27cPYAEFb0WMT3fWG51"><div class="ex-t" style="color:var(--red)" data-page-node-id="pFoqV0DvZ9fMdDDnjev8Fd">🔴 肾损</div><div class="ex-d" data-page-node-id="vyAiUIGAfkQYix2TpZ1uYH">二甲双胍+肾功能不全</div></div>
+            <div class="ex-item" onclick="loadExample(5)" data-page-node-id="LkVwoF9uEJCpPB26booHAB"><div class="ex-t" style="color:var(--green)" data-page-node-id="PYOj3Eb51auz0JKV5DqLVy">🟢 安全</div><div class="ex-d" data-page-node-id="5V387ytWl2kxHdMCneexYr">氨氯地平+对乙酰氨基酚</div></div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="card reveal" data-page-node-id="QMIW23JD6jRf6fNcZx7iYf">
+      <div class="card-head" data-page-node-id="1qes0LRlF9iU7eE9mrTCji"><h2 data-page-node-id="nPWHn3MmAQVJ7e6DldAfqW">📊 审查结果</h2></div>
+      <div class="card-body" data-page-node-id="XFEBLsCkOWm1xGuiflaLru">
+        <div id="emptyState" class="empty" data-page-node-id="nn2KwY5kg3nMCKgSnVfwxu">
+          <div class="ei" data-page-node-id="Oi5KLsaa1F6vqr5zrszH6z">🔬</div>
+          <div class="et" data-page-node-id="nY8xsCSu5rhMluByTfzbDC">等待审查</div>
+          <div class="ed" data-page-node-id="jYFYji6Vuf1ESgymUIquAo">输入处方并点击「开始审查」</div>
+        </div>
+        <div id="resultArea" style="display:none" data-page-node-id="JxBkU68aHm2pVIej512Pvb">
+          <div id="pipeArea" data-page-node-id="1YxAFTsbWsXCcimx1vEiBP"></div>
+          <div id="riskArea" data-page-node-id="yqB4UpyJLddkgeOljp62LC"></div>
+          <div id="tilesArea" data-page-node-id="2cosepCkrlhANPBWHWGOs3"></div>
+          <div id="hitlArea" data-page-node-id="ynXTdcCEuCsYADeFi5legf"></div>
+          <div id="tabBarArea" data-page-node-id="LBDD5M29CauMDG3UiW08Dg"></div>
+          <div id="tabBodyArea" data-page-node-id="7AuG0V1odNJVILG3iS9F1C"></div>
+          <div id="fbArea" data-page-node-id="oljVKL0z79VrwaumShIQVj"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bgrid" id="architecture" data-page-node-id="yzf9x50rS7sKoMvqaZFoWB">
+    <div class="card reveal" data-page-node-id="YDMvO5XAylJ3i2dXMH9eMa">
+      <div class="card-head" data-page-node-id="CQ1CeCsDadZ0PNnbjDAHYV"><h2 data-page-node-id="FoVVmVFrAU39YGHxdGK4BI">👤 患者档案</h2><button class="pbtn" onclick="showPatientForm()" data-page-node-id="u9vEnNUU9fu9twU0PqUI8v">＋ 新增</button></div>
+      <div class="card-body" data-page-node-id="L6CvaqMsYgjpRdDK8Ni6dQ">
+        <div id="pList" data-page-node-id="ATQkG68u12h8q204FwL6RT"></div>
+        <div id="pForm" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-light)" data-page-node-id="eFJ09foZ5PL9WrSkgykHWJ">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px" data-page-node-id="eZTgJLBG6yAaGuCRkptjOY">
+            <div class="field" style="margin-bottom:8px" data-page-node-id="hUQvXxIyH0nJKEBtX6VnOR"><label class="field-label" data-page-node-id="yUKsillVuhtRoo1O10UPWg">ID</label><input class="input" id="pf-id" placeholder="p001" data-page-node-id="WpmMqPOhfYta8AERpUBnba"></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="CvDp5i4hpZvILW2Vrr3E2p"><label class="field-label" data-page-node-id="7RKjWRT0qMISsHJJtGoMoC">姓名</label><input class="input" id="pf-name" placeholder="张某" data-page-node-id="Qp3GEM7zJEmyDbn4VG9ody"></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="kkE2F8B5zd4eEO8XfA88ev"><label class="field-label" data-page-node-id="RsdSC3rpM0ItCeeSiogpIh">年龄</label><input class="input" id="pf-age" placeholder="65" data-page-node-id="GAd5GbKxVfhKN3gWDTh7D8"></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="CeO4gNFYpMmIEx9Srj3T62"><label class="field-label" data-page-node-id="josVZ9pr2M362MxnIllGRn">性别</label><select class="select" id="pf-gender" data-page-node-id="AnWgmNpvptFTgqtAcAHnZU"><option value="" data-page-node-id="ec6Q2S3TCB9x6VOdTaoPWr">选择</option><option value="男" data-page-node-id="YA8EzMLLDZQZlEb9VSCcW6">男</option><option value="女" data-page-node-id="UjPq7VDzghrIBV2rOL9aZk">女</option></select></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="OjApR4E4kabI81VYtg5JRR"><label class="field-label" data-page-node-id="hyfWM4YvwJV052k5ZJZbYD">肝功能</label><select class="select" id="pf-liver" data-page-node-id="oQt2znmLxKMUtVbJtS1HeH"><option value="normal" data-page-node-id="x6RMDwyZj5c9F1kQhHLm7B">正常</option><option value="mild" data-page-node-id="Nrh2C2POhLlxRJcYDDjE0h">轻度异常</option><option value="moderate" data-page-node-id="nIWvUCDQxrpFr9NgHwERlZ">中度异常</option><option value="severe" data-page-node-id="JlyfkmgSyHz0gyHwiWpkVY">重度异常</option></select></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="HYCBsKXLeF3l9prXmIUFDq"><label class="field-label" data-page-node-id="RuSHloNAdblCr5P8M4GKbT">肾功能</label><select class="select" id="pf-renal" data-page-node-id="sBYo06AIOo9soprd8FiLlk"><option value="normal" data-page-node-id="WvPmT1VX4fU2OOIFvkFME0">正常</option><option value="mild" data-page-node-id="wc2MmzMlVyoatTlerOxbc5">轻度异常</option><option value="moderate" data-page-node-id="PXwbOBlC9ulDHLSfRnfTWU">中度异常</option><option value="severe" data-page-node-id="D3XcKYdWaPzv2Ee2K2omIP">重度异常</option></select></div>
+            <div class="field" style="margin-bottom:8px" data-page-node-id="daHWQyPssc2J1ZronFLlJ5"><label class="field-label" data-page-node-id="myf8bd43cNF7S6KCOLRoAD">孕期</label><select class="select" id="pf-preg" data-page-node-id="Wl0NTWsgAwAqdneSMXU6v7"><option value="no" data-page-node-id="0usuZ7rvFDyBzRQeEuR0Xg">否</option><option value="yes" data-page-node-id="7TgTVQWWGxWN3RinHoIlUk">是</option></select></div>
+          </div>
+          <div class="field" style="margin-bottom:8px" data-page-node-id="KB3n1Nr8rMkJccCzPzwx7E"><label class="field-label" data-page-node-id="2UoFVzWtqZZgHbRCOZ9im9">疾病/诊断</label><input class="input" id="pf-cond" placeholder="高血压,糖尿病" data-page-node-id="BvIEOCBghzdfGedLc8h8QW"></div>
+          <div class="field" style="margin-bottom:8px" data-page-node-id="wnZvgbcV5ctkCU6jtA1DvN"><label class="field-label" data-page-node-id="ocwHSikex7vC4K2o95LD5B">过敏史</label><input class="input" id="pf-alle" placeholder="青霉素" data-page-node-id="XeKal2RU0sA4YwyJGaRF3q"></div>
+          <div class="btn-row" data-page-node-id="KNXQLQJGRPrQWyJShDUVux"><button class="btn btn-fill" onclick="savePatient()" style="padding:10px 16px" data-page-node-id="ndMzOYB62Han8Yunu5VJa1">💾 保存</button><button class="btn btn-line" onclick="hidePatientForm()" data-page-node-id="ndhWf64mwQlm4YCsPy8ECP">取消</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card reveal" data-page-node-id="JVz0QboaXKbPjXZUAupsse">
+      <div class="card-head" data-page-node-id="QHMxlX55WLGVHM06ydE6cB"><h2 data-page-node-id="REJhZmnmKypPiHmq1osBLA">🏗️ 三层架构 &amp; 评测</h2></div>
+      <div class="card-body" data-page-node-id="mBcz8LF1Suw7YT7I6ovGwz">
+        <div class="arch" style="margin-bottom:16px" data-page-node-id="pGDjv4GMRcBWuZdGR0EWDV">
+          <div class="arch-s" data-page-node-id="OqFuhoBdsRHD27QHHjcC6U"><div class="ai" style="background:rgba(37,99,235,0.08)" data-page-node-id="Gelsa8kdFBSg02K33vWxX5">🔗</div><div data-page-node-id="uKt3m9Y9SCpxYxDjqg3LSV"><div class="an" data-page-node-id="uaGxAsUHQnRGAd805RldxC">L1 · 药物交互检测</div><div class="ad" data-page-node-id="xg7QrBih88LDsF28M27JrV">NetworkX 图谱 · &lt;10ms</div></div></div>
+          <div class="arch-c" data-page-node-id="wdZjeE5F0AG4df9TExG5yo">↓</div>
+          <div class="arch-s" data-page-node-id="BApY3mx703e7bRdT6ndRIc"><div class="ai" style="background:var(--red-light)" data-page-node-id="TjqyZBRMAonZAtDG72TmgX">📐</div><div data-page-node-id="qlgRFJyBejWCPNvCH3jvce"><div class="an" data-page-node-id="ABeRZHmK9X6yKZrTs4RZwx">L2 · 安全规则引擎</div><div class="ad" data-page-node-id="EdAXQaBlaVV0EIm4UMjnsI">11 类规则 · 41+ 药物对</div></div></div>
+          <div class="arch-c" data-page-node-id="BjFvXb8C4VNrQOBdeTWWm9">↓</div>
+          <div class="arch-s" data-page-node-id="fpcGp2WDiM0hFobgaRIfd0"><div class="ai" style="background:var(--green-light)" data-page-node-id="VF6xzokAumoG88AOsxjET4">🧠</div><div data-page-node-id="XyGFF0ugQbb7F43VIRUvKs"><div class="an" data-page-node-id="HcOpvO7JiFXShr1S7vfhTT">L3 · LLM 智能推理</div><div class="ad" data-page-node-id="VJUJL74QsIr1AgpdWq3EaK">LangChain ReAct · 结构化输出</div></div></div>
+        </div>
+        <div id="evalRows" data-page-node-id="AD0VwNrTWzUpWwqmZMBfQQ"><div class="erow" data-page-node-id="Xd1dyVI9a9zAmYYBSgjBIg"><span class="el" data-page-node-id="LzoFmzajwxGbv8hR8aKMGI">加载中...</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bgrid" style="margin-top:22px" data-page-node-id="pGciQHI39qLdNciwrDWPik">
+    <div class="card reveal" data-page-node-id="e9j3EFFRbdo4zDAAYX7CIX">
+      <div class="card-head" data-page-node-id="fOTlUC7xrafaYDXHWjC1F6"><h2 data-page-node-id="UAbs30kEenvQPcGvatG7u8">🧠 审查记忆库</h2></div>
+      <div class="card-body" data-page-node-id="CRZCtPqMW3xHtoiLDy6hDO">
+        <div id="memStats" style="font-size:12px;color:var(--body-c);margin-bottom:10px" data-page-node-id="6YPoc0exbeE4bDh8vLM5EF">加载中...</div>
+        <div id="memList" style="max-height:260px;overflow-y:auto" data-page-node-id="Melww6PKyo4DgftLXM6V34"></div>
+      </div>
+    </div>
+
+    <div class="card reveal" data-page-node-id="YCntdsPOMN7XRr8oMgrd2H">
+      <div class="card-head" data-page-node-id="oEEJImLY8Va850X8TtoX75">
+        <h2 data-page-node-id="Xa1z6LSqXNBxrrcz19swuG">🕸️ 知识图谱</h2>
+        <div style="display:flex;gap:6px" data-page-node-id="19s3AUKXLpGcNCgT10vm5C">
+          <input class="input" id="gSearch" placeholder="搜索药物..." style="width:140px;padding:7px 10px;font-size:11px" data-page-node-id="tkOZKhK2jFUv7FGrZEmrHF">
+          <button class="pbtn" onclick="searchGraph()" data-page-node-id="QRdveMi5AWyEFOFHxk0SwE">搜索</button>
+        </div>
+      </div>
+      <div class="card-body" data-page-node-id="UAInGZZDN2c8sGACt0NCzw">
+        <div class="gbox" data-page-node-id="MpUpNLKjwEmrLhnODBLKTE">
+          <div class="gbtns" data-page-node-id="mwxOtCVNjPJKGlTyh8rqFU"><button onclick="zoomG(1.2)" data-page-node-id="09luK6QqyM4D522TAtjFdM">+</button><button onclick="zoomG(0.8)" data-page-node-id="0cryNvYJsghF3hpqedIyeA">−</button><button onclick="resetG()" data-page-node-id="p3v8PX1LYYzlXqgDrOMxVC">⟲</button></div>
+          <div class="gleg" data-page-node-id="yMO0jL1LhjDIs7j1xBE925">
+            <div class="gleg-r" data-page-node-id="7QQlmbPbXu4vANn8hLF52l"><span class="gleg-d" style="background:#dc2626" data-page-node-id="nBSDCa887SIKl8QcvDrP0g"></span>极高</div>
+            <div class="gleg-r" data-page-node-id="f2Ji9gHpCU3GJ8MBE2ZNfR"><span class="gleg-d" style="background:#d97706" data-page-node-id="RmGzJAxlDdNWnE6ypY0F9g"></span>高</div>
+            <div class="gleg-r" data-page-node-id="mGbRvNHT7OZBrN2K9Ugthq"><span class="gleg-d" style="background:#ca8a04" data-page-node-id="ieXRO0EiZ74p6x4ekutYJA"></span>中</div>
+            <div class="gleg-r" data-page-node-id="nVm5bBXvKQnu8XD32lQeZQ"><span class="gleg-d" style="background:#059669" data-page-node-id="BLg457eZbg2FNRC6jyOx8X"></span>低</div>
+            <div class="gleg-r" data-page-node-id="5RWkH45TbGhVCENwYAmyOc"><span class="gleg-d" style="background:#2563eb" data-page-node-id="ZlG2hEt6tqjtmPOtZzkt6m"></span>安全</div>
+          </div>
+          <canvas id="graphCanvas" data-page-node-id="X1Q7ulytZQIhTlpFOdQTP7"></canvas>
+        </div>
+        <div class="ginfo" id="gInfo" data-page-node-id="dhkFu42wLjzndMPfn2mcMc">正在加载...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="foot" data-page-node-id="ZpSIp96jpFnv6DHS51NdIH">
+  <div class="foot-inner" data-page-node-id="Cbe7LW49nIGtpb1EgeNW2F">
+    <div class="foot-brand" data-page-node-id="EeyFUFoEBCBZii9ROhu6Wo">
+      <div class="logo" data-page-node-id="bzg6w3eNwgALRiqrB50qmZ">💊</div>
+      <span class="fname" data-page-node-id="yx9VaX0Am9pnAfOVmZ00Jr">MedSafe</span>
+    </div>
+    <div class="foot-tag" data-page-node-id="L5Q5U5aE6QZ1A77nIa6lnj">智能用药安全审查平台 · 让每一次用药安全有据可循</div>
+    <div class="foot-stack" data-page-node-id="zt6KKVwFXgVRmEJwFN8UvK">
+      <span data-page-node-id="FowuJYzK5qvaMZcIXGGpUO">LangChain</span><span data-page-node-id="nbR3oWqrAOi785MSJmTAVQ">LangGraph</span><span data-page-node-id="9f6xsVcZxSvyD2Bkew8k4F">NetworkX</span><span data-page-node-id="ZUwCN4C3tZC9lrjKG8liuk">FastAPI</span><span data-page-node-id="ApcxL8IegXFqIjflUw2cDv">LLM ReAct</span>
+    </div>
+    <div class="foot-copy" data-page-node-id="X217ADnzGAKfduKhd76BfE">MedSafe v3.0 · 三层审查架构 · 药物知识图谱 + 安全规则引擎 + 大模型推理</div>
+  </div>
+</div>
+
+<script>
+const API = location.origin;
+const EX = [
+  "患者王某,男,65岁,高血压病史10年,2型糖尿病5年\n诊断:冠心病,高血压,2型糖尿病\n处方:\n1. 华法林 2.5mg qd\n2. 阿司匹林 100mg qd\n3. 氨氯地平 5mg qd\n4. 二甲双胍 500mg bid\n5. 布洛芬 400mg prn",
+  "患者李某,男,72岁,慢性失眠,骨关节炎\n诊断:失眠症,骨关节炎\n处方:\n1. 地西泮 5mg qn\n2. 布洛芬 400mg tid\n3. 阿托伐他汀 20mg qd\n4. 美托洛尔 47.5mg qd",
+  "患者张某,女,28岁,孕12周,高血压\n诊断:妊娠期高血压\n处方:\n1. 氯沙坦 50mg qd\n2. 辛伐他汀 20mg qd\n3. 对乙酰氨基酚 500mg prn",
+  "患者刘某,男,55岁,慢性乙肝,高脂血症\n诊断:慢性乙型肝炎,高脂血症\n处方:\n1. 辛伐他汀 40mg qn\n2. 对乙酰氨基酚 500mg tid\n3. 阿司匹林 100mg qd",
+  "患者陈某,女,70岁,慢性肾病4期,2型糖尿病\n诊断:慢性肾脏病,2型糖尿病\n处方:\n1. 二甲双胍 1000mg bid\n2. 格列本脲 5mg bid\n3. 赖诺普利 20mg qd",
+  "患者赵某,女,45岁,高血压\n诊断:高血压\n处方:\n1. 氨氯地平 5mg qd\n2. 对乙酰氨基酚 500mg prn"
+];
+const STEPS = [
+  {k:"parse",l:"解析处方",i:"📋"},{k:"detect",l:"检测交互",i:"🔍"},{k:"rules",l:"规则检查",i:"📐"},
+  {k:"assess",l:"风险评估",i:"⚠️"},{k:"recommend",l:"替代方案",i:"💊"},{k:"gen_report",l:"生成报告",i:"📝"}
+];
+const RC = {critical:{l:"极高风险",i:"🔴"},high:{l:"高风险",i:"🟠"},medium:{l:"中等风险",i:"🟡"},low:{l:"低风险",i:"🟢"},safe:{l:"安全",i:"✅"},unknown:{l:"未知",i:"❓"}};
+const COL = {critical:"#dc2626",high:"#d97706",medium:"#ca8a04",low:"#059669",safe:"#2563eb",unknown:"#9ca3af"};
+const SEV_ZH = {critical:"极高",high:"高",medium:"中等",low:"低",safe:"安全",unknown:"未知"};
+const TABS = [{k:"report",l:"📄 审查报告"},{k:"interactions",l:"🔍 药物交互"},{k:"rules",l:"📐 规则引擎"},{k:"alternatives",l:"💊 替代方案"},{k:"reasoning",l:"🧠 推理链"},{k:"graph",l:"🕸️ 处方图谱"}];
+
+let mode="auto", tid=null, rid=null, res=null, rt=0;
+
+const _reviewCache = new Map();
+const _CACHE_MAX_SIZE = 50;
+
+function _normalizeText(text) {
+  return text
+    .trim()
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/[ \t]+/g, ' ')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l)
+    .join('\n')
+    .toLowerCase();
+}
+
+function _getCacheKey(text, patientId) {
+  return _normalizeText(text) + '|' + (patientId || '');
+}
+
+function _getCachedResult(text, patientId) {
+  const key = _getCacheKey(text, patientId);
+  return _reviewCache.get(key) || null;
+}
+
+function _setCachedResult(text, patientId, result) {
+  const key = _getCacheKey(text, patientId);
+  if (_reviewCache.size >= _CACHE_MAX_SIZE) {
+    const firstKey = _reviewCache.keys().next().value;
+    _reviewCache.delete(firstKey);
+  }
+  _reviewCache.set(key, result);
+}
+
+async function init(){
+  loadPats(); loadPatList(); loadGStats(); loadEval(); loadMem(); checkHealth();
+  setTimeout(loadGraph, 500);
+}
+
+async function loadPats(){
+  try{const r=await fetch(`${API}/api/patients`);if(!r.ok)return;const d=await r.json();const ps=d.patients||d;const s=document.getElementById('patient-select');ps.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.name||p.id} · ${p.age||'?'}岁`;s.appendChild(o)})}catch(e){}
+}
+async function loadGStats(){
+  try{const r=await fetch(`${API}/api/drugs/stats`);if(!r.ok)return;const d=await r.json();set('statDrugs',d.num_drugs??d.drug_count??'—');set('statInteractions',d.num_interactions??d.interaction_count??'—');set('statRules',d.rule_count??d.num_rules??0)}catch(e){}
+  try{const r=await fetch(`${API}/api/patients`);if(r.ok){const d=await r.json();const p=d.patients||d;set('statPatients',Array.isArray(p)?p.length:0)}}catch(e){}
+}
+async function loadEval(){
+  const el=document.getElementById('evalRows');
+  try{const r=await fetch(`${API}/api/eval/stats`);if(!r.ok){el.innerHTML='<div class="erow"><span class="el" style="color:var(--faint)">暂无数据</span></div>';return}const d=await r.json();
+    const rows=[['总审查',d.total_runs??0],['高风险',d.high_risk_count??0],['反馈',d.feedback_count??0],['平均分',d.avg_score!=null?d.avg_score.toFixed(1)+'⭐':'—']];
+    el.innerHTML=rows.map(([k,v])=>`<div class="erow"><span class="el">${k}</span><span class="ev">${v}</span></div>`).join('')
+  }catch(e){el.innerHTML='<div class="erow"><span class="el">加载失败</span></div>'}
+}
+async function loadMem(){
+  try{const r=await fetch(`${API}/api/review/conversations`);if(!r.ok)return;const d=await r.json();const ls=Array.isArray(d)?d:(d.conversations||[]);
+    document.getElementById('memStats').innerHTML=`共 <b style="color:var(--primary-deep)">${ls.length}</b> 条记忆`;
+    const el=document.getElementById('memList');if(!ls.length){el.innerHTML='<div style="font-size:12px;color:var(--faint);text-align:center;padding:16px">暂无记忆</div>';return}
+    el.innerHTML=ls.slice(0,8).map(c=>{const rk=c.overall_risk||c.risk_level||'unknown';const cfg=RC[rk]||RC.unknown;return `<div class="mem"><div class="mh"><span class="ml">${cfg.i} ${cfg.l}</span><span class="md">${c.timestamp?new Date(c.timestamp).toLocaleDateString():''}</span></div><div class="mt">${esc(c.prescription_text||c.summary||'').slice(0,60)}</div></div>`}).join('')
+  }catch(e){}
+}
+async function checkHealth(){
+  const dot=document.getElementById('statusDot'),t=document.getElementById('statusText');
+  try{const r=await fetch(`${API}/api/health`);if(r.ok){const d=await r.json();dot.classList.remove('off');t.textContent=d.llm_configured===false?'就绪 · LLM未配置':'系统就绪'}else{dot.classList.add('off');t.textContent='连接异常'}}catch(e){dot.classList.add('off');t.textContent='未连接'}
+}
+
+async function loadPatList(){
+  try{const r=await fetch(`${API}/api/patients`);if(!r.ok)return;const d=await r.json();const ps=d.patients||d;const el=document.getElementById('pList');
+    if(!ps||!ps.length){el.innerHTML='<div class="pempty">暂无档案,点击「新增」</div>';return}
+    el.innerHTML=ps.map(p=>{const tags=[];if(p.conditions?.length)tags.push(...p.conditions);if(p.allergies?.length)tags.push('过敏:'+p.allergies.join('/'));if(p.pregnancy==='yes')tags.push('孕期');if(p.liver_function&&p.liver_function!=='normal')tags.push('肝异常');if(p.renal_function&&p.renal_function!=='normal')tags.push('肾异常');
+      return `<div class="prow"><div class="pa">👤</div><div style="flex:1"><div class="pn">${esc(p.name||p.id)}</div><div class="pm">${p.age||'?'}岁 · ${p.gender||'?'} · ${esc(p.id)}</div>${tags.length?`<div class="ptags">${tags.slice(0,3).map(t=>`<span class="ptag">${esc(t)}</span>`).join('')}</div>`:''}</div><button class="pbtn" onclick="editPat('${esc(p.id)}')">编辑</button></div>`
+    }).join('')
+  }catch(e){document.getElementById('pList').innerHTML='<div class="pempty">加载失败</div>'}
+}
+function showPatientForm(d){document.getElementById('pForm').style.display='';document.getElementById('pf-id').value=d?.id||'';document.getElementById('pf-id').disabled=!!d?.id;document.getElementById('pf-name').value=d?.name||'';document.getElementById('pf-age').value=d?.age||'';document.getElementById('pf-gender').value=d?.gender||'';document.getElementById('pf-liver').value=d?.liver_function||'normal';document.getElementById('pf-renal').value=d?.renal_function||'normal';document.getElementById('pf-preg').value=d?.pregnancy||'no';document.getElementById('pf-cond').value=(d?.conditions||[]).join(',');document.getElementById('pf-alle').value=(d?.allergies||[]).join(',')}
+function hidePatientForm(){document.getElementById('pForm').style.display='none'}
+async function editPat(id){try{const r=await fetch(`${API}/api/patients/${id}`);if(!r.ok)return;const d=await r.json();d.id=id;showPatientForm(d)}catch(e){alert('获取失败')}}
+async function savePatient(){const id=document.getElementById('pf-id').value.trim();if(!id){alert('请输入ID');return}const b={name:document.getElementById('pf-name').value.trim(),age:parseInt(document.getElementById('pf-age').value)||null,gender:document.getElementById('pf-gender').value,liver_function:document.getElementById('pf-liver').value,renal_function:document.getElementById('pf-renal').value,pregnancy:document.getElementById('pf-preg').value,conditions:document.getElementById('pf-cond').value.split(',').map(s=>s.trim()).filter(Boolean),allergies:document.getElementById('pf-alle').value.split(',').map(s=>s.trim()).filter(Boolean)};
+  try{const r=await fetch(`${API}/api/patients/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(r.ok){hidePatientForm();loadPatList();loadPats()}else{const d=await r.json();alert('失败: '+(d.error||r.status))}}catch(e){alert('失败: '+e.message)}}
+
+function switchMode(m){mode=m;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===m))}
+function loadExample(i){document.getElementById('prescription').value=EX[i];document.getElementById('prescription').focus()}
+function clearAll(){document.getElementById('prescription').value='';document.getElementById('patient-select').value='';document.getElementById('emptyState').style.display='';document.getElementById('resultArea').style.display='none';tid=null;rid=null;res=null;rt=0}
+
+async function submitReview(){
+  const t=document.getElementById('prescription').value.trim();if(!t){alert('请输入处方');return}
+  const pid=document.getElementById('patient-select').value||null;const btn=document.getElementById('submitBtn');
+
+  const cachedResult = _getCachedResult(t, pid);
+  if (cachedResult) {
+    console.log('⚡ 前端缓存命中,直接返回结果');
+    document.getElementById('emptyState').style.display='none';
+    document.getElementById('resultArea').style.display='';
+    resetAll();
+    STEPS.forEach(s => markPipe(s.k, 'done'));
+    res = cachedResult;
+    rid = cachedResult.run_id || null;
+    renderRes(cachedResult, true);
+    return;
+  }
+
+  btn.disabled=true;btn.textContent='⏳ 审查中...';document.getElementById('emptyState').style.display='none';document.getElementById('resultArea').style.display='';
+  try{if(mode==='auto')await doAuto(t,pid);else if(mode==='hitl')await doHitl(t,pid);else if(mode==='multi')await doMulti(t,pid)}catch(e){showErr(e.message)}finally{btn.disabled=false;btn.textContent='🔍 开始审查'}
+}
+async function doAuto(t,pid){
+  resetAll();renderPipe(null);
+  const r=await fetch(`${API}/api/review/stream`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prescription_text:t,patient_id:pid})});
+  if(!r.ok){let m=`HTTP ${r.status}`;try{const e=await r.json();m=e.error||m}catch{}throw new Error(m)}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+  while(true){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();for(const ln of ls){if(!ln.startsWith('data: '))continue;try{handleSSE(JSON.parse(ln.slice(6)),t,pid)}catch{}}}
+}
+function handleSSE(d,t,pid){
+  if(d.node){const i=STEPS.findIndex(s=>s.k===d.node);if(i>0)markPipe(STEPS[i-1].k,'done');markPipe(d.node,'active')}
+  if(d.status==='complete'&&d.result){
+    STEPS.forEach(s=>markPipe(s.k,'done'));
+    res=d.result;rid=d.result.run_id||null;
+    _setCachedResult(t, pid, d.result);
+    renderRes(d.result,d.cached);
+  }
+  if(d.error)showErr(d.error,true);
+}
+async function doHitl(t,pid){
+  resetAll();showSpin('审查中(药师审核模式)...');
+  const r=await fetch(`${API}/api/review/hitl`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prescription_text:t,patient_id:pid})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);tid=d.thread_id;hideSpin();
+  if(d.partial_result)renderPartial(d.partial_result);
+  if(d.needs_resume)document.getElementById('hitlArea').innerHTML=`<div class="hitl"><span class="hitl-t">⏸️ 审查已暂停 — 请确认风险评估后继续</span><button class="btn-amb" onclick="resumeHitl()">✅ 确认并继续</button></div>`;
+}
+async function resumeHitl(){
+  if(!tid)return;document.getElementById('hitlArea').innerHTML=`<div class="spin"><div class="spin-r"></div><p>推荐替代方案中...</p></div>`;
+  try{const r=await fetch(`${API}/api/review/hitl/resume`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({thread_id:tid})});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);document.getElementById('hitlArea').innerHTML='';res=d;renderRes(d)}catch(e){document.getElementById('hitlArea').innerHTML=`<div class="err"><div class="ei">⚠️</div><div class="em">恢复失败</div><div class="eh">${esc(e.message)}</div></div>`}
+}
+async function doMulti(t,pid){
+  resetAll();showSpin('启动多智能体审查...');
+  const r=await fetch(`${API}/api/review/multi`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prescription_text:t,patient_id:pid})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);tid=d.thread_id;res=d;rid=d.run_id||null;
+  _setCachedResult(t, pid, d);
+  hideSpin();renderRes(d,d.cached);
+}
+
+function resetAll(){['pipeArea','riskArea','tilesArea','hitlArea','tabBarArea','tabBodyArea','fbArea'].forEach(id=>document.getElementById(id).innerHTML='')}
+function showSpin(m){document.getElementById('tabBodyArea').innerHTML=`<div class="spin"><div class="spin-r"></div><p>${esc(m)}</p></div>`}
+function hideSpin(){const el=document.getElementById('tabBodyArea');if(el.querySelector('.spin'))el.innerHTML=''}
+function showErr(m,isP){document.getElementById('tabBodyArea').innerHTML=`<div class="err"><div class="ei">⚠️</div><div class="em">${esc(m)}</div><div class="eh">请确认后端已启动并检查处方</div></div>`;if(isP)document.getElementById('prescription').value=''}
+
+function renderPipe(ak){
+  let h='<div class="pipe">';STEPS.forEach((s,i)=>{let c='';if(ak!==null){const idx=STEPS.findIndex(x=>x.k===ak);const ci=STEPS.indexOf(s);if(ci<idx)c='done';else if(ci===idx)c='active'}h+=`<div class="pipe-n ${c}">${s.i} ${s.l}</div>`;if(i<STEPS.length-1)h+='<span class="pipe-a">→</span>'});h+='</div>';document.getElementById('pipeArea').innerHTML=h;
+}
+function markPipe(k,st){const ps=document.querySelectorAll('.pipe-n');const i=STEPS.findIndex(s=>s.k===k);if(i>=0&&ps[i]){ps[i].classList.remove('active','done');ps[i].classList.add(st)}}
+
+function renderRes(data,cached){
+  STEPS.forEach(s=>markPipe(s.k,'done'));
+  const drugs=data.prescription?.drugs||[];if(!drugs.length){showErr('未识别到有效药物信息',true);return}
+  const risk=data.risk_assessment?.overall_risk||'unknown';const cfg=RC[risk]||RC.unknown;
+  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'已完成三层安全检测')}</div></div></div>`;
+  const rc=data.risk_assessment?.risks?.length||0,ic=data.interactions?.length||0,rlc=(data.rule_risks?.length||0)+(data.contraindications?.length||0),ac=data.alternatives?.suggestions?.length||0;
+  document.getElementById('tilesArea').innerHTML=`<div class="tiles"><div class="tile"><div class="tv">${rc}</div><div class="tl">风险项</div></div><div class="tile"><div class="tv">${ic}</div><div class="tl">药物交互</div></div><div class="tile"><div class="tv">${rlc}</div><div class="tl">规则触发</div></div><div class="tile"><div class="tv">${ac}</div><div class="tl">替代方案</div></div></div>`;
+  renderTabs(data);renderFb();
+}
+function renderPartial(data){
+  const risk=data.risk_assessment?.overall_risk||'unknown';const cfg=RC[risk]||RC.unknown;
+  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'')}</div></div></div>`;
+  const rc=data.risk_assessment?.risks?.length||0,ic=data.interactions?.length||0,rlc=(data.rule_risks?.length||0)+(data.contraindications?.length||0);
+  document.getElementById('tilesArea').innerHTML=`<div class="tiles"><div class="tile"><div class="tv">${rc}</div><div class="tl">风险项</div></div><div class="tile"><div class="tv">${ic}</div><div class="tl">药物交互</div></div><div class="tile"><div class="tv">${rlc}</div><div class="tl">规则触发</div></div><div class="tile"><div class="tv" style="font-size:13px;color:var(--amber)">待确认</div><div class="tl">替代方案</div></div></div>`;
+  renderTabs(data);
+}
+function renderTabs(data){
+  const counts={report:data.report?1:0,interactions:(data.interactions||[]).length,rules:(data.rule_risks||[]).length+(data.contraindications||[]).length,alternatives:(data.alternatives?.suggestions||[]).length,reasoning:(data.reasoning_chain||data.reasoning||[]).length,graph:1};
+  document.getElementById('tabBarArea').innerHTML=`<div class="tabs">${TABS.map(t=>`<button class="${t.k==='report'?'active':''}" data-t="${t.k}" onclick="switchTab('${t.k}')">${t.l}${counts[t.k]?`<span class="tb-badge">${counts[t.k]}</span>`:''}</button>`).join('')}</div>`;
+  document.getElementById('tabBodyArea').innerHTML=TABS.map(t=>`<div class="tp ${t.k==='report'?'active':''}" data-p="${t.k}"></div>`).join('');
+  fillReport(data.report);fillInteractions(data.interactions);fillRules(data.rule_risks,data.contraindications);fillAlts(data.alternatives);fillReasoning(data.reasoning_chain||data.reasoning);fillGraphTab(data);
+}
+function switchTab(k){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.t===k));document.querySelectorAll('.tp').forEach(p=>p.classList.toggle('active',p.dataset.p===k));if(k==='graph')drawPrescGraph()}
+function getPane(k){return document.querySelector(`.tp[data-p="${k}"]`)}
+
+function fillReport(rp){const el=getPane('report');if(!el||!rp)return;el.innerHTML=`<div class="report">${esc(typeof rp==='string'?rp:JSON.stringify(rp,null,2))}</div>`}
+function fillInteractions(its){const el=getPane('interactions');if(!el||!its||!its.length)return;el.innerHTML=its.map(it=>`<div class="ic"><div class="ic-h"><span class="ic-t">${esc(it.drug_a||it.drug1)} + ${esc(it.drug_b||it.drug2)}</span><span class="pill ${it.severity||''}">${SEV_ZH[it.severity]||it.severity||'?'}</span></div><div class="ic-b">${esc(it.mechanism||it.description||'')}</div>${it.clinical_effect?`<div class="ic-b" style="margin-top:3px"><b>临床后果:</b> ${esc(it.clinical_effect)}</div>`:''}${it.suggestion?`<div class="ic-tip">💡 ${esc(it.suggestion)}</div>`:''}${it.evidence_level?`<div class="ic-meta">证据等级: ${esc(it.evidence_level)}</div>`:''}</div>`).join('')}
+function fillRules(rules,contras){const el=getPane('rules');if(!el)return;let h='';
+  if(contras?.length)h+=contras.map(c=>`<div class="ic danger"><div class="ic-h"><span class="ic-t">🚫 ${esc(c.drug)}</span><span class="pill critical">禁忌</span></div><div class="ic-b">${esc(c.condition||'')} → ${esc(c.contraindication||'')}</div></div>`).join('');
+  if(rules?.length)h+=rules.map(r=>`<div class="ic"><div class="ic-h"><span class="ic-t">${esc(r.drug)}</span><span class="pill ${r.severity||''}">${SEV_ZH[r.severity]||r.severity||'?'}</span></div><div class="ic-b">${esc(r.risk||r.description||'')}</div>${r.suggestion?`<div class="ic-tip">💡 ${esc(r.suggestion)}</div>`:''}<div class="ic-meta">来源: 规则引擎</div></div>`).join('');
+  el.innerHTML=h||'<div style="text-align:center;padding:28px;color:var(--faint);font-size:13px">✅ 无规则风险</div>'}
+function fillAlts(alts){const el=getPane('alternatives');if(!el||!alts||!alts.suggestions?.length)return;let h='';if(alts.summary)h+=`<div class="ic-b" style="margin-bottom:10px">${esc(alts.summary)}</div>`;h+=alts.suggestions.map(s=>`<div class="alt-c"><div class="ac-o">🔄 替换: ${esc(s.original)}</div><div class="ac-r">${esc(s.reason||'')}</div>${s.alternatives?.length?`<div class="ac-tags">${s.alternatives.map(a=>`<span class="alt-tag">${esc(a.name)} <span class="at-c">(${esc(a.category||'')})</span></span>`).join('')}</div>`:''}</div>`).join('');el.innerHTML=h}
+function fillReasoning(ch){const el=getPane('reasoning');if(!el||!ch?.length)return;el.innerHTML=ch.map((s,i)=>`<div class="chain"><div class="cn">${i+1}</div><div class="cb"><div class="cl">${esc(s.step||s.label||`步骤 ${i+1}`)}</div><div class="cd">${esc(s.detail||s.description||s.result||JSON.stringify(s))}</div></div></div>`).join('')}
+function fillGraphTab(data){const el=getPane('graph');if(!el)return;el.innerHTML=`<div class="gbox"><div class="gbtns"><button onclick="zoomP(1.2)">+</button><button onclick="zoomP(0.8)">−</button><button onclick="resetP()">⟲</button></div><div class="gleg"><div class="gleg-r"><span class="gleg-d" style="background:#dc2626"></span>极高</div><div class="gleg-r"><span class="gleg-d" style="background:#d97706"></span>高</div><div class="gleg-r"><span class="gleg-d" style="background:#059669"></span>低/安全</div></div><canvas id="pCanvas"></canvas></div>`;window._pd=data}
+
+let pSc=1;function zoomP(f){pSc*=f;drawPrescGraph()}function resetP(){pSc=1;drawPrescGraph()}
+function drawPrescGraph(){
+  const c=document.getElementById('pCanvas');if(!c)return;const p=c.parentElement;c.width=p.clientWidth;c.height=p.clientHeight;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);const data=window._pd;if(!data)return;
+  const ns=new Map(),es=[];(data.interactions||[]).forEach(it=>{if(!ns.has(it.drug_a))ns.set(it.drug_a,{id:it.drug_a,r:it.severity||'safe'});if(!ns.has(it.drug_b))ns.set(it.drug_b,{id:it.drug_b,r:it.severity||'safe'});es.push({f:it.drug_a,t:it.drug_b,s:it.severity})});
+  (data.risk_assessment?.risks||[]).forEach(r=>{if(!ns.has(r.drug))ns.set(r.drug,{id:r.drug,r:r.severity||'medium'});else ns.get(r.drug).r=r.severity||ns.get(r.drug).r});
+  if(!ns.size){ctx.fillStyle='#9ca3af';ctx.font='13px sans-serif';ctx.textAlign='center';ctx.fillText('暂无图谱数据',c.width/2,c.height/2);return}
+  const cx=c.width/2,cy=c.height/2,rad=Math.min(cx,cy)*0.6*pSc;const arr=Array.from(ns.values());
+  arr.forEach((n,i)=>{const a=(2*Math.PI*i)/arr.length-Math.PI/2;n.x=cx+rad*Math.cos(a);n.y=cy+rad*Math.sin(a)});
+  const nm=new Map(arr.map(n=>[n.id,n]));const cm={critical:'#dc2626',high:'#d97706',medium:'#ca8a04',low:'#059669',safe:'#2563eb',unknown:'#9ca3af'};
+  es.forEach(e=>{const a=nm.get(e.f),b=nm.get(e.t);if(!a||!b)return;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=(e.s==='critical'||e.s==='high')?'rgba(220,38,38,0.2)':'rgba(37,99,235,0.1)';ctx.lineWidth=e.s==='critical'?2:1;ctx.stroke()});
+  arr.forEach(n=>{const cl=cm[n.r]||cm.safe;const big=n.r==='critical'||n.r==='high';const sz=big?8:5;
+    if(big){ctx.beginPath();ctx.arc(n.x,n.y,sz+4,0,2*Math.PI);ctx.fillStyle=n.r==='critical'?'rgba(220,38,38,0.12)':'rgba(217,119,6,0.1)';ctx.fill()}
+    ctx.beginPath();ctx.arc(n.x,n.y,sz,0,2*Math.PI);ctx.fillStyle=cl;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#1e293b';ctx.font=big?'bold 11px sans-serif':'10px sans-serif';ctx.textAlign='center';ctx.fillText(n.id,n.x,n.y+sz+13)})}
+function renderFb(){document.getElementById('fbArea').innerHTML=`<div class="fb"><div style="font-size:13px;font-weight:700;margin-bottom:4px;color:var(--ink)">📝 审查反馈</div><p style="font-size:12px;color:var(--muted)">请为本次审查评分</p><div class="stars" id="stars">${[1,2,3,4,5].map(i=>`<button class="star" data-v="${i}" onclick="setRt(${i})">★</button>`).join('')}</div><textarea class="textarea" id="fbCom" placeholder="可选: 反馈意见..." style="min-height:60px"></textarea><div style="margin-top:8px"><button class="btn btn-line" onclick="submitFb()" style="padding:10px 16px;font-size:12px">📤 提交反馈</button></div></div>`}
+function setRt(v){rt=v;document.querySelectorAll('#stars .star').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)<=v))}
+async function submitFb(){if(!rt){alert('请先评分');return}const c=document.getElementById('fbCom').value.trim();try{const r=await fetch(`${API}/api/eval/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_desc:rid||'manual',rating:rt,comment:c})});if(r.ok)document.getElementById('fbArea').innerHTML='<div style="text-align:center;padding:14px;color:var(--green);font-weight:600;font-size:13px">✅ 感谢反馈!</div>';else{const d=await r.json();alert('失败: '+(d.error||r.status))}}catch(e){alert('失败: '+e.message)}}
+
+let _ns=[],_es=[],_sc=1,_ox=0,_oy=0,_lf=false,_dg=false,_ds={x:0,y:0};
+let _focusedNode=null;
+async function loadGraph(){
+  const info=document.getElementById('gInfo');
+  try{const[dr,ir]=await Promise.all([fetch(`${API}/api/drugs`),fetch(`${API}/api/drugs/all-interactions`)]);if(!dr.ok){info.textContent=`药物接口错误: HTTP${dr.status}`;return}
+    const dd=await dr.json();const ls=dd.drugs||dd||[];let its=[];if(ir.ok){const id=await ir.json();its=id.interactions||[]}else{info.textContent=`交互接口错误: HTTP${ir.status}`}
+    const rk={critical:4,high:3,medium:2,low:1,unknown:0};const mx={};
+    its.forEach(i=>{const s=rk[i.severity]||0;if(!mx[i.drug_a]||s>mx[i.drug_a])mx[i.drug_a]=s;if(!mx[i.drug_b]||s>mx[i.drug_b])mx[i.drug_b]=s});
+    function rf(m){if(m>=4)return'critical';if(m>=3)return'high';if(m>=2)return'medium';return'safe'}
+    _ns=ls.map(d=>{const n=d.name||d.drug_name||d;return{id:n,name:n,cat:d.category||'',risk:rf(mx[n]||0)}});_es=its.map(i=>({f:i.drug_a,t:i.drug_b,s:i.severity||'medium'}));_lf=false;drawGraph();
+    const rc={};_ns.forEach(n=>rc[n.risk]=(rc[n.risk]||0)+1);info.textContent=`${_ns.length}药物 · ${_es.length}交互 · 极高=${rc.critical||0} 高=${rc.high||0} 中等=${rc.medium||0} 安全=${rc.safe||0}`
+  }catch(e){info.textContent=`加载失败: ${e.message}`}
+}
+function drawGraph(){
+  const c=document.getElementById('graphCanvas');if(!c)return;const p=c.parentElement;c.width=p.clientWidth;c.height=p.clientHeight;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  if(!_ns.length){ctx.fillStyle='#9ca3af';ctx.font='13px sans-serif';ctx.textAlign='center';ctx.fillText('加载中...',c.width/2,c.height/2);return}
+  if(!_lf){forceLayout();_lf=true}
+  const ox=c.width/2+_ox,oy=c.height/2+_oy;const nm=new Map(_ns.map(n=>[n.id,n]));const cm={critical:'#dc2626',high:'#d97706',medium:'#ca8a04',low:'#059669',safe:'#2563eb'};
+  _es.forEach(e=>{const a=nm.get(e.f),b=nm.get(e.t);if(!a||!b)return;ctx.beginPath();ctx.moveTo(ox+a.x*_sc,oy+a.y*_sc);ctx.lineTo(ox+b.x*_sc,oy+b.y*_sc);if(e.s==='critical'){ctx.strokeStyle='rgba(220,38,38,0.3)';ctx.lineWidth=2}else if(e.s==='high'){ctx.strokeStyle='rgba(217,119,6,0.2)';ctx.lineWidth=1.5}else{ctx.strokeStyle='rgba(37,99,235,0.1)';ctx.lineWidth=1}ctx.stroke()});
+  _ns.forEach(n=>{const px=ox+n.x*_sc,py=oy+n.y*_sc;const cl=cm[n.risk]||cm.safe;const big=n.risk==='critical'||n.risk==='high';const sz=big?7:4;
+    if(big){ctx.beginPath();ctx.arc(px,py,sz+4,0,2*Math.PI);ctx.fillStyle=n.risk==='critical'?'rgba(220,38,38,0.12)':'rgba(217,119,6,0.1)';ctx.fill()}
+    ctx.beginPath();ctx.arc(px,py,sz,0,2*Math.PI);ctx.fillStyle=cl;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    if(big||_sc>0.8){ctx.fillStyle=big?'#1e293b':'#6b7280';ctx.font=big?'bold 10px sans-serif':'9px sans-serif';ctx.textAlign='center';ctx.fillText(n.name,px,py+sz+11)}
+  })
+}
+function _hashStr(str){
+  let hash=0;
+  for(let i=0;i<str.length;i++){
+    const char=str.charCodeAt(i);
+    hash=((hash<<5)-hash)+char;
+    hash|=0;
+  }
+  return hash;
+}
+function forceLayout(){
+  const W=800,H=600;
+  const nm=new Map(_ns.map(n=>[n.id,n]));
+  _ns.forEach(n=>{
+    const h=_hashStr(n.id);
+    n.x=((h%1000)/1000-0.5)*W;
+    n.y=(((h>>10)%1000)/1000-0.5)*H;
+    n.vx=0;
+    n.vy=0;
+  });
+  for(let it=0;it<120;it++){
+    for(let i=0;i<_ns.length;i++){
+      for(let j=i+1;j<_ns.length;j++){
+        const a=_ns[i],b=_ns[j];
+        let dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+        let f=800/(d*d),fx=(dx/d)*f,fy=(dy/d)*f;
+        a.vx+=fx;a.vy+=fy;
+        b.vx-=fx;b.vy-=fy;
+      }
+    }
+    _es.forEach(e=>{
+      const a=nm.get(e.f),b=nm.get(e.t);
+      if(!a||!b)return;
+      let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+      let f=d*0.008;
+      if(e.s==='critical')f*=2.5;
+      else if(e.s==='high')f*=1.8;
+      let fx=(dx/d)*f,fy=(dy/d)*f;
+      a.vx+=fx;a.vy+=fy;
+      b.vx-=fx;b.vy-=fy;
+    });
+    _ns.forEach(n=>{n.vx-=n.x*0.02;n.vy-=n.y*0.02});
+    _ns.forEach(n=>{n.vx*=0.85;n.vy*=0.85;n.x+=n.vx;n.y+=n.vy});
+  }
+}
+function zoomG(f){
+  const oldSc=_sc;
+  _sc*=f;
+  if(_focusedNode){
+    const c=document.getElementById('graphCanvas');
+    if(c){
+      const nodeScreenX=c.width/2+_ox+_focusedNode.x*oldSc;
+      const nodeScreenY=c.height/2+_oy+_focusedNode.y*oldSc;
+      _ox=nodeScreenX-c.width/2-_focusedNode.x*_sc;
+      _oy=nodeScreenY-c.height/2-_focusedNode.y*_sc;
+    }
+  }
+  drawGraph();
+}
+function zoomGAtPoint(f, screenX, screenY){
+  const c=document.getElementById('graphCanvas');
+  if(!c)return;
+  const oldSc=_sc;
+  _sc*=f;
+  if(_focusedNode){
+    const nodeScreenX=c.width/2+_ox+_focusedNode.x*oldSc;
+    const nodeScreenY=c.height/2+_oy+_focusedNode.y*oldSc;
+    _ox=nodeScreenX-c.width/2-_focusedNode.x*_sc;
+    _oy=nodeScreenY-c.height/2-_focusedNode.y*_sc;
+  } else {
+    const graphX=(screenX-c.width/2-_ox)/oldSc;
+    const graphY=(screenY-c.height/2-_oy)/oldSc;
+    _ox=screenX-c.width/2-graphX*_sc;
+    _oy=screenY-c.height/2-graphY*_sc;
+  }
+  drawGraph();
+}
+function resetG(){
+  _sc=1;_ox=0;_oy=0;_focusedNode=null;drawGraph();
+}
+function searchGraph(){
+  const kw=document.getElementById('gSearch').value.trim();
+  if(!kw)return;
+  const kwLower=kw.toLowerCase();
+  const f=_ns.find(n=>n.name.toLowerCase().includes(kwLower)||n.id.toLowerCase().includes(kwLower));
+  if(f){
+    _ox=-f.x*_sc;
+    _oy=-f.y*_sc;
+    _focusedNode=f;
+    drawGraph();
+    document.getElementById('gInfo').textContent=`已定位: ${f.name} (${f.cat}) · 滚轮缩放以该节点为中心`;
+  }else{
+    document.getElementById('gInfo').textContent=`未找到: ${kw}`;
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const c=document.getElementById('graphCanvas');
+  if(!c)return;
+  c.addEventListener('mousedown',e=>{
+    _dg=true;
+    _ds={x:e.clientX-_ox,y:e.clientY-_oy};
+    _focusedNode=null;
+    document.getElementById('gInfo').textContent='拖拽中...';
+  });
+  c.addEventListener('mousemove',e=>{
+    if(!_dg)return;
+    _ox=e.clientX-_ds.x;
+    _oy=e.clientY-_ds.y;
+    drawGraph();
+  });
+  c.addEventListener('mouseup',()=>{
+    _dg=false;
+    if(!_focusedNode){
+      document.getElementById('gInfo').textContent=`${_ns.length}药物 · ${_es.length}交互`;
+    }
+  });
+  c.addEventListener('mouseleave',()=>_dg=false);
+  c.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=c.getBoundingClientRect();
+    const mouseX=e.clientX-rect.left;
+    const mouseY=e.clientY-rect.top;
+    zoomGAtPoint(e.deltaY>0?0.9:1.1,mouseX,mouseY);
+  });
+});
+
+// Nav scroll shadow + reveal animation
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 10);
+});
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 60);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+function set(id,v){document.getElementById(id).textContent=v}
+function esc(t){if(t==null)return'';const d=document.createElement('div');d.textContent=String(t);return d.innerHTML}
+init();
+</script>
+</body>
+</html>

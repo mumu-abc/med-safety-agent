@@ -1,0 +1,1444 @@
+[
+  {
+    "id": "HI001",
+    "category": "高风险交互",
+    "desc": "地西泮+羟考酮(critical级交互),72岁女",
+    "drugs": [
+      "地西泮",
+      "羟考酮"
+    ],
+    "patient": {
+      "age": 72,
+      "gender": "女",
+      "conditions": [
+        "冠心病",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,72岁,冠心病、高血压\n处方:\n1. 地西泮 5mg qn\n2. 羟考酮 5mg prn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双重中枢抑制,呼吸抑制风险极高"
+  },
+  {
+    "id": "HI002",
+    "category": "高风险交互",
+    "desc": "文拉法辛+曲马多(critical级交互),60岁男",
+    "drugs": [
+      "文拉法辛",
+      "曲马多"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,60岁,体检\n处方:\n1. 文拉法辛 10mg bid\n2. 曲马多 50mg prn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 5-HT综合征风险"
+  },
+  {
+    "id": "HI003",
+    "category": "高风险交互",
+    "desc": "西地那非+硝酸甘油(critical级交互),55岁男",
+    "drugs": [
+      "西地那非",
+      "硝酸甘油",
+      "氟康唑"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "男",
+      "conditions": [
+        "糖尿病",
+        "房颤"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,55岁,糖尿病、房颤\n处方:\n1. 西地那非 50mg prn\n2. 硝酸甘油 0.5mg prn\n3. 氟康唑 200mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 严重低血压,可能致命,绝对禁止合用"
+  },
+  {
+    "id": "HI004",
+    "category": "高风险交互",
+    "desc": "肝素+利伐沙班(critical级交互),75岁女",
+    "drugs": [
+      "肝素",
+      "利伐沙班",
+      "噻托溴铵"
+    ],
+    "patient": {
+      "age": 75,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,75岁,体检\n处方:\n1. 肝素 10mg bid\n2. 利伐沙班 10mg bid\n3. 噻托溴铵 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双重抗凝,出血风险极高"
+  },
+  {
+    "id": "HI005",
+    "category": "高风险交互",
+    "desc": "瑞舒伐他汀+环孢素(critical级交互),45岁男",
+    "drugs": [
+      "瑞舒伐他汀",
+      "环孢素"
+    ],
+    "patient": {
+      "age": 45,
+      "gender": "男",
+      "conditions": [
+        "房颤",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,45岁,房颤、高血压\n处方:\n1. 瑞舒伐他汀 10mg bid\n2. 环孢素 100mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 他汀血药浓度显著升高,横纹肌溶解风险极高"
+  },
+  {
+    "id": "HI006",
+    "category": "高风险交互",
+    "desc": "氟西汀+利奈唑胺(critical级交互),70岁男",
+    "drugs": [
+      "氟西汀",
+      "利奈唑胺"
+    ],
+    "patient": {
+      "age": 70,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,70岁,体检\n处方:\n1. 氟西汀 20mg qd\n2. 利奈唑胺 600mg q12h",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): MAO抑制,5-HT综合征风险"
+  },
+  {
+    "id": "HI007",
+    "category": "高风险交互",
+    "desc": "吉非罗齐+辛伐他汀(critical级交互),70岁男",
+    "drugs": [
+      "吉非罗齐",
+      "辛伐他汀"
+    ],
+    "patient": {
+      "age": 70,
+      "gender": "男",
+      "conditions": [
+        "高脂血症"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,70岁,高脂血症\n处方:\n1. 吉非罗齐 10mg bid\n2. 辛伐他汀 20mg qn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): CYP2C8抑制,横纹肌溶解风险极高"
+  },
+  {
+    "id": "HI008",
+    "category": "高风险交互",
+    "desc": "乙醇+曲马多(critical级交互),65岁男",
+    "drugs": [
+      "乙醇",
+      "曲马多"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "男",
+      "conditions": [
+        "冠心病",
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,65岁,冠心病、糖尿病\n处方:\n1. 乙醇 10mg bid\n2. 曲马多 50mg prn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 协同中枢抑制,呼吸抑制风险"
+  },
+  {
+    "id": "HI009",
+    "category": "高风险交互",
+    "desc": "伊曲康唑+他克莫司(critical级交互),72岁女",
+    "drugs": [
+      "伊曲康唑",
+      "他克莫司"
+    ],
+    "patient": {
+      "age": 72,
+      "gender": "女",
+      "conditions": [
+        "高脂血症"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,72岁,高脂血症\n处方:\n1. 伊曲康唑 10mg bid\n2. 他克莫司 1mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): CYP3A4强抑制,他克莫司血药浓度显著升高"
+  },
+  {
+    "id": "HI010",
+    "category": "高风险交互",
+    "desc": "氟西汀+文拉法辛(critical级交互),55岁男",
+    "drugs": [
+      "氟西汀",
+      "文拉法辛"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,55岁,体检\n处方:\n1. 氟西汀 20mg qd\n2. 文拉法辛 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 5-HT综合征风险"
+  },
+  {
+    "id": "HI011",
+    "category": "高风险交互",
+    "desc": "华法林+阿哌沙班(critical级交互),70岁男",
+    "drugs": [
+      "华法林",
+      "阿哌沙班",
+      "丙泊酚"
+    ],
+    "patient": {
+      "age": 70,
+      "gender": "男",
+      "conditions": [
+        "冠心病",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,70岁,冠心病、高血压\n处方:\n1. 华法林 2.5mg qd\n2. 阿哌沙班 10mg bid\n3. 丙泊酚 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双重抗凝,出血风险极高"
+  },
+  {
+    "id": "HI012",
+    "category": "高风险交互",
+    "desc": "甲硝唑+乙醇(critical级交互),45岁男",
+    "drugs": [
+      "甲硝唑",
+      "乙醇"
+    ],
+    "patient": {
+      "age": 45,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,45岁,体检\n处方:\n1. 甲硝唑 10mg bid\n2. 乙醇 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双硫仑样反应(面部潮红/心悸/恶心)"
+  },
+  {
+    "id": "HI013",
+    "category": "高风险交互",
+    "desc": "环孢素+他克莫司(critical级交互),75岁女",
+    "drugs": [
+      "环孢素",
+      "他克莫司"
+    ],
+    "patient": {
+      "age": 75,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,75岁,体检\n处方:\n1. 环孢素 100mg bid\n2. 他克莫司 1mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双重肾毒性叠加"
+  },
+  {
+    "id": "HI014",
+    "category": "高风险交互",
+    "desc": "沙库巴曲缬沙坦+赖诺普利(critical级交互),60岁女",
+    "drugs": [
+      "沙库巴曲缬沙坦",
+      "赖诺普利"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,60岁,体检\n处方:\n1. 沙库巴曲缬沙坦 10mg bid\n2. 赖诺普利 10mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 禁止合用(必须间隔36小时),血管性水肿风险"
+  },
+  {
+    "id": "HI015",
+    "category": "高风险交互",
+    "desc": "氯硝西泮+吗啡(critical级交互),72岁女",
+    "drugs": [
+      "氯硝西泮",
+      "吗啡"
+    ],
+    "patient": {
+      "age": 72,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,72岁,体检\n处方:\n1. 氯硝西泮 10mg bid\n2. 吗啡 10mg q12h",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 双重中枢抑制,呼吸抑制风险极高"
+  },
+  {
+    "id": "HI016",
+    "category": "高风险交互",
+    "desc": "氯化钾+螺内酯(critical级交互),75岁女",
+    "drugs": [
+      "氯化钾",
+      "螺内酯",
+      "昂丹司琼(化疗)"
+    ],
+    "patient": {
+      "age": 75,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,75岁,体检\n处方:\n1. 氯化钾 10mg bid\n2. 螺内酯 20mg qd\n3. 昂丹司琼(化疗) 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): 高钾血症风险"
+  },
+  {
+    "id": "HI017",
+    "category": "高风险交互",
+    "desc": "华法林+萘普生(critical级交互),65岁女",
+    "drugs": [
+      "华法林",
+      "萘普生"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "女",
+      "conditions": [
+        "房颤"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,65岁,房颤\n处方:\n1. 华法林 2.5mg qd\n2. 萘普生 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(critical): NSAIDs增强华法林抗凝效果,出血风险"
+  },
+  {
+    "id": "PG001",
+    "category": "孕妇禁忌",
+    "desc": "氯沙坦,孕妇,35岁",
+    "drugs": [
+      "氯沙坦"
+    ],
+    "patient": {
+      "age": 35,
+      "gender": "女",
+      "conditions": [
+        "感染"
+      ],
+      "pregnancy": "yes",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,35岁,孕12周,感染\n处方:\n1. 氯沙坦 50mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "pregnancy_contraindication"
+  },
+  {
+    "id": "PG002",
+    "category": "孕妇禁忌",
+    "desc": "甲氨蝶呤,孕妇,32岁",
+    "drugs": [
+      "甲氨蝶呤"
+    ],
+    "patient": {
+      "age": 32,
+      "gender": "女",
+      "conditions": [
+        "癫痫"
+      ],
+      "pregnancy": "yes",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,32岁,孕16周,癫痫\n处方:\n1. 甲氨蝶呤 10mg qw",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "pregnancy_contraindication"
+  },
+  {
+    "id": "PG003",
+    "category": "孕妇禁忌",
+    "desc": "赖诺普利,孕妇,32岁",
+    "drugs": [
+      "赖诺普利"
+    ],
+    "patient": {
+      "age": 32,
+      "gender": "女",
+      "conditions": [
+        "癫痫"
+      ],
+      "pregnancy": "yes",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,32岁,孕35周,癫痫\n处方:\n1. 赖诺普利 10mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "pregnancy_contraindication"
+  },
+  {
+    "id": "PG004",
+    "category": "孕妇禁忌",
+    "desc": "维A酸,孕妇,25岁",
+    "drugs": [
+      "维A酸"
+    ],
+    "patient": {
+      "age": 25,
+      "gender": "女",
+      "conditions": [
+        "感染"
+      ],
+      "pregnancy": "yes",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,25岁,孕33周,感染\n处方:\n1. 维A酸 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "pregnancy_contraindication"
+  },
+  {
+    "id": "PG005",
+    "category": "孕妇禁忌",
+    "desc": "异维A酸,孕妇,35岁",
+    "drugs": [
+      "异维A酸"
+    ],
+    "patient": {
+      "age": 35,
+      "gender": "女",
+      "conditions": [
+        "高血压"
+      ],
+      "pregnancy": "yes",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,35岁,孕9周,高血压\n处方:\n1. 异维A酸 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "pregnancy_contraindication"
+  },
+  {
+    "id": "CH001",
+    "category": "儿童禁忌",
+    "desc": "环丙沙星,6岁儿童(喹诺酮影响软骨发育)",
+    "drugs": [
+      "环丙沙星"
+    ],
+    "patient": {
+      "age": 6,
+      "gender": "男",
+      "conditions": [
+        "感染"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,6岁,感染\n处方:\n1. 环丙沙星 500mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_contraindication: 喹诺酮影响软骨发育"
+  },
+  {
+    "id": "CH002",
+    "category": "儿童禁忌",
+    "desc": "阿司匹林,8岁儿童(Reye综合征)",
+    "drugs": [
+      "阿司匹林"
+    ],
+    "patient": {
+      "age": 8,
+      "gender": "男",
+      "conditions": [
+        "感染"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,8岁,感染\n处方:\n1. 阿司匹林 100mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_contraindication: Reye综合征"
+  },
+  {
+    "id": "CH003",
+    "category": "儿童禁忌",
+    "desc": "多西环素,12岁儿童(牙齿着色)",
+    "drugs": [
+      "多西环素"
+    ],
+    "patient": {
+      "age": 12,
+      "gender": "女",
+      "conditions": [
+        "感染"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,12岁,感染\n处方:\n1. 多西环素 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_contraindication: 牙齿着色"
+  },
+  {
+    "id": "EL001",
+    "category": "老年人高危",
+    "desc": "地西泮,82岁(跌倒风险)",
+    "drugs": [
+      "地西泮"
+    ],
+    "patient": {
+      "age": 82,
+      "gender": "男",
+      "conditions": [
+        "高血压",
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,82岁,高血压、糖尿病\n处方:\n1. 地西泮 5mg qn",
+    "expected_risk": "high",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_related: 跌倒风险"
+  },
+  {
+    "id": "EL002",
+    "category": "老年人高危",
+    "desc": "阿普唑仑,82岁(认知障碍)",
+    "drugs": [
+      "阿普唑仑"
+    ],
+    "patient": {
+      "age": 82,
+      "gender": "男",
+      "conditions": [
+        "冠心病",
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,82岁,冠心病、糖尿病\n处方:\n1. 阿普唑仑 0.4mg qn",
+    "expected_risk": "high",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_related: 认知障碍"
+  },
+  {
+    "id": "EL003",
+    "category": "老年人高危",
+    "desc": "布洛芬,78岁(消化道出血)",
+    "drugs": [
+      "布洛芬"
+    ],
+    "patient": {
+      "age": 78,
+      "gender": "女",
+      "conditions": [
+        "高血压",
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,78岁,高血压、糖尿病\n处方:\n1. 布洛芬 400mg prn",
+    "expected_risk": "high",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_related: 消化道出血"
+  },
+  {
+    "id": "EL004",
+    "category": "老年人高危",
+    "desc": "地高辛,78岁(中毒风险)",
+    "drugs": [
+      "地高辛"
+    ],
+    "patient": {
+      "age": 78,
+      "gender": "男",
+      "conditions": [
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,78岁,糖尿病\n处方:\n1. 地高辛 0.125mg qd",
+    "expected_risk": "high",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "age_related: 中毒风险"
+  },
+  {
+    "id": "RN001",
+    "category": "肾功能不全",
+    "desc": "二甲双胍,肾功能不全,65岁",
+    "drugs": [
+      "二甲双胍"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "男",
+      "conditions": [
+        "慢性肾病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "impaired"
+    },
+    "prescription_text": "患者男,65岁,慢性肾病\n处方:\n1. 二甲双胍 500mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "renal_impairment"
+  },
+  {
+    "id": "RN002",
+    "category": "肾功能不全",
+    "desc": "碳酸锂,肾功能不全,65岁",
+    "drugs": [
+      "碳酸锂"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "女",
+      "conditions": [
+        "慢性肾病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "impaired"
+    },
+    "prescription_text": "患者女,65岁,慢性肾病\n处方:\n1. 碳酸锂 300mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "renal_impairment"
+  },
+  {
+    "id": "MD001",
+    "category": "中风险",
+    "desc": "地高辛+氢氯噻嗪(medium),40岁男",
+    "drugs": [
+      "地高辛",
+      "氢氯噻嗪"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "男",
+      "conditions": [
+        "高脂血症",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,40岁,高脂血症、高血压\n处方:\n1. 地高辛 0.125mg qd\n2. 氢氯噻嗪 10mg bid",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): 低钾血症增加地高辛毒性"
+  },
+  {
+    "id": "MD002",
+    "category": "中风险",
+    "desc": "美托洛尔+氟西汀(medium),50岁男",
+    "drugs": [
+      "美托洛尔",
+      "氟西汀"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,50岁,体检\n处方:\n1. 美托洛尔 47.5mg qd\n2. 氟西汀 20mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): CYP2D6抑制,美托洛尔血药浓度升高"
+  },
+  {
+    "id": "MD003",
+    "category": "中风险",
+    "desc": "氟哌啶醇+卡马西平(medium),50岁女",
+    "drugs": [
+      "氟哌啶醇",
+      "卡马西平"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,50岁,体检\n处方:\n1. 氟哌啶醇 10mg bid\n2. 卡马西平 200mg bid",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): CYP3A4诱导,氟哌啶醇血药浓度降低"
+  },
+  {
+    "id": "MD004",
+    "category": "中风险",
+    "desc": "吗替麦考酚酯+抗酸药(medium),55岁女",
+    "drugs": [
+      "吗替麦考酚酯",
+      "抗酸药"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "女",
+      "conditions": [
+        "高血压",
+        "高脂血症"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,55岁,高血压、高脂血症\n处方:\n1. 吗替麦考酚酯 10mg bid\n2. 抗酸药 10mg bid",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): 降低吗替麦考酚酯吸收"
+  },
+  {
+    "id": "MD005",
+    "category": "中风险",
+    "desc": "华法林+奥美拉唑(medium),60岁女",
+    "drugs": [
+      "华法林",
+      "奥美拉唑"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "女",
+      "conditions": [
+        "高血压",
+        "胃炎"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,60岁,高血压、胃炎\n处方:\n1. 华法林 2.5mg qd\n2. 奥美拉唑 20mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): PPI可能影响华法林代谢(CYP2C19),需监测INR"
+  },
+  {
+    "id": "MD006",
+    "category": "中风险",
+    "desc": "氟哌啶醇+氟西汀(medium),50岁男",
+    "drugs": [
+      "氟哌啶醇",
+      "氟西汀"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,50岁,体检\n处方:\n1. 氟哌啶醇 10mg bid\n2. 氟西汀 20mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): CYP2D6抑制,氟哌啶醇血药浓度升高"
+  },
+  {
+    "id": "MD007",
+    "category": "中风险",
+    "desc": "奥氮平+卡马西平(medium),60岁男",
+    "drugs": [
+      "奥氮平",
+      "卡马西平"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "男",
+      "conditions": [
+        "高脂血症"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,60岁,高脂血症\n处方:\n1. 奥氮平 10mg bid\n2. 卡马西平 200mg bid",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): CYP1A2诱导,奥氮平血药浓度降低"
+  },
+  {
+    "id": "MD008",
+    "category": "中风险",
+    "desc": "格列本脲+美托洛尔(medium),60岁男",
+    "drugs": [
+      "格列本脲",
+      "美托洛尔"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "男",
+      "conditions": [
+        "高脂血症",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,60岁,高脂血症、高血压\n处方:\n1. 格列本脲 5mg qd\n2. 美托洛尔 47.5mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): β阻滞剂掩盖低血糖症状"
+  },
+  {
+    "id": "MD009",
+    "category": "中风险",
+    "desc": "喹硫平+氟西汀(medium),50岁女",
+    "drugs": [
+      "喹硫平",
+      "氟西汀"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "女",
+      "conditions": [
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,50岁,高血压\n处方:\n1. 喹硫平 10mg bid\n2. 氟西汀 20mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): CYP3A4抑制,喹硫平血药浓度可能升高"
+  },
+  {
+    "id": "MD010",
+    "category": "中风险",
+    "desc": "睾酮+华法林(medium),40岁女",
+    "drugs": [
+      "睾酮",
+      "华法林"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "女",
+      "conditions": [
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,40岁,高血压\n处方:\n1. 睾酮 10mg bid\n2. 华法林 2.5mg qd",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): 增强抗凝效果"
+  },
+  {
+    "id": "MD011",
+    "category": "中风险",
+    "desc": "阿仑膦酸钠+碳酸钙(medium),40岁女",
+    "drugs": [
+      "阿仑膦酸钠",
+      "碳酸钙"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,40岁,体检\n处方:\n1. 阿仑膦酸钠 10mg bid\n2. 碳酸钙 10mg bid",
+    "expected_risk": "medium",
+    "expected_min_interactions": 1,
+    "expected_min_rules": 0,
+    "source": "INTERACTIONS(medium): 钙剂降低阿仑膦酸钠吸收,需间隔至少30分钟"
+  },
+  {
+    "id": "SF001",
+    "category": "安全组合",
+    "desc": "比索洛尔+多沙唑嗪,55岁男(无交互)",
+    "drugs": [
+      "比索洛尔",
+      "多沙唑嗪"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "男",
+      "conditions": [
+        "糖尿病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,55岁,糖尿病\n处方:\n1. 比索洛尔 10mg bid\n2. 多沙唑嗪 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF002",
+    "category": "安全组合",
+    "desc": "雷尼替丁+熊去氧胆酸,50岁男(无交互)",
+    "drugs": [
+      "雷尼替丁",
+      "熊去氧胆酸"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "男",
+      "conditions": [
+        "糖尿病",
+        "过敏"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,50岁,糖尿病、过敏\n处方:\n1. 雷尼替丁 10mg bid\n2. 熊去氧胆酸 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF003",
+    "category": "安全组合",
+    "desc": "氢氯噻嗪+泮托拉唑,40岁男(无交互)",
+    "drugs": [
+      "氢氯噻嗪",
+      "泮托拉唑"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,40岁,体检\n处方:\n1. 氢氯噻嗪 10mg bid\n2. 泮托拉唑 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF004",
+    "category": "安全组合",
+    "desc": "氟卡尼+乳果糖,35岁女(无交互)",
+    "drugs": [
+      "氟卡尼",
+      "乳果糖"
+    ],
+    "patient": {
+      "age": 35,
+      "gender": "女",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,35岁,体检\n处方:\n1. 氟卡尼 10mg bid\n2. 乳果糖 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF005",
+    "category": "安全组合",
+    "desc": "昂丹司琼+萘普生,50岁男(无交互)",
+    "drugs": [
+      "昂丹司琼",
+      "萘普生"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "男",
+      "conditions": [
+        "糖尿病",
+        "甲减"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,50岁,糖尿病、甲减\n处方:\n1. 昂丹司琼 10mg bid\n2. 萘普生 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF006",
+    "category": "安全组合",
+    "desc": "坦索罗辛+甲氧氯普胺,35岁女(无交互)",
+    "drugs": [
+      "坦索罗辛",
+      "甲氧氯普胺"
+    ],
+    "patient": {
+      "age": 35,
+      "gender": "女",
+      "conditions": [
+        "胃炎"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,35岁,胃炎\n处方:\n1. 坦索罗辛 10mg bid\n2. 甲氧氯普胺 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF007",
+    "category": "安全组合",
+    "desc": "依诺肝素+普罗帕酮,40岁女(无交互)",
+    "drugs": [
+      "依诺肝素",
+      "普罗帕酮"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "女",
+      "conditions": [
+        "胃炎",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,40岁,胃炎、高血压\n处方:\n1. 依诺肝素 10mg bid\n2. 普罗帕酮 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF008",
+    "category": "安全组合",
+    "desc": "氯吡格雷+艾司奥美拉唑,40岁男(无交互)",
+    "drugs": [
+      "氯吡格雷",
+      "艾司奥美拉唑"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,40岁,体检\n处方:\n1. 氯吡格雷 75mg qd\n2. 艾司奥美拉唑 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF009",
+    "category": "安全组合",
+    "desc": "奥美拉唑+萘普生,50岁男(无交互)",
+    "drugs": [
+      "奥美拉唑",
+      "萘普生"
+    ],
+    "patient": {
+      "age": 50,
+      "gender": "男",
+      "conditions": [
+        "甲减"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,50岁,甲减\n处方:\n1. 奥美拉唑 20mg qd\n2. 萘普生 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF010",
+    "category": "安全组合",
+    "desc": "依诺肝素+美托洛尔,55岁女(无交互)",
+    "drugs": [
+      "依诺肝素",
+      "美托洛尔"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "女",
+      "conditions": [
+        "甲减"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,55岁,甲减\n处方:\n1. 依诺肝素 10mg bid\n2. 美托洛尔 47.5mg qd",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "SF011",
+    "category": "安全组合",
+    "desc": "螺内酯+普罗帕酮,40岁男(无交互)",
+    "drugs": [
+      "螺内酯",
+      "普罗帕酮"
+    ],
+    "patient": {
+      "age": 40,
+      "gender": "男",
+      "conditions": [],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,40岁,体检\n处方:\n1. 螺内酯 20mg qd\n2. 普罗帕酮 10mg bid",
+    "expected_risk": "safe",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 0,
+    "source": "no_known_interaction"
+  },
+  {
+    "id": "ED001",
+    "category": "多药联用",
+    "desc": "华法林+阿司匹林+布洛芬,65岁(三重出血风险叠加)",
+    "drugs": [
+      "华法林",
+      "阿司匹林",
+      "布洛芬"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "女",
+      "conditions": [
+        "房颤",
+        "冠心病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,65岁,房颤、冠心病\n处方:\n1. 华法林 2.5mg qd\n2. 阿司匹林 100mg qd\n3. 布洛芬 400mg prn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 三重出血风险叠加"
+  },
+  {
+    "id": "ED002",
+    "category": "多药联用",
+    "desc": "地西泮+吗啡+乙醇,55岁(三重中枢抑制)",
+    "drugs": [
+      "地西泮",
+      "吗啡",
+      "乙醇"
+    ],
+    "patient": {
+      "age": 55,
+      "gender": "男",
+      "conditions": [
+        "高血压",
+        "冠心病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,55岁,高血压、冠心病\n处方:\n1. 地西泮 5mg qn\n2. 吗啡 10mg q12h\n3. 乙醇 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 三重中枢抑制"
+  },
+  {
+    "id": "ED003",
+    "category": "多药联用",
+    "desc": "氟西汀+曲马多+利奈唑胺,70岁(三重5-HT风险)",
+    "drugs": [
+      "氟西汀",
+      "曲马多",
+      "利奈唑胺"
+    ],
+    "patient": {
+      "age": 70,
+      "gender": "女",
+      "conditions": [
+        "冠心病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,70岁,冠心病\n处方:\n1. 氟西汀 20mg qd\n2. 曲马多 50mg prn\n3. 利奈唑胺 600mg q12h",
+    "expected_risk": "critical",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 三重5-HT风险"
+  },
+  {
+    "id": "ED004",
+    "category": "多药联用",
+    "desc": "辛伐他汀+克拉霉素+胺碘酮,60岁(多重CYP3A4抑制)",
+    "drugs": [
+      "辛伐他汀",
+      "克拉霉素",
+      "胺碘酮"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "女",
+      "conditions": [
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,60岁,高血压\n处方:\n1. 辛伐他汀 20mg qn\n2. 克拉霉素 500mg bid\n3. 胺碘酮 10mg bid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 多重CYP3A4抑制"
+  },
+  {
+    "id": "ED005",
+    "category": "多药联用",
+    "desc": "美托洛尔+维拉帕米+地尔硫卓,60岁(三重心脏抑制)",
+    "drugs": [
+      "美托洛尔",
+      "维拉帕米",
+      "地尔硫卓"
+    ],
+    "patient": {
+      "age": 60,
+      "gender": "女",
+      "conditions": [
+        "冠心病"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者女,60岁,冠心病\n处方:\n1. 美托洛尔 47.5mg qd\n2. 维拉帕米 80mg tid\n3. 地尔硫卓 30mg tid",
+    "expected_risk": "critical",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 三重心脏抑制"
+  },
+  {
+    "id": "ED006",
+    "category": "多药联用",
+    "desc": "碳酸锂+赖诺普利+布洛芬,65岁(锂中毒三重风险)",
+    "drugs": [
+      "碳酸锂",
+      "赖诺普利",
+      "布洛芬"
+    ],
+    "patient": {
+      "age": 65,
+      "gender": "男",
+      "conditions": [
+        "抑郁症",
+        "高血压"
+      ],
+      "pregnancy": "no",
+      "liver_function": "normal",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,65岁,抑郁症、高血压\n处方:\n1. 碳酸锂 300mg bid\n2. 赖诺普利 10mg qd\n3. 布洛芬 400mg prn",
+    "expected_risk": "high",
+    "expected_min_interactions": 2,
+    "expected_min_rules": 0,
+    "source": "edge_case: 锂中毒三重风险"
+  },
+  {
+    "id": "ED007",
+    "category": "肝功能不全",
+    "desc": "华法林,肝功能不全(肝功能不全+华法林出血风险)",
+    "drugs": [
+      "华法林"
+    ],
+    "patient": {
+      "age": 58,
+      "gender": "男",
+      "conditions": [
+        "肝硬化"
+      ],
+      "pregnancy": "no",
+      "liver_function": "impaired",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,58岁,肝硬化\n处方:\n1. 华法林 2.5mg qd",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "edge_case: 肝功能不全+华法林出血风险"
+  },
+  {
+    "id": "ED008",
+    "category": "肝功能不全",
+    "desc": "阿托伐他汀,肝功能不全(肝功能不全+他汀肝毒性)",
+    "drugs": [
+      "阿托伐他汀"
+    ],
+    "patient": {
+      "age": 58,
+      "gender": "男",
+      "conditions": [
+        "肝硬化"
+      ],
+      "pregnancy": "no",
+      "liver_function": "impaired",
+      "renal_function": "normal"
+    },
+    "prescription_text": "患者男,58岁,肝硬化\n处方:\n1. 阿托伐他汀 20mg qn",
+    "expected_risk": "critical",
+    "expected_min_interactions": 0,
+    "expected_min_rules": 1,
+    "source": "edge_case: 肝功能不全+他汀肝毒性"
+  }
+]

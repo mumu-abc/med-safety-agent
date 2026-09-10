@@ -1,0 +1,14 @@
+{
+  "test001": {
+    "name": "张三",
+    "age": 65,
+    "gender": "male",
+    "conditions": [
+      "高血压"
+    ],
+    "allergies": [],
+    "liver_function": "normal",
+    "renal_function": "normal",
+    "pregnancy": "no"
+  }
+}

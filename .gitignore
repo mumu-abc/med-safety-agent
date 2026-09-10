@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual env
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore
+
+# Data (保留图谱与评测用例,忽略运行时产物)
+*.log
+*.db
+data/med_safety.db
+data/memory_index/
+data/*_results.json
+data/judge_results.json
+
+# 本地工具/临时目录
+.trae-html-share-packages/
+agent-project-analysis/

@@ -1,0 +1,21 @@
+services:
+  med-safety:
+    build: .
+    container_name: med-safety-app
+    ports:
+      - "8000:8000"   # FastAPI
+      - "8501:8501"   # Streamlit
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data           # 图谱数据持久化
+      - ./data/med_safety.db:/app/data/med_safety.db  # 数据库持久化
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
