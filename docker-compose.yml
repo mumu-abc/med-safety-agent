@@ -10,11 +10,13 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./data:/app/data           # 图谱数据持久化
-      - ./data/med_safety.db:/app/data/med_safety.db  # 数据库持久化
+      - ./data:/app/data           # 图谱数据 + SQLite 一并持久化
+      # 不要再单独挂 ./data/med_safety.db:Docker 在该文件不存在时会建同名目录,
+      # 导致全新 clone 后 SQLite 打不开。已由上一条目录挂载覆盖。
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      # 用 /api/health:它会探活 LLM 配置、知识图谱与数据库,/docs 只是静态页
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

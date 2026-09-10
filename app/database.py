@@ -190,16 +190,32 @@ class Database:
         return normalized.lower()  # 统一大小写
 
     @staticmethod
-    def _hash_prescription(text: str) -> str:
-        normalized = Database._normalize_prescription(text)
-        return hashlib.md5(normalized.encode('utf-8')).hexdigest()
+    def _hash_prescription(text: str, patient_id: str = "", mode: str = "") -> str:
+        """缓存键 = 处方文本 + 患者 + 审查模式。
 
-    def get_cached_review(self, prescription_text: str) -> Optional[dict]:
-        """按处方文本查找缓存结果。命中时自动累加hit_count。"""
-        h = self._hash_prescription(prescription_text)
+        patient_id 必须参与:患者信息(孕期/肝肾功能)是在缓存查询之后才追加到
+        处方文本里的,若只按文本哈希,孕期患者会命中普通患者的缓存结论。
+        mode 必须参与:/review、/raw、/multi 返回的字段结构不同,共用同一缓存
+        槽会让接口拿到缺字段的异构结果。
+        """
+        normalized = Database._normalize_prescription(text)
+        raw = f"{mode}||{patient_id or ''}||{normalized}"
+        return hashlib.md5(raw.encode('utf-8')).hexdigest()
+
+    def get_cached_review(
+        self,
+        prescription_text: str,
+        patient_id: str = "",
+        mode: str = "",
+        ttl_days: int = 7,
+    ) -> Optional[dict]:
+        """按 (处方, 患者, 模式) 查找缓存结果,超过 TTL 视为未命中。"""
+        h = self._hash_prescription(prescription_text, patient_id, mode)
+        cutoff = (datetime.now() - timedelta(days=ttl_days)).isoformat()
         conn = self._get_conn()
         row = conn.execute(
-            "SELECT result_json FROM review_cache WHERE prescription_hash = ?", (h,)
+            "SELECT result_json FROM review_cache "
+            "WHERE prescription_hash = ? AND created_at >= ?", (h, cutoff)
         ).fetchone()
         if row:
             conn.execute(
@@ -210,9 +226,15 @@ class Database:
             return json.loads(row["result_json"])
         return None
 
-    def save_review_cache(self, prescription_text: str, result: dict) -> None:
-        """保存审查结果到缓存(相同处方自动跳过)。"""
-        h = self._hash_prescription(prescription_text)
+    def save_review_cache(
+        self,
+        prescription_text: str,
+        result: dict,
+        patient_id: str = "",
+        mode: str = "",
+    ) -> None:
+        """保存审查结果到缓存(相同 处方+患者+模式 自动跳过)。"""
+        h = self._hash_prescription(prescription_text, patient_id, mode)
         conn = self._get_conn()
         conn.execute(
             "INSERT OR IGNORE INTO review_cache (prescription_hash, prescription_text, result_json, created_at) "

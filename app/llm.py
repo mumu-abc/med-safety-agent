@@ -38,6 +38,8 @@ def get_llm() -> ChatOpenAI:
             model=settings.llm_model,
             temperature=settings.llm_temperature,
             max_retries=3,
-            timeout=300,
+            # 单次调用 120s 对 glm-4-flash 已足够宽松;原来是 300s,叠加 3 次重试
+            # 最坏要 15 分钟才失败,而 SSE 早已超时断开,白白占用线程和 token。
+            timeout=120,
         )
     return _llm

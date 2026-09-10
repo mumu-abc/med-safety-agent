@@ -211,20 +211,27 @@ def _build_raw_response(result) -> dict:
 @router.post("")
 async def review(req: ReviewRequest):
     """提交处方进行安全审查。"""
-    # 缓存优先
+    # 缓存优先(键含 patient_id 与模式,避免不同患者/不同接口互相污染)
     from app.database import get_db
-    cached = get_db().get_cached_review(req.prescription_text)
+    cached = get_db().get_cached_review(
+        req.prescription_text, patient_id=req.patient_id or "", mode="summary"
+    )
     if cached:
         logger.info("⚡ 缓存命中，直接返回历史结果")
         cached["cached"] = True
         return cached
 
     try:
+        loop = asyncio.get_running_loop()
         # 记忆检索：查找相似历史案例
+        # retrieve_memories 首次调用会加载 SentenceTransformer(联网下载 + CPU 编码),
+        # 同步执行会阻塞整个事件循环,必须放进 executor
         memory_context = ""
         try:
             from app.memory import retrieve_memories, format_memories_for_context
-            memories = retrieve_memories(req.prescription_text, top_k=3)
+            memories = await loop.run_in_executor(
+                None, lambda: retrieve_memories(req.prescription_text, top_k=3)
+            )
             if memories:
                 memory_context = format_memories_for_context(memories)
                 logger.info(f"🧠 检索到 {len(memories)} 条相关记忆")
@@ -232,7 +239,6 @@ async def review(req: ReviewRequest):
             logger.debug(f"记忆检索跳过: {e}")
 
         prescription_text = _enrich_with_patient(req.prescription_text, req.patient_id)
-        loop = asyncio.get_running_loop()
         result = await loop.run_in_executor(None, review_prescription, prescription_text)
     except Exception as e:
         logger.exception("审查流程异常")
@@ -252,7 +258,10 @@ async def review(req: ReviewRequest):
         risk_level = risk_assessment.overall_risk if risk_assessment else "unknown"
         rx_for_mem = _get(result, "prescription")
         drug_names = [d.name for d in (rx_for_mem.drugs or [])] if rx_for_mem else []
-        extract_and_save_case(req.prescription_text, risk_level, summary, drug_names)
+        await loop.run_in_executor(
+            None,
+            lambda: extract_and_save_case(req.prescription_text, risk_level, summary, drug_names),
+        )
     except Exception as e:
         logger.debug(f"记忆保存跳过: {e}")
 
@@ -294,7 +303,9 @@ async def review(req: ReviewRequest):
 
     # 保存到审查缓存
     try:
-        get_db().save_review_cache(req.prescription_text, resp)
+        get_db().save_review_cache(
+            req.prescription_text, resp, patient_id=req.patient_id or "", mode="summary"
+        )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 
@@ -306,7 +317,9 @@ async def review_raw(req: ReviewRequest):
     """返回完整结构化数据。"""
     # 缓存优先
     from app.database import get_db
-    cached = get_db().get_cached_review(req.prescription_text)
+    cached = get_db().get_cached_review(
+        req.prescription_text, patient_id=req.patient_id or "", mode="raw"
+    )
     if cached:
         cached["cached"] = True
         return cached
@@ -331,7 +344,9 @@ async def review_raw(req: ReviewRequest):
 
     # 保存到审查缓存
     try:
-        get_db().save_review_cache(req.prescription_text, resp)
+        get_db().save_review_cache(
+            req.prescription_text, resp, patient_id=req.patient_id or "", mode="raw"
+        )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 
@@ -411,9 +426,11 @@ async def review_stream(req: ReviewRequest):
     - {status: "complete", result: {...}}     — 最终完整结果
     - {error: "..."}                          — 错误
     """
-    # 先查缓存（使用原始处方文本，不包含患者信息）
+    # 先查缓存(使用原始处方文本,不包含患者信息)
     from app.database import get_db
-    cached = get_db().get_cached_review(req.prescription_text)
+    cached = get_db().get_cached_review(
+        req.prescription_text, patient_id=req.patient_id or "", mode="raw"
+    )
     if cached:
         async def cached_generator():
             cached["cached"] = True
@@ -439,6 +456,9 @@ async def review_stream(req: ReviewRequest):
 
         q: queue.Queue = queue.Queue()
 
+        # 自动完成模式无 checkpointer,直接从流式输出累积最终状态
+        state_values: dict = {"raw_text": prescription_text}
+
         def run_stream():
             try:
                 for chunk in graph.stream({"raw_text": prescription_text}, config=config):
@@ -452,18 +472,16 @@ async def review_stream(req: ReviewRequest):
 
         while True:
             try:
-                kind, data = await loop.run_in_executor(None, q.get, 120.0)
+                kind, data = await loop.run_in_executor(None, q.get, 300.0)
             except Exception:
                 yield f"data: {json.dumps({'error': '处理超时'}, ensure_ascii=False)}\n\n"
                 break
 
             if kind == "done":
                 try:
-                    state = graph.get_state(config)
-                    result = state.values
-                    response_data = _build_raw_response(result)
+                    response_data = _build_raw_response(state_values)
                 except Exception as e:
-                    logger.warning(f"从 graph state 构建响应失败,回退到直接审查: {e}")
+                    logger.warning(f"从流式状态构建响应失败,回退到直接审查: {e}")
                     try:
                         fallback = await loop.run_in_executor(None, review_prescription, prescription_text)
                         response_data = _build_raw_response(fallback)
@@ -473,7 +491,10 @@ async def review_stream(req: ReviewRequest):
                 response_data["cached"] = False
                 # 保存到审查缓存
                 try:
-                    get_db().save_review_cache(req.prescription_text, response_data)
+                    get_db().save_review_cache(
+                        req.prescription_text, response_data,
+                        patient_id=req.patient_id or "", mode="raw",
+                    )
                 except Exception as e:
                     logger.debug(f"缓存保存跳过: {e}")
                 yield f"data: {json.dumps({'status': 'complete', 'result': response_data}, ensure_ascii=False, default=str)}\n\n"
@@ -482,7 +503,9 @@ async def review_stream(req: ReviewRequest):
                 yield f"data: {json.dumps({'error': data}, ensure_ascii=False)}\n\n"
                 break
             elif kind == "chunk":
-                for node_name in data:
+                for node_name, values in data.items():
+                    if isinstance(values, dict):
+                        state_values.update(values)
                     yield f"data: {json.dumps({'node': node_name, 'label': node_labels.get(node_name, node_name)}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
@@ -576,7 +599,9 @@ async def review_multi(req: ReviewRequest):
     """
     # 缓存优先
     from app.database import get_db
-    cached = get_db().get_cached_review(req.prescription_text)
+    cached = get_db().get_cached_review(
+        req.prescription_text, patient_id=req.patient_id or "", mode="multi"
+    )
     if cached:
         cached["cached"] = True
         return cached
@@ -596,7 +621,9 @@ async def review_multi(req: ReviewRequest):
 
     # 保存到审查缓存
     try:
-        get_db().save_review_cache(req.prescription_text, resp)
+        get_db().save_review_cache(
+            req.prescription_text, resp, patient_id=req.patient_id or "", mode="multi"
+        )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 

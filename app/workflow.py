@@ -201,19 +201,21 @@ _shared_checkpointer = MemorySaver()
 _compiled_graph = None
 _compiled_graph_hitl = None
 
-# 自动完成模式的固定 thread_id — 每次审查覆盖前一次的状态,避免无限积累
-_AUTO_THREAD_ID = "auto-review"
-
 
 def get_review_graph():
-    """获取审查图(自动完成,用共享 checkpointer + 固定 thread_id)。
+    """获取审查图(自动完成模式)。
 
-    固定 thread_id 确保每次审查覆盖前一次的状态,不会无限积累。
-    同时支持 streaming 模式的 get_state() 获取完整结果。
+    有意**不挂 checkpointer**:自动完成模式一次跑完 parse→...→gen_report,
+    不需要跨调用保留状态。早期版本给自动模式挂了 MemorySaver + 固定
+    thread_id,导致两个问题:
+      1. 跨请求状态残留 —— 条件边跳过 `recommend` 节点时,`alternatives`
+         字段会保留上一次审查的值,用户 B 拿到用户 A 的换药建议;
+      2. 所有审查的 checkpoint 堆在同一个 thread 下,进程内存持续增长。
+    需要中断恢复的场景请用 get_review_graph_hitl()。
     """
     global _compiled_graph
     if _compiled_graph is None:
-        _compiled_graph = _build_graph().compile(checkpointer=_shared_checkpointer)
+        _compiled_graph = _build_graph().compile()
     return _compiled_graph
 
 
@@ -239,8 +241,7 @@ def review_prescription(text: str) -> ReviewState:
     parse → detect → rules → assess → (条件)alternatives → report
     """
     graph = get_review_graph()
-    config = {"configurable": {"thread_id": _AUTO_THREAD_ID}, "recursion_limit": 100}
-    result = graph.invoke({"raw_text": text}, config=config)
+    result = graph.invoke({"raw_text": text}, config={"recursion_limit": 100})
     return AttrDict(result)
 
 
@@ -290,7 +291,6 @@ def review_prescription_stream(text: str):
         {"step": "complete", "label": "✅ 审查完成", "status": "done", "result": {...}}
     """
     graph = get_review_graph()
-    config = {"configurable": {"thread_id": _AUTO_THREAD_ID}, "recursion_limit": 100}
 
     node_labels = {
         "parse": "📋 解析处方",
@@ -302,17 +302,18 @@ def review_prescription_stream(text: str):
     }
 
     try:
-        for chunk in graph.stream({"raw_text": text}, config=config):
-            for node_name in chunk:
+        # 自动完成模式没有 checkpointer,直接从流式输出累积最终状态
+        result: dict = {"raw_text": text}
+        for chunk in graph.stream({"raw_text": text}, config={"recursion_limit": 100}):
+            for node_name, values in chunk.items():
+                if isinstance(values, dict):
+                    result.update(values)
                 yield {
                     "step": node_name,
                     "label": node_labels.get(node_name, node_name),
                     "status": "running",
                 }
 
-        # 从 checkpointer 获取完整状态
-        state = graph.get_state(config)
-        result = state.values
         yield {
             "step": "complete",
             "label": "✅ 审查完成",

@@ -19,6 +19,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# 轻量 IP 限流:只保护 /api/review/* 与 /api/eval/run,静态资源不限流
+# 注意:Starlette 里后注册的中间件在外层,所以限流必须先注册,让 CORS 成为最外层,
+# 否则 429 响应不会带 CORS 头,跨域调用方只能看到 CORS 错误而不是限流提示。
+app.add_middleware(RateLimitMiddleware)
+
 # P2-14修复:allow_origins=["*"] + allow_credentials=True 违反CORS规范
 # 前端同源部署,不需要credentials;若需跨域认证改为具体origin列表
 app.add_middleware(
@@ -28,9 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 轻量 IP 限流:只保护 /api/review/* 与 /api/eval/run,静态资源不限流
-app.add_middleware(RateLimitMiddleware)
 
 
 # ---- API 根路由(必须在 mount 之前定义,否则被静态文件拦截) ----
@@ -52,12 +54,31 @@ async def root():
 
 @app.get("/api/health")
 async def health():
-    """系统健康检查。"""
+    """系统健康检查:探活关键依赖,而不是只返回 alive。"""
     from app.config import settings
-    llm_configured = bool(settings.llm_api_key)
+    from app.database import get_db
+    from app.graph.repository import get_repository
+
+    checks: dict[str, bool] = {}
+    try:
+        checks["llm_configured"] = bool(settings.llm_api_key)
+    except Exception:
+        checks["llm_configured"] = False
+    try:
+        checks["drug_graph_loaded"] = bool(get_repository().graph.number_of_nodes())
+    except Exception as e:
+        logging.warning(f"健康检查: 知识图谱未就绪 -> {e}")
+        checks["drug_graph_loaded"] = False
+    try:
+        get_db().get_cache_stats()
+        checks["database_ok"] = True
+    except Exception as e:
+        logging.warning(f"健康检查: 数据库不可用 -> {e}")
+        checks["database_ok"] = False
+
     return {
-        "status": "ok",
-        "llm_configured": llm_configured,
+        "status": "ok" if all(checks.values()) else "degraded",
+        "checks": checks,
         "version": "1.0.0",
     }
 

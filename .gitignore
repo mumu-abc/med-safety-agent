@@ -29,7 +29,8 @@ Thumbs.db
 htmlcov/
 
 # Docker
-.dockerignore
+# 注意:.dockerignore 必须进仓库。之前它被写在这里,导致 clone 后 docker build
+# 的 `COPY . .` 会把 .venv(1.6G)、*.db、.env(密钥进镜像层)全部打进镜像。
 
 # Data (保留图谱与评测用例,忽略运行时产物)
 *.log

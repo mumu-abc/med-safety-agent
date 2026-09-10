@@ -293,7 +293,6 @@ def _build_supervisor_graph():
 _supervisor_checkpointer = MemorySaver()
 _compiled_supervisor = None
 _compiled_supervisor_hitl = None
-_AUTO_MULTI_THREAD_ID = "auto-multi-review"
 
 
 class AttrDict(dict):
@@ -306,9 +305,14 @@ class AttrDict(dict):
 
 
 def get_supervisor_graph():
+    """自动完成模式:不挂 checkpointer。
+
+    与 workflow.get_review_graph() 同理 —— 固定 thread_id + MemorySaver 会让
+    上一次审查的中间状态(如 alternatives)泄漏到下一次审查。
+    """
     global _compiled_supervisor
     if _compiled_supervisor is None:
-        _compiled_supervisor = _build_supervisor_graph().compile(checkpointer=_supervisor_checkpointer)
+        _compiled_supervisor = _build_supervisor_graph().compile()
     return _compiled_supervisor
 
 
@@ -331,8 +335,7 @@ def review_multi_agent(text: str) -> AttrDict:
     3. agent_history 记录完整执行路径 + 路由原因
     """
     graph = get_supervisor_graph()
-    config = {"configurable": {"thread_id": _AUTO_MULTI_THREAD_ID}, "recursion_limit": 100}
-    result = graph.invoke({"raw_text": text}, config=config)
+    result = graph.invoke({"raw_text": text}, config={"recursion_limit": 100})
     return AttrDict(result)
 
 

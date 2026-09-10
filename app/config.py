@@ -13,9 +13,10 @@ class Settings(BaseSettings):
     )
 
     # ---- LLM ----
-    llm_base_url: str = "https://token-plan-cn.xiaomimimo.com/v1"
+    # 默认值与 .env / .env.example 保持一致(智谱 GLM),避免没有 .env 时回退到旧模型
+    llm_base_url: str = "https://open.bigmodel.cn/api/paas/v4"
     llm_api_key: str = ""
-    llm_model: str = "mimo-v2.5-pro"
+    llm_model: str = "glm-4-flash"
     llm_temperature: float = 0.0
 
     # ---- LangSmith Observability ----
