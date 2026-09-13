@@ -163,7 +163,7 @@ def generate_special_population(n: int = 12) -> list[dict]:
                         "isotretinoin", "tretinoin", "doxycycline"]
     random.shuffle(pregnancy_danger)
 
-    for i, drug_id in enumerate(pregnancy_danger[:5]):
+    for i, drug_id in enumerate(pregnancy_danger[:min(20, max(8, n // 2))]):
         age = random.choice([25, 28, 30, 32, 35])
         patient = _make_patient(age=age, gender="女", pregnancy="yes",
                                 conditions=random.sample(["高血压", "癫痫", "高脂血症", "感染"], k=1))
@@ -392,14 +392,13 @@ def _risk_level_num(level: str) -> int:
     return {"critical": 4, "high": 3, "medium": 2, "low": 1, "safe": 0}.get(level, -1)
 
 
-def generate_all(target_total: int = 70) -> list[dict]:
-    """生成全部用例。"""
-    # 按比例分配
-    n_high = min(18, target_total // 4)
-    n_special = min(14, target_total // 5)
-    n_medium = min(12, target_total // 6)
-    n_safe = min(12, target_total // 6)
-    n_edge = min(8, target_total // 8)
+def generate_all(target_total: int = 180) -> list[dict]:
+    """生成全部用例。图谱扩容后按更大目标采样。"""
+    n_high = min(80, max(30, target_total // 3))
+    n_special = min(40, max(16, target_total // 5))
+    n_medium = min(40, max(16, target_total // 5))
+    n_safe = min(40, max(16, target_total // 5))
+    n_edge = min(24, max(10, target_total // 8))
 
     all_cases = []
     all_cases.extend(generate_high_risk_interactions(n_high))
@@ -454,7 +453,7 @@ def print_stats(cases: list[dict]):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="批量生成评测用例")
     parser.add_argument("--preview", action="store_true", help="预览前10个用例")
-    parser.add_argument("--target", type=int, default=70, help="目标用例总数")
+    parser.add_argument("--target", type=int, default=180, help="目标用例总数(默认180)")
     args = parser.parse_args()
 
     cases = generate_all(args.target)

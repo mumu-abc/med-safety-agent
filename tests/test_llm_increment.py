@@ -12,7 +12,7 @@ DATA = ROOT / "data" / "eval_llm_increment.json"
 
 def test_llm_increment_dataset_exists_and_valid():
     cases = json.loads(DATA.read_text(encoding="utf-8"))
-    assert len(cases) >= 8
+    assert len(cases) >= 15
     tracks = {c["track"] for c in cases}
     assert "parse" in tracks
     assert "reason" in tracks

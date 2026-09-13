@@ -125,6 +125,8 @@ DRUG_ALIASES: dict[str, list[str]] = {
     "可乐定": ["可乐定", "clonidine"],
     "苯妥英": ["苯妥英钠", "phenytoin"],
     "苯妥英钠": ["苯妥英钠", "phenytoin"],
+    "复方新诺明": ["复方磺胺甲噁唑", "cotrimoxazole", "sulfamethoxazole"],
+    "新诺明": ["复方磺胺甲噁唑", "cotrimoxazole"],
 }
 
 

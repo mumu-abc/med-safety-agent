@@ -1103,6 +1103,15 @@ if not any(d["id"] == "cholestyramine" for d in DRUGS):
         "generic_name": "考来烯胺", "contraindications": ["完全性胆道梗阻"],
         "side_effects": ["便秘", "脂肪泻"], "metabolism": "不吸收",
     })
+if not any(d["id"] == "rifampin" for d in DRUGS):
+    DRUGS.append({
+        "id": "rifampin", "name": "利福平", "category": "抗结核药",
+        "generic_name": "利福平", "contraindications": ["严重肝功能不全", "黄疸"],
+        "side_effects": ["肝毒性", "体液变色", "酶诱导"], "metabolism": "CYP酶诱导",
+    })
+_EXTRA_INTERACTIONS_4.append(
+    ("rifampin", "warfarin", "high", "强酶诱导显著降低华法林疗效")
+)
 
 
 def build_graph_from_data():

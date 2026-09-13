@@ -11,7 +11,7 @@ DATA = ROOT / "data" / "eval_external_holdout.json"
 def test_external_holdout_schema():
     data = json.loads(DATA.read_text(encoding="utf-8"))
     cases = data["cases"]
-    assert len(cases) >= 25
+    assert len(cases) >= 50
     assert data["meta"]["description"]
     for c in cases:
         assert c["id"].startswith("EX-")

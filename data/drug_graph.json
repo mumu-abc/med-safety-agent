@@ -9416,6 +9416,25 @@
       }
     },
     {
+      "id": "rifampin",
+      "attrs": {
+        "name": "利福平",
+        "category": "抗结核药",
+        "drug": true,
+        "generic_name": "利福平",
+        "contraindications": [
+          "严重肝功能不全",
+          "黄疸"
+        ],
+        "side_effects": [
+          "肝毒性",
+          "体液变色",
+          "酶诱导"
+        ],
+        "metabolism": "CYP酶诱导"
+      }
+    },
+    {
       "id": "oxazepam",
       "attrs": {}
     },

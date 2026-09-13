@@ -97,5 +97,126 @@
     "expected_risk": "safe",
     "why_llm": "吸收干扰可通过服药时间解决,不应 high",
     "rules_only_expected_miss": false
+  },
+  {
+    "id": "LI-P05",
+    "track": "parse",
+    "category": "英文混写",
+    "desc": "中英文混写处方",
+    "prescription_text": "Patient male 64y, AF. Rx: Warfarin 3mg qd, Plavix 75mg qd, Lipitor 20mg qn",
+    "expected_drugs": ["华法林", "氯吡格雷", "阿托伐他汀"],
+    "expected_risk": "high",
+    "why_llm": "英文药名+商品名需归一到中文通用名才能查图谱",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-P06",
+    "track": "parse",
+    "category": "剂量单位口语",
+    "desc": "华法林两片半 + 自购芬必得",
+    "prescription_text": "女,72岁,房颤。华法林吃两片半一天(2.5mg/片),牙疼自己加了芬必得",
+    "expected_drugs": ["华法林", "布洛芬"],
+    "expected_risk": "critical",
+    "why_llm": "口语剂量+商品名,关键词匹配难",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R04",
+    "track": "reason",
+    "category": "病史语义",
+    "desc": "溃疡出血史 + 双氯芬酸",
+    "prescription_text": "患者男,52岁,半年前消化性溃疡出血已愈。现因腰痛处方双氯芬酸钠 75mg qd",
+    "expected_drugs": ["双氯芬酸"],
+    "expected_risk": "high",
+    "why_llm": "病史在叙述中;若未解析成 conditions,规则不会触发",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R05",
+    "track": "reason",
+    "category": "重复用药语义",
+    "desc": "络活喜 + 氨氯地平(同一成分)",
+    "prescription_text": "患者女,59岁,高血压。处方:络活喜 5mg qd,氨氯地平 5mg qd(药店自购)",
+    "expected_drugs": ["氨氯地平"],
+    "expected_risk": "high",
+    "why_llm": "商品名与通用名同一成分,剂量加倍",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R06",
+    "track": "reason",
+    "category": "化验值",
+    "desc": "eGFR 22 + 二甲双胍",
+    "prescription_text": "患者男,71岁,糖尿病。eGFR 22。处方:二甲双胍 500mg bid",
+    "expected_drugs": ["二甲双胍"],
+    "expected_risk": "critical",
+    "why_llm": "严重肾损需解析进 renal_function 才能触发禁忌规则",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R07",
+    "track": "reason",
+    "category": "多药叠加",
+    "desc": "曲马多+氟西汀+昂丹司琼 5-HT/QT 综合风险",
+    "prescription_text": "患者女,47岁,抑郁+癌痛+化疗止吐。处方:氟西汀 20mg qd,曲马多 50mg bid,昂丹司琼 8mg bid",
+    "expected_drugs": ["氟西汀", "曲马多", "昂丹司琼"],
+    "expected_risk": "high",
+    "why_llm": "多通路风险需综合,不能只看单边",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R08",
+    "track": "reason",
+    "category": "超说明书剂量",
+    "desc": "对乙酰氨基酚 1g q4h(日剂量6g)",
+    "prescription_text": "患者女,48岁,术后痛。处方:对乙酰氨基酚 1000mg q4h",
+    "expected_drugs": ["对乙酰氨基酚"],
+    "expected_risk": "critical",
+    "why_llm": "远超日剂量上限,肝毒性高危;规则不查剂量",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-N03",
+    "track": "negative",
+    "category": "负样本",
+    "desc": "标准哮喘控制方案",
+    "prescription_text": "患者女,30岁,哮喘。处方:布地奈德福莫特罗吸入剂 1吸 bid,沙丁胺醇 prn",
+    "expected_drugs": ["布地奈德", "沙丁胺醇"],
+    "expected_risk": "safe",
+    "why_llm": "ICS+按需SABA是标准方案,不应报警",
+    "rules_only_expected_miss": false
+  },
+  {
+    "id": "LI-N04",
+    "track": "negative",
+    "category": "负样本",
+    "desc": "PPI+促动力标准胃炎方案",
+    "prescription_text": "患者男,40岁,胃炎。处方:奥美拉唑 20mg qd,莫沙必利 5mg tid",
+    "expected_drugs": ["奥美拉唑", "莫沙必利"],
+    "expected_risk": "safe",
+    "why_llm": "标准联用,防止过度报警",
+    "rules_only_expected_miss": false
+  },
+  {
+    "id": "LI-P07",
+    "track": "parse",
+    "category": "别名",
+    "desc": "倍他乐克+络活喜",
+    "prescription_text": "患者男,61岁,高血压。处方:倍他乐克 47.5mg qd,络活喜 5mg qd",
+    "expected_drugs": ["美托洛尔", "氨氯地平"],
+    "expected_risk": "safe",
+    "why_llm": "商品名归一后应识别为合理联合降压",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-P08",
+    "track": "parse",
+    "category": "复方药名",
+    "desc": "复方磺胺甲噁唑 + 华法林",
+    "prescription_text": "患者男,67岁,房颤+尿感。处方:华法林 2.5mg qd,复方新诺明 2片 bid",
+    "expected_drugs": ["华法林", "复方磺胺甲噁唑"],
+    "expected_risk": "high",
+    "why_llm": "复方名/商品名需归一,CYP2C9抑制增强抗凝",
+    "rules_only_expected_miss": true
   }
 ]
