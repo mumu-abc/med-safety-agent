@@ -1,0 +1,101 @@
+[
+  {
+    "id": "LI-P01",
+    "track": "parse",
+    "category": "商品名归一",
+    "desc": "波立维+拜阿司匹灵(商品名),双联抗血小板",
+    "prescription_text": "患者男,62岁,冠心病PCI术后。Rx:\n1. 波立维 75mg qd\n2. 拜阿司匹灵 100mg qd",
+    "expected_drugs": ["氯吡格雷", "阿司匹林"],
+    "expected_risk": "high",
+    "why_llm": "商品名需 LLM 归一到通用名;图谱按通用名索引,关键词直配会漏",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-P02",
+    "track": "parse",
+    "category": "口语+商品名",
+    "desc": "华法林 + 芬必得(布洛芬),老年人",
+    "prescription_text": "老太太78了,房颤吃华法林2.5mg qd,最近牙疼自己买了芬必得0.3g bid",
+    "expected_drugs": ["华法林", "布洛芬"],
+    "expected_risk": "critical",
+    "why_llm": "口语病历+商品名芬必得;归一后规则命中抗凝+NSAID",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-P03",
+    "track": "parse",
+    "category": "同成分重复",
+    "desc": "立普妥 + 阿托伐他汀钙片,同一成分重复处方",
+    "prescription_text": "患者男,60岁,高脂血症。处方:\n1. 立普妥 20mg qn\n2. 阿托伐他汀钙片 20mg qn (社区医院带药)",
+    "expected_drugs": ["阿托伐他汀"],
+    "expected_risk": "high",
+    "why_llm": "需识别商品名与通用名是同一成分,判定重复用药/剂量加倍",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-P04",
+    "track": "parse",
+    "category": "别名缺失",
+    "desc": "强的松(图谱无此别名)+布洛芬,68岁",
+    "prescription_text": "患者男,68岁,类风湿关节炎。处方:强的松 10mg qd,布洛芬 400mg tid",
+    "expected_drugs": ["泼尼松", "布洛芬"],
+    "expected_risk": "high",
+    "why_llm": "强的松不在图谱节点;LLM 应归一为泼尼松,并结合老年+激素+NSAID 判断消化道风险",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R01",
+    "track": "reason",
+    "category": "剂量语义",
+    "desc": "对乙酰氨基酚日剂量 4g,达说明书上限",
+    "prescription_text": "患者女,55岁,骨关节炎。处方:对乙酰氨基酚 1000mg q6h(日剂量4g)",
+    "expected_drugs": ["对乙酰氨基酚"],
+    "expected_risk": "high",
+    "why_llm": "单药、图谱无边、规则不查剂量;需 LLM 判断日剂量上限与肝毒性",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R02",
+    "track": "reason",
+    "category": "化验值入参",
+    "desc": "文本写明 eGFR 28,二甲双胍",
+    "prescription_text": "患者女,70岁,2型糖尿病。近查 eGFR 28 mL/min/1.73m2。处方:二甲双胍 500mg bid",
+    "expected_drugs": ["二甲双胍"],
+    "expected_risk": "critical",
+    "why_llm": "肾功能在自由文本中;只有 LLM 解析出 renal_function=impaired,规则引擎才能兜住乳酸酸中毒风险",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-R03",
+    "track": "reason",
+    "category": "多药中枢抑制叠加",
+    "desc": "阿片+苯二氮卓+加巴喷丁三联",
+    "prescription_text": "患者男,65岁,癌痛伴焦虑。处方:羟考酮 10mg bid,阿普唑仑 0.4mg qn,加巴喷丁 300mg tid",
+    "expected_drugs": ["羟考酮", "阿普唑仑", "加巴喷丁"],
+    "expected_risk": "critical",
+    "why_llm": "规则可能只覆盖阿片+苯二氮卓;加巴喷丁叠加需综合评估呼吸抑制",
+    "rules_only_expected_miss": true
+  },
+  {
+    "id": "LI-N01",
+    "track": "negative",
+    "category": "负样本",
+    "desc": "合理慢病多药,不应 high+",
+    "prescription_text": "患者男,58岁,高血压+2型糖尿病。处方:氨氯地平 5mg qd,二甲双胍 500mg bid",
+    "expected_drugs": ["氨氯地平", "二甲双胍"],
+    "expected_risk": "safe",
+    "why_llm": "防止 LLM 因多药/慢病就升级报警",
+    "rules_only_expected_miss": false
+  },
+  {
+    "id": "LI-N02",
+    "track": "negative",
+    "category": "负样本",
+    "desc": "左甲状腺素+钙剂间隔服用",
+    "prescription_text": "患者女,52岁,甲减+骨质疏松。处方:左甲状腺素 50μg 晨起空腹,碳酸钙 600mg 睡前",
+    "expected_drugs": ["左甲状腺素", "碳酸钙"],
+    "expected_risk": "safe",
+    "why_llm": "吸收干扰可通过服药时间解决,不应 high",
+    "rules_only_expected_miss": false
+  }
+]
