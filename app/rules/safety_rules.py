@@ -45,8 +45,8 @@ def check_age_related(drugs: list[dict], age: int | None) -> list[dict]:
             if drug_id == "ciprofloxacin":
                 risks.append({
                     "drug": name, "risk": "喹诺酮类药物影响儿童软骨发育",
-                    "severity": "critical", "rule": "age_quinolone_child",
-                    "suggestion": "禁止使用,换用其他抗生素",
+                    "severity": "high", "rule": "age_quinolone_child",
+                    "suggestion": "通常避免,换用其他抗生素",
                 })
             if drug_id == "aspirin":
                 risks.append({
@@ -57,7 +57,7 @@ def check_age_related(drugs: list[dict], age: int | None) -> list[dict]:
             if drug_id in ("doxycycline", "minocycline"):
                 risks.append({
                     "drug": name, "risk": "四环素类药物影响儿童牙齿和骨骼发育",
-                    "severity": "critical", "rule": "age_tetracycline_child",
+                    "severity": "high", "rule": "age_tetracycline_child",
                     "suggestion": "8岁以下禁用,换用其他抗生素",
                 })
     return risks

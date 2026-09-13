@@ -123,6 +123,8 @@ DRUG_ALIASES: dict[str, list[str]] = {
     "代文": ["缬沙坦", "valsartan"],
     "蒙诺": ["依那普利", "enalapril"],
     "可乐定": ["可乐定", "clonidine"],
+    "苯妥英": ["苯妥英钠", "phenytoin"],
+    "苯妥英钠": ["苯妥英钠", "phenytoin"],
 }
 
 

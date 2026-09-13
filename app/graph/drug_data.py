@@ -732,7 +732,7 @@ DRUGS = [
 # ===== 药物相互作用数据 =====
 INTERACTIONS = [
     # --- 华法林相关(高危) ---
-    ("warfarin", "aspirin", "critical", "双重抗凝/抗血小板,出血风险显著增加"),
+    ("warfarin", "aspirin", "high", "抗凝+抗血小板双联,消化道出血风险显著增加(非三联)"),
     ("warfarin", "ibuprofen", "critical", "NSAIDs抑制血小板+华法林抗凝,消化道出血风险极高"),
     ("warfarin", "diclofenac", "critical", "NSAIDs增强华法林抗凝效果,出血风险"),
     ("warfarin", "naproxen", "critical", "NSAIDs增强华法林抗凝效果,出血风险"),
@@ -792,7 +792,7 @@ INTERACTIONS = [
     ("simvastatin", "fluconazole", "critical", "CYP3A4强抑制,他汀血药浓度显著升高,横纹肌溶解"),
     ("atorvastatin", "fluconazole", "high", "CYP3A4抑制,他汀血药浓度升高"),
     ("simvastatin", "itraconazole", "critical", "CYP3A4强抑制,他汀血药浓度显著升高"),
-    ("simvastatin", "clarithromycin", "critical", "CYP3A4强抑制,横纹肌溶解风险"),
+    ("simvastatin", "clarithromycin", "high", "CYP3A4强抑制,横纹肌溶解风险,建议暂停他汀或换药"),
     ("simvastatin", "erythromycin", "high", "CYP3A4抑制,他汀血药浓度升高"),
     ("atorvastatin", "itraconazole", "high", "CYP3A4抑制"),
     ("atorvastatin", "clarithromycin", "high", "CYP3A4抑制"),
@@ -1040,6 +1040,69 @@ ALTERNATIVES.extend(_EXTRA_ALTERNATIVES_2)
 # ==================== 第三批扩展(肿瘤靶向) ====================
 _EXTRA_DRUGS_3 = [{'id': 'trastuzumab', 'name': '曲妥珠单抗', 'category': '生物制剂', 'generic_name': '曲妥珠单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['心脏毒性', '输液反应'], 'metabolism': '蛋白水解'}, {'id': 'bevacizumab', 'name': '贝伐珠单抗', 'category': '生物制剂', 'generic_name': '贝伐珠单抗', 'contraindications': ['近期手术', '出血'], 'side_effects': ['高血压', '蛋白尿', '出血'], 'metabolism': '蛋白水解'}, {'id': 'pembrolizumab', 'name': '帕博利珠单抗', 'category': '免疫检查点抑制剂', 'generic_name': '帕博利珠单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应', '肺炎', '肝炎'], 'metabolism': '蛋白水解'}, {'id': 'nivolumab', 'name': '纳武利尤单抗', 'category': '免疫检查点抑制剂', 'generic_name': '纳武利尤单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应', '肺炎'], 'metabolism': '蛋白水解'}, {'id': 'atezolizumab', 'name': '阿替利珠单抗', 'category': '免疫检查点抑制剂', 'generic_name': '阿替利珠单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应'], 'metabolism': '蛋白水解'}, {'id': 'durvalumab', 'name': '度伐利尤单抗', 'category': '免疫检查点抑制剂', 'generic_name': '度伐利尤单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应'], 'metabolism': '蛋白水解'}, {'id': 'avelumab', 'name': '阿维鲁单抗', 'category': '免疫检查点抑制剂', 'generic_name': '阿维鲁单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应', '输液反应'], 'metabolism': '蛋白水解'}, {'id': 'ipilimumab', 'name': '伊匹木单抗', 'category': '免疫检查点抑制剂', 'generic_name': '伊匹木单抗', 'contraindications': ['对本品过敏'], 'side_effects': ['免疫相关不良反应(较重)', '结肠炎'], 'metabolism': '蛋白水解'}, {'id': 'olaparib', 'name': '奥拉帕利', 'category': 'PARP抑制剂', 'generic_name': '奥拉帕利', 'contraindications': ['严重肝功能不全'], 'side_effects': ['骨髓抑制', '恶心'], 'metabolism': 'CYP3A4'}, {'id': 'niraparib', 'name': '尼拉帕利', 'category': 'PARP抑制剂', 'generic_name': '尼拉帕利', 'contraindications': ['对本品过敏'], 'side_effects': ['骨髓抑制', '高血压'], 'metabolism': 'CYP3A4'}, {'id': 'rucaparib', 'name': '卢卡帕利', 'category': 'PARP抑制剂', 'generic_name': '卢卡帕利', 'contraindications': ['对本品过敏'], 'side_effects': ['骨髓抑制', '恶心'], 'metabolism': 'CYP2D6'}, {'id': 'palbociclib', 'name': '哌柏西利', 'category': 'CDK4/6抑制剂', 'generic_name': '哌柏西利', 'contraindications': ['严重肝功能不全'], 'side_effects': ['骨髓抑制', '疲劳'], 'metabolism': 'CYP3A4'}, {'id': 'ribociclib', 'name': '瑞波西利', 'category': 'CDK4/6抑制剂', 'generic_name': '琥珀酸瑞波西利', 'contraindications': ['QT延长'], 'side_effects': ['骨髓抑制', 'QT延长'], 'metabolism': 'CYP3A4'}, {'id': 'abemaciclib', 'name': '阿贝西利', 'category': 'CDK4/6抑制剂', 'generic_name': '阿贝西利', 'contraindications': ['严重肝功能不全'], 'side_effects': ['腹泻', '骨髓抑制'], 'metabolism': 'CYP3A4'}, {'id': 'ibrutinib', 'name': '伊布替尼', 'category': 'BTK抑制剂', 'generic_name': '伊布替尼', 'contraindications': ['CYP3A4强抑制剂合用'], 'side_effects': ['出血', '感染', '房颤'], 'metabolism': 'CYP3A4'}, {'id': 'acalabrutinib', 'name': '阿卡替尼', 'category': 'BTK抑制剂', 'generic_name': '阿卡替尼', 'contraindications': ['CYP3A4强抑制剂合用'], 'side_effects': ['头痛', '感染'], 'metabolism': 'CYP3A4'}, {'id': 'zanubrutinib', 'name': '泽布替尼', 'category': 'BTK抑制剂', 'generic_name': '泽布替尼', 'contraindications': ['CYP3A4强抑制剂合用'], 'side_effects': ['感染', '出血'], 'metabolism': 'CYP3A4'}, {'id': 'venetoclax', 'name': '维奈克拉', 'category': 'BCL-2抑制剂', 'generic_name': '维奈克拉', 'contraindications': ['CYP3A4强抑制剂合用(首剂)'], 'side_effects': ['肿瘤溶解综合征', '骨髓抑制'], 'metabolism': 'CYP3A4'}, {'id': 'enzalutamide', 'name': '恩杂鲁胺', 'category': 'AR抑制剂', 'generic_name': '恩杂鲁胺', 'contraindications': ['对本品过敏'], 'side_effects': ['疲劳', '潮热', '癫痫'], 'metabolism': 'CYP2C8/CYP3A4'}, {'id': 'abiraterone', 'name': '阿比特龙', 'category': 'CYP17抑制剂', 'generic_name': '醋酸阿比特龙', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高血压', '低钾血症'], 'metabolism': 'CYP3A4'}, {'id': 'bortezomib', 'name': '硼替佐米', 'category': '蛋白酶体抑制剂', 'generic_name': '硼替佐米', 'contraindications': ['对本品过敏'], 'side_effects': ['周围神经病变', '血小板减少'], 'metabolism': 'CYP3A4'}, {'id': 'lenalidomide', 'name': '来那度胺', 'category': '免疫调节剂', 'generic_name': '来那度胺', 'contraindications': ['孕妇(致畸)'], 'side_effects': ['骨髓抑制', '血栓栓塞'], 'metabolism': '不代谢'}, {'id': 'pomalidomide', 'name': '泊马度胺', 'category': '免疫调节剂', 'generic_name': '泊马度胺', 'contraindications': ['孕妇(致畸)'], 'side_effects': ['骨髓抑制', '血栓栓塞'], 'metabolism': 'CYP1A2'}, {'id': 'crizotinib', 'name': '克唑替尼', 'category': 'ALK/ROS1抑制剂', 'generic_name': '克唑替尼', 'contraindications': ['QT延长'], 'side_effects': ['视力障碍', 'QT延长'], 'metabolism': 'CYP3A4'}, {'id': 'alectinib', 'name': '阿来替尼', 'category': 'ALK抑制剂', 'generic_name': '盐酸阿来替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['肌痛', '便秘'], 'metabolism': 'CYP3A4'}, {'id': 'osimertinib', 'name': '奥希替尼', 'category': 'EGFR抑制剂', 'generic_name': '甲磺酸奥希替尼', 'contraindications': ['QT延长'], 'side_effects': ['皮疹', '腹泻', '间质性肺炎'], 'metabolism': 'CYP3A4'}, {'id': 'dabrafenib', 'name': '达拉非尼', 'category': 'BRAF抑制剂', 'generic_name': '甲磺酸达拉非尼', 'contraindications': ['对本品过敏'], 'side_effects': ['发热', '皮疹'], 'metabolism': 'CYP2C8'}, {'id': 'trametinib', 'name': '曲美替尼', 'category': 'MEK抑制剂', 'generic_name': '曲美替尼', 'contraindications': ['LVEF降低'], 'side_effects': ['皮疹', '腹泻', '心肌病'], 'metabolism': 'CYP酶(少量)'}, {'id': 'vemurafenib', 'name': '维莫非尼', 'category': 'BRAF抑制剂', 'generic_name': '维莫非尼', 'contraindications': ['QT延长'], 'side_effects': ['关节痛', '皮疹'], 'metabolism': 'CYP3A4'}, {'id': 'regorafenib', 'name': '瑞戈非尼', 'category': '多激酶抑制剂', 'generic_name': '瑞戈非尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['手足综合征', '肝毒性'], 'metabolism': 'CYP3A4'}, {'id': 'cabozantinib', 'name': '卡博替尼', 'category': '多激酶抑制剂', 'generic_name': '苹果酸卡博替尼', 'contraindications': ['近期出血'], 'side_effects': ['腹泻', '高血压'], 'metabolism': 'CYP3A4'}, {'id': 'apatinib', 'name': '阿帕替尼', 'category': 'VEGFR抑制剂', 'generic_name': '甲磺酸阿帕替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高血压', '蛋白尿'], 'metabolism': 'CYP3A4'}, {'id': 'anlotinib', 'name': '安罗替尼', 'category': '多激酶抑制剂', 'generic_name': '盐酸安罗替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高血压', '手足综合征'], 'metabolism': 'CYP1A2'}, {'id': 'surufatinib', 'name': '索凡替尼', 'category': '多激酶抑制剂', 'generic_name': '索凡替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['蛋白尿', '高血压'], 'metabolism': 'CYP3A4'}, {'id': 'famitinib', 'name': '法米替尼', 'category': '多激酶抑制剂', 'generic_name': '法米替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高血压', '腹泻'], 'metabolism': 'CYP3A4'}, {'id': 'tivozanib', 'name': '替沃扎尼', 'category': 'VEGFR抑制剂', 'generic_name': '替沃扎尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高血压', '疲劳'], 'metabolism': 'CYP3A4'}, {'id': 'pazopanib', 'name': '帕唑帕尼', 'category': '多激酶抑制剂', 'generic_name': '帕唑帕尼', 'contraindications': ['QT延长'], 'side_effects': ['肝毒性', '高血压', '腹泻'], 'metabolism': 'CYP3A4'}, {'id': 'sunitinib', 'name': '舒尼替尼', 'category': '多激酶抑制剂', 'generic_name': '苹果酸舒尼替尼', 'contraindications': ['QT延长'], 'side_effects': ['疲劳', '高血压', '手足综合征'], 'metabolism': 'CYP3A4'}, {'id': 'lapatinib', 'name': '拉帕替尼', 'category': 'HER2/EGFR抑制剂', 'generic_name': '甲苯磺酸拉帕替尼', 'contraindications': ['QT延长'], 'side_effects': ['腹泻', '皮疹', 'QT延长'], 'metabolism': 'CYP3A4'}, {'id': 'neratinib', 'name': '奈拉替尼', 'category': 'HER2抑制剂', 'generic_name': '马来酸奈拉替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['腹泻', '肝毒性'], 'metabolism': 'CYP3A4'}, {'id': 'tucatinib', 'name': '图卡替尼', 'category': 'HER2抑制剂', 'generic_name': '图卡替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['腹泻', '手足综合征'], 'metabolism': 'CYP2C8/CYP3A4'}, {'id': 'pirtobrutinib', 'name': '吡托布鲁替尼', 'category': 'BTK抑制剂', 'generic_name': '吡托布鲁替尼', 'contraindications': ['对本品过敏'], 'side_effects': ['疲劳', '瘀伤', '感染'], 'metabolism': 'CYP2C19/CYP3A4'}, {'id': 'capivasertib', 'name': '卡帕塞替尼', 'category': 'AKT抑制剂', 'generic_name': '卡帕塞替尼', 'contraindications': ['对本品过敏'], 'side_effects': ['皮疹', '腹泻', '高血糖'], 'metabolism': 'CYP3A4'}, {'id': 'infigratinib', 'name': '英菲格拉替尼', 'category': 'FGFR抑制剂', 'generic_name': '英菲格拉替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高磷血症', '视网膜病变'], 'metabolism': 'CYP3A4'}, {'id': 'futibatinib', 'name': '福巴替尼', 'category': 'FGFR抑制剂', 'generic_name': '福巴替尼', 'contraindications': ['对本品过敏'], 'side_effects': ['高磷血症', '甲沟炎'], 'metabolism': 'CYP3A4'}, {'id': 'erdafitinib', 'name': '厄达替尼', 'category': 'FGFR抑制剂', 'generic_name': '厄达替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['高磷血症', '视网膜病变'], 'metabolism': 'CYP2C9/CYP3A4'}, {'id': 'selpercatinib', 'name': '塞普替尼', 'category': 'RET抑制剂', 'generic_name': '塞普替尼', 'contraindications': ['QT延长'], 'side_effects': ['口干', '腹泻', 'QT延长'], 'metabolism': 'CYP3A4'}, {'id': 'pralsetinib', 'name': '普拉替尼', 'category': 'RET抑制剂', 'generic_name': '普拉替尼', 'contraindications': ['对本品过敏'], 'side_effects': ['便秘', '疲劳'], 'metabolism': 'CYP3A4'}, {'id': 'larotrectinib', 'name': '拉罗替尼', 'category': 'TRK抑制剂', 'generic_name': '拉罗替尼', 'contraindications': ['CYP3A4强抑制剂合用'], 'side_effects': ['头晕', '疲劳'], 'metabolism': 'CYP3A4'}, {'id': 'entrectinib', 'name': '恩曲替尼', 'category': 'TRK/ROS1抑制剂', 'generic_name': '恩曲替尼', 'contraindications': ['QT延长'], 'side_effects': ['疲劳', '便秘', 'QT延长'], 'metabolism': 'CYP3A4'}, {'id': 'tepotinib', 'name': '特泊替尼', 'category': 'MET抑制剂', 'generic_name': '盐酸特泊替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['水肿', '疲劳'], 'metabolism': 'CYP3A4/CYP2C8'}, {'id': 'capmatinib', 'name': '卡马替尼', 'category': 'MET抑制剂', 'generic_name': '盐酸卡马替尼', 'contraindications': ['严重肝功能不全'], 'side_effects': ['水肿', '恶心'], 'metabolism': 'CYP3A4'}]
 DRUGS.extend(_EXTRA_DRUGS_3)
+
+
+# ==================== 第四批扩展(常见缺口 + 别名友好) ====================
+_EXTRA_DRUGS_4 = [
+    {"id": "phenytoin", "name": "苯妥英钠", "category": "抗癫痫药", "generic_name": "苯妥英",
+     "contraindications": ["窦性心动过缓", "II-III度房室传导阻滞", "严重肝功能不全"],
+     "side_effects": ["牙龈增生", "共济失调", "血液系统异常"], "metabolism": "CYP2C9/CYP2C19"},
+    {"id": "theophylline", "name": "茶碱", "category": "平喘药", "generic_name": "氨茶碱",
+     "contraindications": ["活动性消化道溃疡", "未控制心律失常"],
+     "side_effects": ["恶心", "心律失常", "抽搐"], "metabolism": "CYP1A2"},
+    {"id": "cimetidine", "name": "西咪替丁", "category": "H2受体拮抗剂", "generic_name": "西咪替丁",
+     "contraindications": ["对本品过敏"], "side_effects": ["头痛", "男性乳房发育"], "metabolism": "CYP酶抑制"},
+    {"id": "cyclophosphamide", "name": "环磷酰胺", "category": "烷化剂", "generic_name": "环磷酰胺",
+     "contraindications": ["严重骨髓抑制", "孕妇", "活动性感染"],
+     "side_effects": ["骨髓抑制", "出血性膀胱炎"], "metabolism": "CYP2B6/CYP3A4"},
+    {"id": "azathioprine", "name": "硫唑嘌呤", "category": "免疫抑制剂", "generic_name": "硫唑嘌呤",
+     "contraindications": ["孕妇", "严重感染"], "side_effects": ["骨髓抑制", "肝毒性"],
+     "metabolism": "黄嘌呤氧化酶"},
+    {"id": "mercaptopurine", "name": "巯嘌呤", "category": "抗代谢药", "generic_name": "6-巯基嘌呤",
+     "contraindications": ["孕妇"], "side_effects": ["骨髓抑制", "肝毒性"], "metabolism": "黄嘌呤氧化酶/TPMT"},
+    {"id": "methotrexate", "name": "甲氨蝶呤", "category": "抗代谢药", "generic_name": "甲氨蝶呤",
+     "contraindications": ["孕妇", "严重肝肾功能不全", "免疫缺陷"],
+     "side_effects": ["骨髓抑制", "肝纤维化", "口腔炎"], "metabolism": "肾脏排泄"},
+    {"id": "tacrolimus", "name": "他克莫司", "category": "免疫抑制剂", "generic_name": "他克莫司",
+     "contraindications": ["孕妇", "对他克莫司过敏"],
+     "side_effects": ["肾毒性", "高血糖", "神经毒性"], "metabolism": "CYP3A4"},
+    {"id": "mycophenolate", "name": "吗替麦考酚酯", "category": "免疫抑制剂", "generic_name": "吗替麦考酚酯",
+     "contraindications": ["孕妇"], "side_effects": ["腹泻", "骨髓抑制", "感染"],
+     "metabolism": "葡萄糖醛酸转移酶"},
+]
+DRUGS.extend(_EXTRA_DRUGS_4)
+
+_EXTRA_INTERACTIONS_4 = [
+    ("warfarin", "aspirin", "high", "抗凝+抗血小板双联,出血风险增加3-4倍"),
+    ("phenytoin", "amiodarone", "high", "相互影响血药浓度,需监测"),
+    ("cimetidine", "theophylline", "high", "CYP抑制升高茶碱浓度,心律失常风险"),
+    ("cimetidine", "warfarin", "high", "CYP抑制增强华法林抗凝"),
+    ("mercaptopurine", "allopurinol", "critical", "XO抑制致6-MP蓄积,严重骨髓抑制"),
+    ("azathioprine", "allopurinol", "critical", "XO抑制致硫唑嘌呤蓄积,骨髓抑制"),
+    ("methotrexate", "cotrimoxazole", "high", "叶酸拮抗/肾排泄竞争,毒性叠加"),
+    ("tacrolimus", "cyclosporine", "critical", "两种钙调磷酸酶抑制剂联用,肾毒性叠加"),
+    ("tacrolimus", "clarithromycin", "critical", "CYP3A4强抑制,他克莫司浓度升高"),
+    ("cyclosporine", "atorvastatin", "high", "他汀暴露升高,肌病风险"),
+    ("mycophenolate", "cholestyramine", "high", "树脂吸附降低吗替麦考酚酯吸收"),
+    ("levothyroxine", "calcium_carbonate", "low", "钙剂吸附降低甲状腺素吸收,间隔4小时可解"),
+    ("levothyroxine", "calcium", "low", "钙剂吸附降低甲状腺素吸收,间隔4小时可解"),
+    ("amlodipine", "simvastatin", "medium", "氨氯地平轻度升高他汀暴露,注意肌病"),
+    ("omeprazole", "clopidogrel", "medium", "CYP2C19抑制可能减弱氯吡格雷活化"),
+]
+INTERACTIONS.extend(_EXTRA_INTERACTIONS_4)
+# 碳酸钙若已存在则用 calcium_carbonate 别名边;同时确保 calcium 节点可用
+if not any(d["id"] == "calcium_carbonate" for d in DRUGS):
+    DRUGS.append({
+        "id": "calcium_carbonate", "name": "碳酸钙", "category": "矿物质补充剂",
+        "generic_name": "碳酸钙", "contraindications": ["高钙血症"],
+        "side_effects": ["便秘", "腹胀"], "metabolism": "不代谢",
+    })
+if not any(d["id"] == "cholestyramine" for d in DRUGS):
+    DRUGS.append({
+        "id": "cholestyramine", "name": "考来烯胺", "category": "胆汁酸螯合剂",
+        "generic_name": "考来烯胺", "contraindications": ["完全性胆道梗阻"],
+        "side_effects": ["便秘", "脂肪泻"], "metabolism": "不吸收",
+    })
 
 
 def build_graph_from_data():

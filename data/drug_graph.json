@@ -9396,6 +9396,26 @@
       }
     },
     {
+      "id": "phenytoin",
+      "attrs": {
+        "name": "苯妥英钠",
+        "category": "抗癫痫药",
+        "drug": true,
+        "generic_name": "苯妥英",
+        "contraindications": [
+          "窦性心动过缓",
+          "II-III度房室传导阻滞",
+          "严重肝功能不全"
+        ],
+        "side_effects": [
+          "牙龈增生",
+          "共济失调",
+          "血液系统异常"
+        ],
+        "metabolism": "CYP2C9/CYP2C19"
+      }
+    },
+    {
       "id": "oxazepam",
       "attrs": {}
     },
@@ -9433,10 +9453,6 @@
     },
     {
       "id": "oral_contraceptives",
-      "attrs": {}
-    },
-    {
-      "id": "phenytoin",
       "attrs": {}
     },
     {
@@ -9494,6 +9510,10 @@
     {
       "id": "trimethoprim",
       "attrs": {}
+    },
+    {
+      "id": "calcium",
+      "attrs": {}
     }
   ],
   "edges": [
@@ -9530,8 +9550,8 @@
       "target": "aspirin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "双重抗凝/抗血小板,出血风险显著增加"
+        "severity": "high",
+        "mechanism": "抗凝+抗血小板双联,出血风险增加3-4倍"
       }
     },
     {
@@ -9738,7 +9758,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "CYP抑制,华法林浓度升高"
+        "mechanism": "CYP抑制增强华法林抗凝"
       }
     },
     {
@@ -9864,8 +9884,8 @@
       "target": "warfarin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "双重抗凝/抗血小板,出血风险显著增加"
+        "severity": "high",
+        "mechanism": "抗凝+抗血小板双联,出血风险增加3-4倍"
       }
     },
     {
@@ -9974,7 +9994,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "medium",
-        "mechanism": "奥美拉唑抑制CYP2C19,氯吡格雷活化受阻"
+        "mechanism": "CYP2C19抑制可能减弱氯吡格雷活化"
       }
     },
     {
@@ -10250,8 +10270,8 @@
       "target": "simvastatin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "CYP3A4抑制,他汀血药浓度升高"
+        "severity": "medium",
+        "mechanism": "氨氯地平轻度升高他汀暴露,注意肌病"
       }
     },
     {
@@ -10859,7 +10879,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "环孢素抑制OATP/CYP3A4"
+        "mechanism": "他汀暴露升高,肌病风险"
       }
     },
     {
@@ -10908,8 +10928,8 @@
       "target": "amlodipine",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "CYP3A4抑制,他汀血药浓度升高"
+        "severity": "medium",
+        "mechanism": "氨氯地平轻度升高他汀暴露,注意肌病"
       }
     },
     {
@@ -10935,8 +10955,8 @@
       "target": "clarithromycin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "CYP3A4强抑制,横纹肌溶解风险"
+        "severity": "high",
+        "mechanism": "CYP3A4强抑制,横纹肌溶解风险,建议暂停他汀或换药"
       }
     },
     {
@@ -11439,7 +11459,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "胺碘酮抑制CYP2C9,苯妥英中毒"
+        "mechanism": "相互影响血药浓度,需监测"
       }
     },
     {
@@ -11553,7 +11573,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "medium",
-        "mechanism": "奥美拉唑抑制CYP2C19,氯吡格雷活化受阻"
+        "mechanism": "CYP2C19抑制可能减弱氯吡格雷活化"
       }
     },
     {
@@ -12338,8 +12358,8 @@
       "target": "simvastatin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "CYP3A4强抑制,横纹肌溶解风险"
+        "severity": "high",
+        "mechanism": "CYP3A4强抑制,横纹肌溶解风险,建议暂停他汀或换药"
       }
     },
     {
@@ -12375,7 +12395,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "CYP3A4强抑制,他克莫司血药浓度显著升高"
+        "mechanism": "CYP3A4强抑制,他克莫司浓度升高"
       }
     },
     {
@@ -14325,8 +14345,8 @@
       "target": "calcium_carbonate",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "钙剂影响甲状腺素吸收,需间隔4小时"
+        "severity": "low",
+        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
       }
     },
     {
@@ -14384,6 +14404,15 @@
       }
     },
     {
+      "source": "levothyroxine",
+      "target": "calcium",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "low",
+        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
+      }
+    },
+    {
       "source": "salbutamol",
       "target": "propranolol",
       "attrs": {
@@ -14416,7 +14445,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "CYP1A2抑制,茶碱血药浓度升高"
+        "mechanism": "CYP抑制升高茶碱浓度,心律失常风险"
       }
     },
     {
@@ -14524,7 +14553,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "抑制黄嘌呤氧化酶,硫唑嘌呤代谢受阻,骨髓抑制风险极高"
+        "mechanism": "XO抑制致硫唑嘌呤蓄积,骨髓抑制"
       }
     },
     {
@@ -14533,7 +14562,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "别嘌醇抑制XO,6-MP蓄积,严重骨髓抑制"
+        "mechanism": "XO抑制致6-MP蓄积,严重骨髓抑制"
       }
     },
     {
@@ -14597,7 +14626,7 @@
         "relation": "INTERACTS_WITH",
         "reason": "他克莫司肾毒性相对较轻(需个体化评估)",
         "severity": "critical",
-        "mechanism": "双重肾毒性叠加"
+        "mechanism": "两种钙调磷酸酶抑制剂联用,肾毒性叠加"
       }
     },
     {
@@ -14704,7 +14733,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "环孢素抑制OATP/CYP3A4"
+        "mechanism": "他汀暴露升高,肌病风险"
       }
     },
     {
@@ -14741,7 +14770,7 @@
         "relation": "INTERACTS_WITH",
         "reason": "他克莫司肾毒性相对较轻(需个体化评估)",
         "severity": "critical",
-        "mechanism": "双重肾毒性叠加"
+        "mechanism": "两种钙调磷酸酶抑制剂联用,肾毒性叠加"
       }
     },
     {
@@ -14768,7 +14797,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "CYP3A4强抑制,他克莫司血药浓度显著升高"
+        "mechanism": "CYP3A4强抑制,他克莫司浓度升高"
       }
     },
     {
@@ -14831,7 +14860,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "抑制黄嘌呤氧化酶,硫唑嘌呤代谢受阻,骨髓抑制风险极高"
+        "mechanism": "XO抑制致硫唑嘌呤蓄积,骨髓抑制"
       }
     },
     {
@@ -14866,7 +14895,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "考来烯胺降低霉酚酸肠肝循环"
+        "mechanism": "树脂吸附降低吗替麦考酚酯吸收"
       }
     },
     {
@@ -14910,7 +14939,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "抑制肾小管分泌,甲氨蝶呤蓄积"
+        "mechanism": "叶酸拮抗/肾排泄竞争,毒性叠加"
       }
     },
     {
@@ -15161,8 +15190,8 @@
       "target": "levothyroxine",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "钙剂影响甲状腺素吸收,需间隔4小时"
+        "severity": "low",
+        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
       }
     },
     {
@@ -15540,7 +15569,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "别嘌醇抑制XO,6-MP蓄积,严重骨髓抑制"
+        "mechanism": "XO抑制致6-MP蓄积,严重骨髓抑制"
       }
     },
     {
@@ -15557,7 +15586,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "CYP1A2抑制,茶碱血药浓度升高"
+        "mechanism": "CYP抑制升高茶碱浓度,心律失常风险"
       }
     },
     {
@@ -15566,7 +15595,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "CYP抑制,华法林浓度升高"
+        "mechanism": "CYP抑制增强华法林抗凝"
       }
     },
     {
@@ -15835,7 +15864,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "考来烯胺降低霉酚酸肠肝循环"
+        "mechanism": "树脂吸附降低吗替麦考酚酯吸收"
       }
     },
     {
@@ -15853,7 +15882,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "抑制肾小管分泌,甲氨蝶呤蓄积"
+        "mechanism": "叶酸拮抗/肾排泄竞争,毒性叠加"
       }
     },
     {
@@ -16956,6 +16985,51 @@
       }
     },
     {
+      "source": "phenytoin",
+      "target": "fluconazole",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "氟康唑抑制CYP2C9,苯妥英中毒"
+      }
+    },
+    {
+      "source": "phenytoin",
+      "target": "amiodarone",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "相互影响血药浓度,需监测"
+      }
+    },
+    {
+      "source": "phenytoin",
+      "target": "warfarin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "苯妥英诱导CYP,华法林效果可能变化"
+      }
+    },
+    {
+      "source": "phenytoin",
+      "target": "omeprazole",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "奥美拉唑抑制CYP2C19,苯妥英血药浓度可能升高"
+      }
+    },
+    {
+      "source": "phenytoin",
+      "target": "cimetidine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "西咪替丁抑制CYP,苯妥英血药浓度升高"
+      }
+    },
+    {
       "source": "oxazepam",
       "target": "diazepam",
       "attrs": {
@@ -17164,51 +17238,6 @@
         "relation": "INTERACTS_WITH",
         "severity": "critical",
         "mechanism": "卡马西平诱导CYP3A4,口服避孕药失效"
-      }
-    },
-    {
-      "source": "phenytoin",
-      "target": "fluconazole",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "氟康唑抑制CYP2C9,苯妥英中毒"
-      }
-    },
-    {
-      "source": "phenytoin",
-      "target": "amiodarone",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "胺碘酮抑制CYP2C9,苯妥英中毒"
-      }
-    },
-    {
-      "source": "phenytoin",
-      "target": "warfarin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "苯妥英诱导CYP,华法林效果可能变化"
-      }
-    },
-    {
-      "source": "phenytoin",
-      "target": "omeprazole",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "奥美拉唑抑制CYP2C19,苯妥英血药浓度可能升高"
-      }
-    },
-    {
-      "source": "phenytoin",
-      "target": "cimetidine",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "西咪替丁抑制CYP,苯妥英血药浓度升高"
       }
     },
     {
@@ -17443,6 +17472,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "medium",
         "mechanism": "甲氧苄啶降低金刚烷胺肾脏清除"
+      }
+    },
+    {
+      "source": "calcium",
+      "target": "levothyroxine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "low",
+        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
       }
     }
   ]
