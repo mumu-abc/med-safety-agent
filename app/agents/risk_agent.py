@@ -178,90 +178,50 @@ SYSTEM_PROMPT = """你是资深临床药师,负责评估用药安全性。
 - 你发现的风险,source 字段填 "llm"""
 
 
-def assess_risk(
-    interactions: list[dict],
-    contraindications: list[dict],
-    rule_risks: list[dict],
-    patient: dict,
-    drugs: list[dict],
-) -> RiskAssessment:
-    """用 ReAct Agent + response_format 进行综合风险评估。
+def _deterministic_risks(interactions, contraindications, rule_risks) -> list[RiskItem]:
+    """图谱交互 + 禁忌症 + 规则 → RiskItem 列表（不依赖 LLM）。"""
+    items: list[RiskItem] = []
+    for it in interactions or []:
+        items.append(RiskItem(
+            drug=f"{it.get('drug_a','')}+{it.get('drug_b','')}",
+            risk_type="interaction",
+            severity=it.get("severity", "high"),
+            description=it.get("mechanism", "药物相互作用"),
+            source="graph",
+            suggestion="评估是否需调整方案或加强监测",
+        ))
+    for ct in contraindications or []:
+        items.append(RiskItem(
+            drug=ct.get("drug", ""),
+            risk_type="contraindication",
+            severity=ct.get("severity", "high"),
+            description=f"{ct.get('condition','')}: {ct.get('contraindication','')}",
+            source="graph",
+            suggestion="核对禁忌，必要时停用或换药",
+        ))
+    for rr in rule_risks or []:
+        items.append(RiskItem(
+            drug=rr.get("drug", ""),
+            risk_type=rr.get("risk_type", "rule"),
+            severity=rr.get("severity", "high"),
+            description=rr.get("risk", ""),
+            source="rule",
+            suggestion=rr.get("suggestion", ""),
+        ))
+    return items
 
-    流程:
-    1. 构建上下文
-    2. ReAct Agent 自主循环调用工具(response_format 直接输出 RiskAssessment)
-    3. 合并规则引擎结果(用 risk_type+drug 去重)
-    """
-    # ---- 构建上下文 ----
-    context_parts = []
-    context_parts.append("## 患者信息")
-    context_parts.append(f"- 年龄: {patient.get('age', '未知')}")
-    context_parts.append(f"- 性别: {patient.get('gender', '未知')}")
-    context_parts.append(f"- 诊断: {patient.get('conditions', [])}")
-    context_parts.append(f"- 过敏史: {patient.get('allergies', [])}")
-    context_parts.append(f"- 肝功能: {patient.get('liver_function', '正常')}")
-    context_parts.append(f"- 肾功能: {patient.get('renal_function', '正常')}")
-    context_parts.append(f"- 孕期: {patient.get('pregnancy', '否')}")
 
-    context_parts.append("\n## 处方药物")
-    for d in drugs:
-        context_parts.append(f"- {d.get('name', '')} {d.get('dosage', '')} {d.get('frequency', '')}")
+def _max_severity_rank(items: list[RiskItem], default: str = "safe") -> str:
+    rank = {"safe": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
+    best, best_r = default, rank.get(default, 0)
+    for r in items:
+        cur = rank.get(r.severity, 0)
+        if cur > best_r:
+            best, best_r = r.severity, cur
+    return best
 
-    if interactions:
-        context_parts.append("\n## 图谱检测到的药物相互作用")
-        for it in interactions:
-            context_parts.append(f"- {it['drug_a']} + {it['drug_b']}: {it['severity']} — {it['mechanism']}")
 
-    if contraindications:
-        context_parts.append("\n## 禁忌症匹配")
-        for ct in contraindications:
-            context_parts.append(f"- {ct['drug']}: {ct['condition']} → {ct.get('contraindication', '')}")
-
-    if rule_risks:
-        context_parts.append("\n## 规则引擎已识别的风险(必须采纳,不得降低)")
-        for rr in rule_risks:
-            context_parts.append(f"- [{rr['severity']}] {rr['drug']}: {rr['risk']} → {rr.get('suggestion', '')}")
-
-    context = "\n".join(context_parts)
-
-    # ---- ReAct Agent with response_format (直接输出结构化结果,省一次 LLM 调用) ----
-    try:
-        llm = get_llm()
-        react_agent = create_react_agent(
-            model=llm,
-            tools=RISK_TOOLS,
-            state_modifier=SYSTEM_PROMPT,
-            response_format=RiskAssessment,
-        )
-
-        react_result = react_agent.invoke(
-            {"messages": [HumanMessage(content=f"请评估以下处方的安全性:\n\n{context}")]},
-            config={"recursion_limit": 50},
-        )
-
-        # response_format 直接输出结构化结果
-        result = react_result.get("structured_response")
-        if result is None:
-            # 兜底:尝试从 messages 提取
-            final_content = ""
-            messages = react_result.get("messages", [])
-            for msg in reversed(messages):
-                if hasattr(msg, "content") and msg.content and not hasattr(msg, "tool_call_id"):
-                    final_content = msg.content
-                    break
-            if final_content:
-                structured_llm = llm.with_structured_output(RiskAssessment)
-                result = structured_llm.invoke([
-                    SystemMessage(content=SYSTEM_PROMPT),
-                    HumanMessage(content=f"根据以下分析,输出结构化风险评估:\n\n{final_content}\n\n原始上下文:\n{context}"),
-                ])
-        if result is None:
-            result = RiskAssessment(overall_risk="unknown", risks=[], summary="LLM未返回有效结果")
-    except Exception as e:
-        logger.error(f"风险评估Agent异常: {e}")
-        result = RiskAssessment(overall_risk="unknown", risks=[], summary=f"⚠️ 风险评估失败: {type(e).__name__}")
-
-    # ---- 风险等级归一化(LLM 可能返回非标准值) ----
+def _normalize_risk(level: str) -> str:
     _RISK_NORMALIZE = {
         "critical": "critical", "critial": "critical", "危急": "critical", "严重": "critical",
         "high": "high", "高风险": "high", "重要": "high",
@@ -270,40 +230,141 @@ def assess_risk(
         "safe": "safe", "安全": "safe", "not_safe": "high", "not safe": "high",
         "unsafe": "high", "不安全": "high", "unknown": "unknown",
     }
-    raw_risk = result.overall_risk.strip().lower() if result.overall_risk else "unknown"
-    result.overall_risk = _RISK_NORMALIZE.get(raw_risk, "unknown")
-    if result.overall_risk == "unknown":
-        logger.warning(f"LLM 返回非标准风险等级: {raw_risk}")
+    raw = (level or "unknown").strip().lower()
+    return _RISK_NORMALIZE.get(raw, "unknown")
 
-    # ---- 合并规则引擎结果(P0-5:用 risk_type+drug 去重,而非精确字符串匹配) ----
-    # 规则引擎的风险有 risk_type(如"pregnancy"/"hepatic"),用它做去重键
+
+def _llm_react_assess(context: str) -> RiskAssessment | None:
+    """ReAct 工具循环评估；失败返回 None。"""
+    try:
+        llm = get_llm()
+        react_agent = create_react_agent(
+            model=llm,
+            tools=RISK_TOOLS,
+            state_modifier=SYSTEM_PROMPT,
+            response_format=RiskAssessment,
+        )
+        react_result = react_agent.invoke(
+            {"messages": [HumanMessage(content=f"请评估以下处方的安全性:\n\n{context}")]},
+            config={"recursion_limit": 50},
+        )
+        result = react_result.get("structured_response")
+        if isinstance(result, RiskAssessment):
+            return result
+        if result is not None:
+            return RiskAssessment.model_validate(result)
+    except Exception as e:
+        logger.error(f"ReAct 风险评估失败: {e}")
+    return None
+
+
+def _llm_semantic_assess(context: str) -> RiskAssessment | None:
+    """单次 structured output 语义评估（默认路径，延迟可控）。"""
+    try:
+        from app.agents.semantic_assess import assess_risk_llm_once
+        llm_out = assess_risk_llm_once(context)
+        risks = [
+            RiskItem(
+                drug=r.drug, risk_type=r.risk_type or "llm",
+                severity=_normalize_risk(r.severity) if _normalize_risk(r.severity) != "unknown" else "medium",
+                description=r.description, source="llm", suggestion=r.suggestion,
+            )
+            for r in llm_out.risks
+        ]
+        return RiskAssessment(
+            overall_risk=_normalize_risk(llm_out.overall_risk),
+            risks=risks,
+            summary=llm_out.summary or "",
+        )
+    except Exception as e:
+        logger.error(f"语义风险评估失败: {e}")
+        return None
+
+
+def assess_risk(
+    interactions: list[dict],
+    contraindications: list[dict],
+    rule_risks: list[dict],
+    patient: dict,
+    drugs: list[dict],
+) -> RiskAssessment:
+    """综合风险评估：确定性地板 + 可选 LLM。
+
+    RISK_MODE:
+      - semantic（默认）: 单次 structured output，延迟可控
+      - react: ReAct 工具循环（慢，演示用）；失败自动降级 semantic
+      - rules: 纯图谱+规则，不调 LLM
+
+    无论 LLM 输出什么，overall_risk 不得低于图谱/规则最高 severity。
+    """
+    from app.config import settings
+
+    # ---- 确定性地板 ----
+    det_items = _deterministic_risks(interactions, contraindications, rule_risks)
+    det_floor = _max_severity_rank(det_items, default="safe")
+
+    context_parts = [
+        "## 患者信息",
+        f"- 年龄: {patient.get('age', '未知')}",
+        f"- 性别: {patient.get('gender', '未知')}",
+        f"- 诊断: {patient.get('conditions', [])}",
+        f"- 过敏史: {patient.get('allergies', [])}",
+        f"- 肝功能: {patient.get('liver_function', '正常')}",
+        f"- 肾功能: {patient.get('renal_function', '正常')}",
+        f"- 孕期: {patient.get('pregnancy', '否')}",
+        "\n## 处方药物",
+    ]
+    for d in drugs:
+        context_parts.append(f"- {d.get('name', '')} {d.get('dosage', '')} {d.get('frequency', '')}")
+    if interactions:
+        context_parts.append("\n## 图谱检测到的药物相互作用")
+        for it in interactions:
+            context_parts.append(f"- {it['drug_a']} + {it['drug_b']}: {it['severity']} — {it['mechanism']}")
+    if contraindications:
+        context_parts.append("\n## 禁忌症匹配")
+        for ct in contraindications:
+            context_parts.append(f"- {ct['drug']}: {ct['condition']} → {ct.get('contraindication', '')}")
+    if rule_risks:
+        context_parts.append("\n## 规则引擎已识别的风险(必须采纳,不得降低)")
+        for rr in rule_risks:
+            context_parts.append(f"- [{rr['severity']}] {rr['drug']}: {rr['risk']} → {rr.get('suggestion', '')}")
+    context = "\n".join(context_parts)
+
+    mode = (getattr(settings, "risk_mode", "semantic") or "semantic").strip().lower()
+    result: RiskAssessment | None = None
+    if mode == "react":
+        result = _llm_react_assess(context)
+        if result is None:
+            logger.warning("ReAct 评估失败，降级 semantic")
+            result = _llm_semantic_assess(context)
+    elif mode == "rules":
+        result = None
+    else:
+        result = _llm_semantic_assess(context)
+
+    if result is None:
+        result = RiskAssessment(
+            overall_risk=det_floor if det_floor != "safe" else "safe",
+            risks=[],
+            summary="仅图谱+规则（无 LLM 或 LLM 不可用）" if mode == "rules" else "LLM 不可用，仅图谱+规则",
+        )
+
+    result.overall_risk = _normalize_risk(result.overall_risk)
+    if result.overall_risk == "unknown":
+        result.overall_risk = det_floor
+
+    # 合并确定性风险（risk_type+drug 去重）
     existing_keys = {(r.risk_type, r.drug) for r in result.risks}
-    for rr in rule_risks:
-        key = (rr.get("risk_type", "rule"), rr.get("drug", ""))
+    for item in det_items:
+        key = (item.risk_type, item.drug)
         if key not in existing_keys:
-            result.risks.append(RiskItem(
-                drug=rr.get("drug", ""), risk_type=rr.get("risk_type", "rule"),
-                severity=rr.get("severity", "high"), description=rr["risk"],
-                source="rule", suggestion=rr.get("suggestion", ""),
-            ))
+            result.risks.append(item)
             existing_keys.add(key)
 
-    # ---- 安全校准:规则/图谱兜底不得被 LLM 降级 ----
-    # 缺陷修复:早期实现只把 rule_risks append 进列表,overall_risk 仍以 LLM 输出为准。
-    # 当 LLM 判 safe、但规则引擎已命中 critical(如孕妇禁用华法林)时,报告会吞掉硬风险。
-    # 现在以「合并后全部 risks 的最高 severity」抬升 overall_risk,保证规则是底线。
-    _SEV_RANK = {"safe": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
-    max_rank = _SEV_RANK.get(result.overall_risk, 0)
-    max_sev = result.overall_risk
-    for r in result.risks:
-        rank = _SEV_RANK.get(r.severity, 0)
-        if rank > max_rank:
-            max_rank = rank
-            max_sev = r.severity
-    if max_rank > _SEV_RANK.get(result.overall_risk, 0):
-        logger.warning(
-            "规则/图谱最高风险(%s)高于 LLM overall_risk(%s),已抬升",
-            max_sev, result.overall_risk,
-        )
-        result.overall_risk = max_sev
+    # 规则/图谱地板：不得被 LLM 降级
+    rank = {"safe": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
+    if rank.get(det_floor, 0) > rank.get(result.overall_risk, 0):
+        logger.warning("确定性地板(%s)高于 LLM(%s)，已抬升", det_floor, result.overall_risk)
+        result.overall_risk = det_floor
+
     return result

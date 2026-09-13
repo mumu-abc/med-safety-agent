@@ -32,5 +32,11 @@ class Settings(BaseSettings):
     # react: LLM ReAct 工具循环(慢,用于演示/补充语义分析)
     detect_mode: str = "graph"
 
+    # ---- 风险评估模式 ----
+    # semantic: 单次 structured output(默认,延迟可控)
+    # react: ReAct 工具循环(慢);失败自动降级 semantic
+    # rules: 纯图谱+规则,不调 LLM
+    risk_mode: str = "semantic"
+
 
 settings = Settings()
