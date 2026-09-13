@@ -31,5 +31,14 @@ jobs:
           LLM_API_KEY: "test-key-not-real"
           LLM_BASE_URL: "https://example.com/v1"
           LLM_MODEL: "test-model"
+          DETECT_MODE: "graph"
         run: |
           python -m pytest tests/ -m "not slow" -v --tb=short
+
+      - name: Oracle eval smoke (no LLM)
+        env:
+          DETECT_MODE: "graph"
+        run: |
+          python -u scripts/eval_llm_increment.py --oracle
+          python -u scripts/eval_external_holdout.py
+

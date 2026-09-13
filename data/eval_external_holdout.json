@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "name": "external_ddi_holdout",
+    "version": "1.0",
+    "description": "外部临床知识 holdout：按公开药品说明书/临床用药指南常识手工标注，不从本项目 drug_data 生成。用于检验图谱+规则在非自产分布上的真实表现。",
+    "label_standard": "critical=禁用/危及生命; high=需干预调整; medium=需监测; safe=无需干预",
+    "disclaimer": "技术评测用，不构成临床用药建议。"
+  },
+  "cases": [
+    {
+      "id": "EX-001",
+      "drugs": ["华法林", "阿司匹林"],
+      "patient": {"age": 70, "gender": "男", "conditions": ["房颤"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "抗凝+抗血小板双联，消化道出血风险显著升高"
+    },
+    {
+      "id": "EX-002",
+      "drugs": ["华法林", "布洛芬"],
+      "patient": {"age": 68, "gender": "女", "conditions": ["关节炎"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "抗凝+NSAID，出血风险叠加，临床通常避免联用"
+    },
+    {
+      "id": "EX-003",
+      "drugs": ["华法林", "胺碘酮"],
+      "patient": {"age": 65, "gender": "男", "conditions": ["房颤"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "CYP抑制升高华法林浓度，需减量并监测INR"
+    },
+    {
+      "id": "EX-004",
+      "drugs": ["辛伐他汀", "克拉霉素"],
+      "patient": {"age": 62, "gender": "男", "conditions": ["高脂血症"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "CYP3A4抑制→他汀浓度升高→横纹肌溶解风险"
+    },
+    {
+      "id": "EX-005",
+      "drugs": ["阿托伐他汀", "环孢素"],
+      "patient": {"age": 55, "gender": "女", "conditions": ["移植术后"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "他汀+环孢素肌病风险，部分他汀禁用"
+    },
+    {
+      "id": "EX-006",
+      "drugs": ["美托洛尔", "维拉帕米"],
+      "patient": {"age": 60, "gender": "男", "conditions": ["高血压"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "β阻滞剂+非二氢吡啶CCB，心动过缓/传导阻滞/负性肌力叠加"
+    },
+    {
+      "id": "EX-007",
+      "drugs": ["地高辛", "胺碘酮"],
+      "patient": {"age": 72, "gender": "女", "conditions": ["心衰", "房颤"], "pregnancy": "no", "liver_function": "normal", "renal_function": "impaired"},
+      "expected_risk": "high",
+      "source": "胺碘酮升高地高辛浓度，中毒风险"
+    },
+    {
+      "id": "EX-008",
+      "drugs": ["卡马西平", "红霉素"],
+      "patient": {"age": 40, "gender": "男", "conditions": ["癫痫"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "CYP3A4抑制升高卡马西平浓度→中毒"
+    },
+    {
+      "id": "EX-009",
+      "drugs": ["苯妥英钠", "胺碘酮"],
+      "patient": {"age": 50, "gender": "男", "conditions": ["癫痫", "心律失常"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "相互影响血药浓度，需监测"
+    },
+    {
+      "id": "EX-010",
+      "drugs": ["锂盐", "布洛芬"],
+      "patient": {"age": 35, "gender": "女", "conditions": ["双相障碍"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "NSAID减少锂排泄→锂中毒"
+    },
+    {
+      "id": "EX-011",
+      "drugs": ["甲氨蝶呤", "甲氧苄啶"],
+      "patient": {"age": 45, "gender": "女", "conditions": ["类风湿关节炎"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "叶酸拮抗叠加，骨髓抑制/肾毒性风险剧增"
+    },
+    {
+      "id": "EX-012",
+      "drugs": ["环孢素", "他克莫司"],
+      "patient": {"age": 50, "gender": "男", "conditions": ["移植"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "两种钙调磷酸酶抑制剂联用，肾毒性/神经毒性叠加，通常禁止"
+    },
+    {
+      "id": "EX-013",
+      "drugs": ["西咪替丁", "茶碱"],
+      "patient": {"age": 58, "gender": "男", "conditions": ["哮喘"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "CYP抑制升高茶碱浓度→心律失常风险"
+    },
+    {
+      "id": "EX-014",
+      "drugs": ["别嘌醇", "巯嘌呤"],
+      "patient": {"age": 48, "gender": "男", "conditions": ["痛风", "白血病"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "XO抑制→6-MP蓄积→严重骨髓抑制"
+    },
+    {
+      "id": "EX-015",
+      "drugs": ["秋水仙碱", "克拉霉素"],
+      "patient": {"age": 66, "gender": "男", "conditions": ["痛风"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "CYP3A4/P-gp抑制→秋水仙碱致命毒性"
+    },
+    {
+      "id": "EX-016",
+      "drugs": ["华法林", "氟康唑"],
+      "patient": {"age": 60, "gender": "女", "conditions": ["真菌感染", "房颤"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "CYP2C9抑制升高华法林浓度"
+    },
+    {
+      "id": "EX-017",
+      "drugs": ["阿司匹林", "布洛芬"],
+      "patient": {"age": 55, "gender": "男", "conditions": ["冠心病", "关节痛"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "NSAID干扰阿司匹林抗血小板 + 出血/肾损伤叠加"
+    },
+    {
+      "id": "EX-018",
+      "drugs": ["华法林", "对乙酰氨基酚"],
+      "patient": {"age": 70, "gender": "女", "conditions": ["房颤"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "medium",
+      "source": "长期/大剂量对乙酰氨基酚可增强华法林抗凝，需监测INR"
+    },
+    {
+      "id": "EX-019",
+      "drugs": ["氨氯地平", "辛伐他汀"],
+      "patient": {"age": 58, "gender": "男", "conditions": ["高血压", "高脂血症"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "medium",
+      "source": "氨氯地平轻度升高他汀暴露，注意肌病症状；通常可联用"
+    },
+    {
+      "id": "EX-020",
+      "drugs": ["奥美拉唑", "氯吡格雷"],
+      "patient": {"age": 64, "gender": "男", "conditions": ["冠心病", "胃炎"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "medium",
+      "source": "CYP2C19抑制可能减弱氯吡格雷活化，优先考虑泮托拉唑"
+    },
+    {
+      "id": "EX-021",
+      "drugs": ["阿托伐他汀", "美托洛尔"],
+      "patient": {"age": 55, "gender": "男", "conditions": ["高脂血症", "高血压"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "safe",
+      "source": "无重要临床相互作用，常用联用"
+    },
+    {
+      "id": "EX-022",
+      "drugs": ["氨氯地平", "缬沙坦"],
+      "patient": {"age": 60, "gender": "女", "conditions": ["高血压"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "safe",
+      "source": "CCB+ARB合理联合降压"
+    },
+    {
+      "id": "EX-023",
+      "drugs": ["二甲双胍", "阿卡波糖"],
+      "patient": {"age": 52, "gender": "男", "conditions": ["2型糖尿病"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "safe",
+      "source": "不同机制降糖药联用，常规方案"
+    },
+    {
+      "id": "EX-024",
+      "drugs": ["左甲状腺素", "碳酸钙"],
+      "patient": {"age": 50, "gender": "女", "conditions": ["甲减"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "safe",
+      "source": "吸收干扰可通过间隔4小时服用解决，非禁忌"
+    },
+    {
+      "id": "EX-025",
+      "drugs": ["华法林", "阿司匹林", "布洛芬"],
+      "patient": {"age": 75, "gender": "男", "conditions": ["冠心病", "房颤", "关节炎"], "pregnancy": "no", "liver_function": "normal", "renal_function": "impaired"},
+      "expected_risk": "critical",
+      "source": "抗凝+抗血小板+NSAID三联，出血风险极高"
+    },
+    {
+      "id": "EX-026",
+      "drugs": ["华法林"],
+      "patient": {"age": 30, "gender": "女", "conditions": ["房颤"], "pregnancy": "yes", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "孕期华法林致畸/胎儿出血，X级"
+    },
+    {
+      "id": "EX-027",
+      "drugs": ["环丙沙星"],
+      "patient": {"age": 12, "gender": "男", "conditions": ["尿路感染"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "儿童氟喹诺酮软骨发育风险，通常避免"
+    },
+    {
+      "id": "EX-028",
+      "drugs": ["地西泮"],
+      "patient": {"age": 78, "gender": "女", "conditions": ["焦虑"], "pregnancy": "no", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "high",
+      "source": "老年人苯二氮卓跌倒/认知/呼吸抑制风险"
+    },
+    {
+      "id": "EX-029",
+      "drugs": ["二甲双胍"],
+      "patient": {"age": 68, "gender": "男", "conditions": ["2型糖尿病"], "pregnancy": "no", "liver_function": "normal", "renal_function": "impaired"},
+      "expected_risk": "critical",
+      "source": "严重肾功能不全时二甲双胍乳酸酸中毒风险，通常禁用"
+    },
+    {
+      "id": "EX-030",
+      "drugs": ["阿托伐他汀"],
+      "patient": {"age": 32, "gender": "女", "conditions": ["高脂血症"], "pregnancy": "yes", "liver_function": "normal", "renal_function": "normal"},
+      "expected_risk": "critical",
+      "source": "孕期禁用他汀，致畸风险"
+    }
+  ]
+}

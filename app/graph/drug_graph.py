@@ -106,19 +106,55 @@ def get_drug(drug_id: str) -> dict | None:
     return {"id": drug_id, **dict(G.nodes[drug_id])}
 
 
+# 常见商品名/别名/英文名 → 优先尝试的检索词
+# 用于图谱直查兜底;LLM 解析层仍可做更开放的归一
+DRUG_ALIASES: dict[str, list[str]] = {
+    "波立维": ["氯吡格雷", "clopidogrel"],
+    "拜阿司匹灵": ["阿司匹林", "aspirin"],
+    "芬必得": ["布洛芬", "ibuprofen"],
+    "立普妥": ["阿托伐他汀", "atorvastatin"],
+    "强的松": ["泼尼松", "prednisone"],
+    "锂盐": ["碳酸锂", "lithium"],
+    "苯妥英钠": ["苯妥英", "phenytoin"],
+    "心痛定": ["硝苯地平", "nifedipine"],
+    "开博通": ["卡托普利", "captopril"],
+    "倍他乐克": ["美托洛尔", "metoprolol"],
+    "络活喜": ["氨氯地平", "amlodipine"],
+    "代文": ["缬沙坦", "valsartan"],
+    "蒙诺": ["依那普利", "enalapril"],
+    "可乐定": ["可乐定", "clonidine"],
+}
+
+
 def get_drug_by_name(name: str) -> dict | None:
-    """按名称模糊查找药物。"""
+    """按名称模糊查找药物。支持常见商品名/别名映射。"""
     G = get_graph()
-    name_lower = name.strip().lower()
-    for n, data in G.nodes(data=True):
-        if not data.get("drug"):
+    raw = (name or "").strip()
+    name_lower = raw.lower()
+
+    candidates = [raw]
+    for alias, targets in DRUG_ALIASES.items():
+        if alias.lower() in name_lower or name_lower in alias.lower():
+            candidates.extend(targets)
+    # 直接别名表命中
+    if raw in DRUG_ALIASES:
+        candidates.extend(DRUG_ALIASES[raw])
+
+    for cand in candidates:
+        cand_l = cand.strip().lower()
+        if not cand_l:
             continue
-        drug_name = data.get("name", "").lower()
-        generic = data.get("generic_name", "").lower()
-        if name_lower in drug_name or drug_name in name_lower:
-            return {"id": n, **data}
-        if generic and (name_lower in generic or generic in name_lower):
-            return {"id": n, **data}
+        for n, data in G.nodes(data=True):
+            if not data.get("drug"):
+                continue
+            drug_name = data.get("name", "").lower()
+            generic = data.get("generic_name", "").lower()
+            if cand_l == drug_name or cand_l == n.lower():
+                return {"id": n, **data}
+            if drug_name and (cand_l in drug_name or drug_name in cand_l):
+                return {"id": n, **data}
+            if generic and (cand_l in generic or generic in cand_l):
+                return {"id": n, **data}
     return None
 
 
