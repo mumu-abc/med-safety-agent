@@ -5,10 +5,10 @@
 **这是一个面向秋招 Agent 开发方向的简历级项目。** 它展示的不是"会调 API",而是:
 
 - **安全关键AI** — 不是聊天机器人,是能救命的系统,LLM只是辅助,规则才是底线
+- **可量化的 LLM 增量** — 主集 F1 高是因为图谱;难例集证明解析/剂量/化验语义上 LLM 把二分类从 77.8% 拉到 100%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
 - **LangChain 深度使用** — structured output 强约束处方解析,bind_tools 让LLM自主调用图谱工具,LangGraph StateGraph 编排全流程
 - **知识图谱推理** — 213种药物、199条相互作用的知识图谱,结构化查询比 RAG 更可靠
-- **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,不依赖LLM,确保不遗漏已知风险
-- **可解释推理链** — 每个风险结论都有完整依据,医疗场景必须可追溯
+- **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,overall_risk 不得被 LLM 降级
 
 ---
 
@@ -159,7 +159,8 @@ med_safety/
 │   ├── agents/                     # 🤖 LangChain Agent
 │   │   ├── prescription_agent.py   #   处方解析(with_structured_output)
 │   │   ├── interaction_agent.py    #   交互检测(create_react_agent + 3 tools)
-│   │   ├── risk_agent.py           #   风险评估(ReAct + response_format + dedup)
+│   │   ├── risk_agent.py           #   风险评估(ReAct + response_format + dedup + 规则地板)
+│   │   ├── semantic_assess.py      #   单次语义评估(评测/降级用,不跑 ReAct)
 │   │   ├── alternative_agent.py    #   替代方案(ReAct + response_format)
 │   │   └── supervisor_agent.py     #   Supervisor 多Agent编排(Send fan-out)
 │   ├── rules/                      # 📐 安全规则引擎
@@ -199,23 +200,66 @@ med_safety/
 
 ## 📊 评测体系
 
-### 评测规模:77个标注样本
+主评测集衡量「已覆盖分布」上的回归;**LLM 增量难例集**衡量「分布外」Agent 价值。
+两套都要看——只报主集 F1=97.9% 无法回答「为什么要 LLM」。
+
+### 2.1 主评测集(77 样本,图谱内分布)
 
 | 来源 | 数量 | 说明 |
 |------|------|------|
 | 手工标注 | 16 | 覆盖高风险/孕妇/儿童/老年人/安全 |
-| 程序生成 | 61 | 从药物图谱数据分层采样,5大类覆盖 |
-
-### 评测结果
+| 程序生成 | 61 | 从药物图谱数据分层采样(**自产自销,勿单独当卖点**) |
 
 | 方案 | Accuracy | Precision | Recall | F1 |
 |------|----------|-----------|--------|----|
 | Embedding RAG(FAISS+LLM) | 70.1% | 67.1% | 100% | **80.3%** |
 | **图谱+规则**(结构化查询) | 97.4% | 95.9% | 100% | **97.9%** |
 
-**F1 差距 17.6%** — 知识图谱方案在安全场景下全面优于 Embedding RAG。
+> 主集上「纯图谱+规则」与「含 LLM」F1 几乎相同——**这正是需要增量难例的原因**。
 
-### 多分类指标(图谱+规则方案)
+### 2.2 LLM 增量难例集(9 条,规则/图谱覆盖不到)
+
+| 轨道 | 说明 | 精确匹配 | 二分类正确率 |
+|------|------|----------|--------------|
+| A. Graph+Rules @ 标注药名(无 LLM) | 确定性基线 | 66.7% | 77.8% |
+| C. LLM 解析 + 语义评估 + 规则兜底 | Agent 路径 | **77.8%** | **100%** |
+
+**净增量**:修好 2 条 Oracle 错判(同成分重复用药、对乙酰氨基酚超日剂量),净 +1 精确匹配;
+二分类从 77.8% → **100%**。
+
+### 2.2b 外部临床 Holdout（30 条,非自产）
+
+按公开药品说明书/临床指南常识**手工标注**，不从本项目 `drug_data` 生成。
+
+| 指标 | 图谱+规则（无 LLM） |
+|------|---------------------|
+| 二分类 F1 | **97.9%** |
+| 二分类正确率 | 96.7% |
+| 精确匹配（多分类） | 73.3% |
+
+与主集对比：主集 97.9% 含 61 条自产样本；外部 holdout 二分类仍高，但**精确匹配只有 73%**——主要失分在 high→critical 过度升级，这是诚实短板，不是藏起来的假饱和。
+
+```bash
+python -u scripts/eval_external_holdout.py --report
+```
+
+报告: [EXTERNAL_HOLDOUT_REPORT.md](./EXTERNAL_HOLDOUT_REPORT.md)
+
+典型 LLM 独有价值:
+1. **商品名归一**:波立维→氯吡格雷、芬必得→布洛芬、强的松→泼尼松
+2. **同成分重复**:立普妥 + 阿托伐他汀钙片
+3. **剂量语义**:对乙酰氨基酚日剂量 4g → high(规则不查剂量)
+4. **化验值入参**:文本中的 eGFR 28 解析进 `renal_function`,规则才能兜住二甲双胍
+
+```bash
+python -u scripts/eval_llm_increment.py --oracle          # 仅基线,无 LLM
+python -u scripts/eval_llm_increment.py --report          # 三轨对比并写报告
+python -u scripts/eval_llm_increment.py --report --limit 4
+```
+
+报告: [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)
+
+### 2.3 多分类 / LLM-as-Judge / RAG 对比
 
 | 风险等级 | Precision | Recall | F1 | 支持数 |
 |----------|-----------|--------|----|--------|
@@ -224,11 +268,7 @@ med_safety/
 | medium | 91.7% | 78.6% | 84.6% | 14 |
 | safe | 93.8% | 93.8% | 93.8% | 16 |
 
-### LLM-as-Judge 评测
-
-用 LLM 做自动化评判,减少人工标注依赖:
-- 严格准确率: **81.8%**
-- 宽松准确率(correct+partial): **88.3%**
+LLM-as-Judge: 严格 81.8% / 宽松 88.3%。RAG 对比见 [RAG_COMPARISON_REPORT.md](./RAG_COMPARISON_REPORT.md)。
 
 ### 运行评测
 
@@ -236,14 +276,12 @@ med_safety/
 # 图谱+规则评测(不需要LLM, <10秒)
 python tests/test_eval.py --report
 
-# RAG Baseline 对比(需要LLM API)
+# LLM 增量难例(需要LLM API)
+python -u scripts/eval_llm_increment.py --report
+
+# RAG Baseline / LLM-as-Judge
 python tests/test_rag_baseline.py --report
-
-# LLM-as-Judge 评测(需要LLM API)
 python tests/test_llm_judge.py --report
-
-# 完整三层评测(需要LLM API, 耗时较长)
-python tests/test_eval.py --full --report
 ```
 
 ---
@@ -342,6 +380,10 @@ LANGSMITH_PROJECT=med-safety-agent
 
 > 医疗场景容不得幻觉。LLM可能遗漏已知的药物相互作用,也可能编造不存在的相互作用。我的方案是三层保障:图谱查询保证已知交互不遗漏,规则引擎保证关键安全底线,LLM负责理解和发现潜在的新风险。三者互补,不是二选一。
 
+### Q1b: 那 LLM 到底带来了什么?能量化吗?
+
+> 主评测集(77条)里图谱+规则 F1 已经 97.9%,看起来 LLM 没用——因为样本是从图谱生成的。所以我专门做了 9 条「规则/图谱覆盖不到」的难例:商品名归一(波立维→氯吡格雷)、同成分重复(立普妥+阿托伐他汀)、剂量语义(对乙酰氨基酚日剂量4g)、化验值入参(eGFR 28)。无 LLM 基线二分类 77.8%,加上解析+语义评估后 100%,精确匹配 66.7%→77.8%。同时 overall_risk 有规则地板,LLM 不能把 critical 降成 safe。
+
 ### Q2: LangChain在这个项目里怎么用的?
 
 > 三个核心用法。第一,处方解析用 `with_structured_output` 强约束输出为 Pydantic schema,确保格式不会乱。第二,药物交互检测和风险评估用 `create_react_agent` 实现 ReAct 循环,LLM 自主决定调哪些工具、调几轮。第三,整个流程用 LangGraph StateGraph 编排,支持条件分支(高风险时触发替代方案推荐)。还有 Supervisor 多Agent编排模式,用 Send 实现 fan-out 并行。
@@ -407,15 +449,42 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ## ⚠️ 已知局限(诚实说明)
 
-做这个项目时有意保留/尚未解决的限制，面试时主动讲比被问出来好：
-
 | 局限 | 现状 | 原因/规划 |
 |------|------|-----------|
-| 知识图谱规模有限 | 213 种药物 / 199 条交互,远小于真实临床库 | 手工整理成本高;规划接入 DDInter 等公开数据集 |
-| 评测样本自产自销 | 77 个样本中 61 个由图谱数据程序生成 | 外部标注数据获取成本高;规划扩充手工标注至 50+ 并引入外部数据源 |
-| LLM 层的增量价值缺乏量化 | 当前评测中「三层」与「纯规则引擎」F1 相同(97.9%) | 需要针对「规则漏检但 LLM 捕获」的样本做专项对比评测 |
-| high 等级识别偏弱 | high 类 F1 仅 64.0% | 临界样本标注主观性强;规划细化 severity 判定阈值 |
-| 非医疗建议 | 本项目为技术方案验证,不构成临床用药建议 | 真实上线需药品监管审批与临床验证 |
+| 知识图谱规模有限 | 213 种药物 / 199 条交互 | 手工整理成本高;规划接入 DDInter 等公开数据集 |
+| 主评测自产样本偏多 | 77 条中 61 条由图谱程序生成 | **请同时看外部 holdout（30 条手工）与 LLM 增量难例** |
+| severity 过度升级 | 外部 holdout 精确匹配仅 73.3%,high 常被抬到 critical | 细化 high/critical 阈值;规划校准集 |
+| high 等级识别偏弱 | 主集 high 类 F1 仅 64.0% | 临界样本主观性强;规划细化 severity 阈值 |
+| ReAct 延迟 | 部分国产模型 tool-calling 循环很慢 | **默认 `DETECT_MODE=graph`**；`react` 需显式开启；降级用 `semantic_assess.py` |
+| 非医疗建议 | 技术方案验证,不构成临床用药建议 | 真实上线需监管审批与临床验证 |
+
+---
+
+## 🛠️ 工程深坑(面试可讲 5 分钟)
+
+### 坑 1:规则 critical 被 LLM「安全」吞掉
+
+**现象**:`assess_risk` 把规则结果 append 进 `risks` 列表,但 `overall_risk` 仍以 LLM 输出为准。
+LLM 判 `safe`、规则已命中「孕妇禁用华法林=critical」时,报告会漏掉硬风险。
+
+**修复**(`app/agents/risk_agent.py`):合并后按全部 risks 的最高 severity **抬升** `overall_risk`。
+回归测试:`tests/test_llm_increment.py::test_assess_risk_merges_and_calibrates_without_live_llm`。
+
+### 坑 2:ReAct 挂了等于图谱也瞎了
+
+**现象**:交互检测 Agent 异常时直接返回空 `interactions`,确定性图谱结果一起丢掉。
+
+**修复**(`app/agents/interaction_agent.py`):ReAct 失败/无工具结果时回退 `_fallback_graph_detect()`
+直接查 NetworkX,保证「LLM 故障 ≠ 安全层失效」。
+
+### 坑 3:跨请求状态串味
+
+早期自动完成模式挂了固定 `thread_id` 的 MemorySaver,条件边跳过 `recommend` 时会残留上一次的
+`alternatives`。现已拆成:自动模式无 checkpointer,HITL 用唯一 thread_id。
+
+### 坑 4:`create_react_agent(prompt=)` 在 langgraph 0.2.x 已移除
+
+当前签名是 `state_modifier=` / `messages_modifier=`。`interaction/risk/alternative` 三个 Agent 已对齐。
 
 ---
 
