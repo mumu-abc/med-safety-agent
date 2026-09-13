@@ -230,7 +230,7 @@ def assess_risk(
         react_agent = create_react_agent(
             model=llm,
             tools=RISK_TOOLS,
-            prompt=SYSTEM_PROMPT,
+            state_modifier=SYSTEM_PROMPT,
             response_format=RiskAssessment,
         )
 
@@ -286,4 +286,24 @@ def assess_risk(
                 severity=rr.get("severity", "high"), description=rr["risk"],
                 source="rule", suggestion=rr.get("suggestion", ""),
             ))
+            existing_keys.add(key)
+
+    # ---- 安全校准:规则/图谱兜底不得被 LLM 降级 ----
+    # 缺陷修复:早期实现只把 rule_risks append 进列表,overall_risk 仍以 LLM 输出为准。
+    # 当 LLM 判 safe、但规则引擎已命中 critical(如孕妇禁用华法林)时,报告会吞掉硬风险。
+    # 现在以「合并后全部 risks 的最高 severity」抬升 overall_risk,保证规则是底线。
+    _SEV_RANK = {"safe": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
+    max_rank = _SEV_RANK.get(result.overall_risk, 0)
+    max_sev = result.overall_risk
+    for r in result.risks:
+        rank = _SEV_RANK.get(r.severity, 0)
+        if rank > max_rank:
+            max_rank = rank
+            max_sev = r.severity
+    if max_rank > _SEV_RANK.get(result.overall_risk, 0):
+        logger.warning(
+            "规则/图谱最高风险(%s)高于 LLM overall_risk(%s),已抬升",
+            max_sev, result.overall_risk,
+        )
+        result.overall_risk = max_sev
     return result

@@ -27,5 +27,10 @@ class Settings(BaseSettings):
     # ---- 知识图谱 ----
     graph_path: str = str(BASE_DIR / "data" / "drug_graph.json")
 
+    # ---- 交互检测模式 ----
+    # graph: 确定性图谱直查(默认,毫秒级,安全兜底)
+    # react: LLM ReAct 工具循环(慢,用于演示/补充语义分析)
+    detect_mode: str = "graph"
+
 
 settings = Settings()

@@ -57,42 +57,46 @@ PARSE_SYSTEM = """你是一个专业药剂师。从以下处方文本中提取�
 
 
 def parse_prescription(text: str) -> Prescription:
-    """从自由文本解析结构化处方。手动解析JSON输出。"""
-    try:
-        llm = get_llm()
-        response = llm.invoke([
-            SystemMessage(content=PARSE_SYSTEM),
-            HumanMessage(content=f"处方文本:\n{text}"),
-        ])
-        content = response.content
-        logger.info(f"MiMo原始返回: {repr(content[:500])}")
-        content = content.strip() if content else ""
-        # 去掉可能的 markdown 代码块标记
-        if content.startswith("```"):
-            content = content.split("\n", 1)[1] if "\n" in content else content[3:]
-        if content.endswith("```"):
-            content = content[:-3]
-        if content.startswith("json"):
-            content = content[4:]
-        content = content.strip()
+    """从自由文本解析结构化处方。手动解析JSON输出。带连接重试。"""
+    last_err: Exception | None = None
+    for attempt in range(3):
+        try:
+            return _parse_once(text)
+        except Exception as e:
+            last_err = e
+            logger.warning(f"处方解析第{attempt+1}次失败: {e}")
+            import time
+            time.sleep(1.5 * (attempt + 1))
+    logger.error(f"处方解析最终失败: {last_err}")
+    return Prescription(diagnosis="", drugs=[], patient=PatientInfo())
 
-        # 清理 JSON 中的 null 值,替换为空字符串(Pydantic str 字段不接受 null)
-        import re
-        content = re.sub(r':\s*null', ': ""', content)
 
-        data = json.loads(content)
-        # 确保 drugs 列表中的每个项都有必需字段
-        for drug in data.get("drugs", []):
-            drug.setdefault("name", "")
-            drug.setdefault("dosage", "")
-            drug.setdefault("frequency", "")
-            drug.setdefault("duration", "")
-        result = Prescription(**data)
-        logger.info(f"处方解析成功: {len(result.drugs)}种药物")
-        return result
-    except json.JSONDecodeError as e:
-        logger.error(f"处方解析JSON解析失败: {e}, 原始输出: {content[:200]}")
-        return Prescription(diagnosis="", drugs=[], patient=PatientInfo())
-    except Exception as e:
-        logger.error(f"处方解析失败: {e}")
-        return Prescription(diagnosis="", drugs=[], patient=PatientInfo())
+def _parse_once(text: str) -> Prescription:
+    llm = get_llm()
+    response = llm.invoke([
+        SystemMessage(content=PARSE_SYSTEM),
+        HumanMessage(content=f"处方文本:\n{text}"),
+    ])
+    content = response.content
+    logger.info(f"MiMo原始返回: {repr(content[:500])}")
+    content = content.strip() if content else ""
+    if content.startswith("```"):
+        content = content.split("\n", 1)[1] if "\n" in content else content[3:]
+    if content.endswith("```"):
+        content = content[:-3]
+    if content.startswith("json"):
+        content = content[4:]
+    content = content.strip()
+
+    import re
+    content = re.sub(r':\s*null', ': ""', content)
+
+    data = json.loads(content)
+    for drug in data.get("drugs", []):
+        drug.setdefault("name", "")
+        drug.setdefault("dosage", "")
+        drug.setdefault("frequency", "")
+        drug.setdefault("duration", "")
+    result = Prescription(**data)
+    logger.info(f"处方解析成功: {len(result.drugs)}种药物")
+    return result

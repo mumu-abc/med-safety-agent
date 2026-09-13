@@ -80,7 +80,8 @@ SYSTEM_PROMPT = """你是药物交互检测专家。使用工具检查药物相�
 def _build_react_agent():
     """创建 LangGraph ReAct Agent。"""
     llm = get_llm()
-    return create_react_agent(model=llm, tools=INTERACTION_TOOLS, prompt=SYSTEM_PROMPT)
+    # langgraph 0.2.x 起不再接受 prompt=,应使用 state_modifier=
+    return create_react_agent(model=llm, tools=INTERACTION_TOOLS, state_modifier=SYSTEM_PROMPT)
 
 
 def _extract_tool_results(messages: list[BaseMessage]) -> tuple[list[dict], list[dict]]:
@@ -115,40 +116,69 @@ def _extract_final_analysis(messages: list[BaseMessage]) -> str:
 
 
 def detect_interactions(drug_names: list[str], patient_conditions: list[str] | None = None) -> dict:
-    """用 ReAct Agent 检测药物交互。
+    """检测药物相互作用与禁忌症。
 
-    流程:
-    1. ReAct Agent 自主循环调用工具
-    2. 从消息历史中提取工具返回的结构化数据
-    3. 提取 LLM 的最终分析作为补充
+    默认走确定性图谱直查(毫秒级)。`DETECT_MODE=react` 时先尝试 ReAct,
+    失败仍回退图谱——安全关键场景下 LLM 故障不得清空结果。
+
+    历史缺陷:早期默认 ReAct,异常时返回空 interactions,等于图谱也瞎了;
+    且在部分国产模型上 tool-calling 循环极慢。现已默认 graph。
     """
-    # 构建输入
+    from app.config import settings
+
+    mode = (settings.detect_mode or "graph").strip().lower()
+    if mode != "react":
+        return _fallback_graph_detect(drug_names, patient_conditions, "图谱直查(默认)")
+
     input_text = f"处方药物: {', '.join(drug_names)}"
     if patient_conditions:
         input_text += f"\n患者状况: {', '.join(patient_conditions)}"
     input_text += "\n请检查所有药物相互作用和禁忌症。"
 
-    # ReAct Agent 自主循环(P2-15:加 try/except 防 LLM 崩溃)
+    final_analysis = ""
     try:
         react_agent = _build_react_agent()
         react_result = react_agent.invoke(
             {"messages": [HumanMessage(content=input_text)]},
             config={"recursion_limit": 50},
         )
-
-        # 从 ReAct 消息历史中提取结构化数据(不再重复查询)
         interactions, contras = _extract_tool_results(react_result["messages"])
         final_analysis = _extract_final_analysis(react_result["messages"])
+        if interactions or contras:
+            return {
+                "interactions": interactions,
+                "contraindications": contras,
+                "analysis": final_analysis,
+            }
+        logger.warning("ReAct 未返回工具结果,回退图谱直查")
     except Exception as e:
-        logger.error(f"交互检测Agent异常: {e}")
-        return {
-            "interactions": [],
-            "contraindications": [],
-            "analysis": f"⚠️ 交互检测失败: {type(e).__name__}: {str(e)}",
-        }
+        logger.error(f"交互检测Agent异常,回退图谱直查: {e}")
+        final_analysis = f"⚠️ ReAct失败已降级图谱直查: {type(e).__name__}"
 
+    return _fallback_graph_detect(drug_names, patient_conditions, final_analysis)
+
+
+def _fallback_graph_detect(drug_names: list[str], patient_conditions: list[str] | None, analysis: str = "") -> dict:
+    """确定性图谱查询兜底(不依赖 LLM)。"""
+    from app.graph.drug_data import build_graph_from_data
+    from app.graph.drug_graph import get_drug_by_name, find_interactions, find_contraindications
+
+    try:
+        build_graph_from_data()
+    except Exception:
+        pass
+    ids = []
+    for name in drug_names or []:
+        d = get_drug_by_name(name)
+        if d:
+            ids.append(d["id"])
+    interactions = find_interactions(ids) if len(ids) >= 2 else []
+    contras = []
+    conditions = patient_conditions or []
+    for did in ids:
+        contras.extend(find_contraindications(did, conditions))
     return {
         "interactions": interactions,
         "contraindications": contras,
-        "analysis": final_analysis,
+        "analysis": analysis or "图谱直查兜底",
     }

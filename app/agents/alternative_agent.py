@@ -142,7 +142,7 @@ def recommend_alternatives(
         react_agent = create_react_agent(
             model=llm,
             tools=ALT_TOOLS,
-            prompt=SYSTEM_PROMPT,
+            state_modifier=SYSTEM_PROMPT,
             response_format=AlternativeReport,
         )
 
