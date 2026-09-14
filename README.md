@@ -202,6 +202,7 @@ med_safety/
 ├── docker-compose.yml              # Docker Compose 编排
 ├── docker-entrypoint.sh            # 容器启动脚本
 ├── requirements.txt                # 依赖清单
+├── docs/langsmith-trace.png        # LangSmith 流水线 trace 截图
 └── data/                           # 图谱数据 + SQLite数据库
 ```
 
@@ -386,6 +387,23 @@ LANGSMITH_PROJECT=med-safety-agent
 - 总 token 17.3K,端到端 100.5s(含多轮 LLM 往返与工具循环)
 
 每条节点都能看到输入输出、延迟和 token 用量,可用来定位是解析、图谱查询还是评估环节出的问题。
+
+![LangSmith 流水线 trace](docs/langsmith-trace.png)
+
+各节点的实测耗时与 token 消耗:
+
+| 节点 | 耗时 | token | 做什么 |
+|------|------|-------|--------|
+| `parse` | 31.42s | 2.18K | 处方解析(structured output) |
+| `detect` | 0.05s | 0 | 图谱查药物相互作用(确定性) |
+| `rules` | 0.00s | 0 | 规则引擎(确定性) |
+| `assess` | 12.54s | 1.31K | 语义风险评估 |
+| `recommend` | 56.44s | 13.81K | 替代方案 ReAct 循环(占 79% token) |
+| `gen_report` | 0.00s | 0 | 报告聚合 |
+| **合计** | **100.54s** | **17.3K** | |
+
+> 这张表本身就是设计说明:两个确定性环节(图谱 + 规则)合计 0.05s 且**不消耗任何 token**,
+> 成本与延迟几乎全部落在 LLM 的三个环节上 —— 想提速或降本,优化目标一目了然。
 
 ### 一个容易踩的坑:开关必须在图执行前生效
 
