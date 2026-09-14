@@ -7,8 +7,14 @@
 - **安全关键AI** — 不是聊天机器人,是能救命的系统,LLM只是辅助,规则才是底线
 - **可量化的 LLM 增量** — 主集 F1 高是因为图谱;20 条规则/图谱覆盖不到的难例上,LLM 语义评估把二分类从 70.0% 拉到 **95.0%**、精确匹配 55.0%→80.0%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
 - **LangChain 深度使用** — structured output 强约束处方解析,bind_tools 让LLM自主调用图谱工具,LangGraph StateGraph 编排全流程
-- **知识图谱推理** — 540种药物、396条相互作用、48条替代关系的知识图谱,结构化查询比 RAG 更可靠
+- **知识图谱推理** — 540种药物、396条相互作用、56条替代关系的知识图谱,结构化查询比 RAG 更可靠
 - **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,overall_risk 不得被 LLM 降级
+
+[![CI](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml)
+
+**在线 Demo**: <https://1ffa2c82b79f40eda086904a26871fe8.app.workbuddy.host>
+(免费层部署,未配 LLM key → 自动降级为「图谱 + 规则」模式。这两层不依赖 LLM,critical 级相互作用照样查得出来;
+配了 key 才会跑解析/语义评估/替代方案推荐三个 LLM 环节)
 
 ---
 
@@ -92,7 +98,7 @@ flowchart TD
 | 能力 | 在项目哪里 | 面试怎么说 |
 |---|---|---|
 | LangChain深度使用 | `agents/` + `workflow.py` | structured output强约束,create_react_agent ReAct循环,LangGraph StateGraph + 多Agent Supervisor编排 |
-| 知识图谱 | `graph/drug_graph.py` | 540种药物/396条相互作用/48条替代关系,结构化查询比RAG可靠 |
+| 知识图谱 | `graph/drug_graph.py` | 540种药物/396条相互作用/56条替代关系,结构化查询比RAG可靠 |
 | 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
@@ -458,11 +464,14 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 ### Q4: 知识图谱怎么构建的?
 
-> 预置了540种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及396条药物相互作用和48条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
+> 预置了540种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及396条药物相互作用(去重后的药对数,原始条目439条含反向重复)和56条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
 
 ### Q5: 为什么用知识图谱而不是RAG?
 
-> 我们做了对比实验。用 FAISS + sentence-transformers 做 embedding RAG baseline,F1 是 80.3%,图谱方案是 95.9%,差距 15.6%。RAG 的核心问题是精度只有 67.1%——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精度 95.9%,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
+> 我们做了对比实验(77 条标注样本,见 [RAG_COMPARISON_REPORT.md](./RAG_COMPARISON_REPORT.md))。用 FAISS + sentence-transformers 做 embedding RAG baseline,F1 是 80.3%、精确率 67.1%;图谱+规则方案 F1 **97.9%**、精确率 95.9%,**F1 差距 17.6%**。RAG 的核心问题是精度低——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精确率高,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
+>
+> 注意别把两组数字混着说:**97.9% 是 77 条旧样本集**上的结果;主集扩到 191 条后图谱方案 F1 是 94.8%。
+> 样本从 77 扩到 191 之后数字反而降了,是因为新加的样本更难、召回不再虚高 100% —— 报数字时说清楚是哪个评测集,比报一个高分更重要。
 
 ### Q6: 规则引擎和LLM怎么分工?
 

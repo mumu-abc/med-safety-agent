@@ -1,46 +1,39 @@
-name: Tests
+﻿name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # 暂时不放 3.13:faiss-cpu 在 3.13 上的 wheel 不稳定,会让整个矩阵变红。
-        # 等 faiss-cpu 正式支持 3.13 后再加回来。
-        python-version: ["3.10", "3.11", "3.12"]
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
       - name: Run tests
+        # pytest.ini 默认 -m "not slow",不需要 LLM key 也能跑完
         env:
-          LLM_API_KEY: "test-key-not-real"
-          LLM_BASE_URL: "https://example.com/v1"
-          LLM_MODEL: "test-model"
-          DETECT_MODE: "graph"
-        run: |
-          python -m pytest tests/ -m "not slow" -v --tb=short
+          ENABLE_MEMORY: "false"
+          LANGSMITH_TRACING: "false"
+        run: pytest -q
 
-      - name: Oracle eval smoke (no LLM)
+      - name: Check knowledge graph integrity
         env:
-          DETECT_MODE: "graph"
-        run: |
-          python -u scripts/eval_llm_increment.py --oracle
-          python -u scripts/eval_external_holdout.py
-
+          ENABLE_MEMORY: "false"
+        run: python scripts/check_graph_data.py

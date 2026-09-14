@@ -1,0 +1,33 @@
+# CI 专用依赖:去掉 sentence-transformers / faiss-cpu。
+#
+# 这两个只是 scripts/ 里「RAG baseline 对比实验」用的,不进主流程,
+# 而且会拖进 torch(2GB+),让 CI 从 1 分钟变成 10 分钟。
+# 对应测试在 tests/test_rag_baseline.py 里标了 @pytest.mark.slow,
+# 默认 `pytest`(-m "not slow")不会跑,所以 CI 不装也不会挂。
+#
+# 要跑 RAG 对比实验时,用完整的 requirements.txt。
+
+# ===== Core =====
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.0
+pydantic-settings>=2.0
+python-dotenv>=1.0
+
+# ===== LangChain =====
+langchain-core>=0.3,<0.4
+langchain-openai>=0.2,<0.4
+langchain>=0.3
+langsmith>=0.1
+
+# ===== LangGraph =====
+langgraph>=0.2.63,<0.3
+
+# ===== 图谱 =====
+networkx>=3.0
+
+# ===== HTTP =====
+httpx>=0.27
+
+# ===== Testing =====
+pytest>=8.0

@@ -1,0 +1,12 @@
+﻿鍘熷鏉＄洰: 58
+鍘婚噸鍚庢棤搴忓: 56
+python.exe : 鍘婚櫎閲嶅鑽墿瀹氫箟锛堜繚鐣欓涓級: ['azathioprine', 'cefdinir', 'cimetidine', 
+'cyclophosphamide', 'mercaptopurine', 'methotrexate', 'mycophenolate', 'tacroli
+mus', 'theophylline']
+所在位置 行:445 字符: 49
++ ... ed_safety"; & ".\.venv\Scripts\python.exe" scripts\_tmp_count.py 2>&1 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (鍘婚櫎閲嶅鑽墿瀹氫箟锛堜繚...'theophylline'] 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
