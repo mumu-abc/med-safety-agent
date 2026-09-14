@@ -384,26 +384,29 @@ LANGSMITH_PROJECT=med-safety-agent
 
 - 根节点 `LangGraph`,7 个直接子节点:`parse → detect → rules → assess → recommend → gen_report`
 - 替代方案节点里的 ReAct 子循环完整可见:`agent → call_model → ChatOpenAI`、`tools → get_alternatives_for`
-- 总 token 17.3K,端到端 100.5s(含多轮 LLM 往返与工具循环)
+- 总 token 105.5K,端到端 168.5s(含 25 次 LLM 往返与 21 次工具调用)
 
 每条节点都能看到输入输出、延迟和 token 用量,可用来定位是解析、图谱查询还是评估环节出的问题。
 
 ![LangSmith 流水线 trace](docs/langsmith-trace.png)
 
-各节点的实测耗时与 token 消耗:
+各节点的实测耗时与 token 消耗(四药联用处方:华法林 + 阿司匹林 + 克拉霉素 + 辛伐他汀):
 
 | 节点 | 耗时 | token | 做什么 |
 |------|------|-------|--------|
-| `parse` | 31.42s | 2.18K | 处方解析(structured output) |
+| `parse` | 21.94s | 1.79K | 处方解析(structured output) |
 | `detect` | 0.05s | 0 | 图谱查药物相互作用(确定性) |
 | `rules` | 0.00s | 0 | 规则引擎(确定性) |
-| `assess` | 12.54s | 1.31K | 语义风险评估 |
-| `recommend` | 56.44s | 13.81K | 替代方案 ReAct 循环(占 79% token) |
+| `assess` | 23.52s | 2.08K | 语义风险评估 |
+| `recommend` | 122.85s | 101.6K | 替代方案 ReAct 循环(占 96% token) |
 | `gen_report` | 0.00s | 0 | 报告聚合 |
-| **合计** | **100.54s** | **17.3K** | |
+| **合计** | **168.47s** | **105.5K** | |
 
 > 这张表本身就是设计说明:两个确定性环节(图谱 + 规则)合计 0.05s 且**不消耗任何 token**,
 > 成本与延迟几乎全部落在 LLM 的三个环节上 —— 想提速或降本,优化目标一目了然。
+> `recommend` 之所以吃掉了 96% 的 token,是因为它内部是一层 ReAct 子图:
+> 9 轮 `agent → call_model → ChatOpenAI → tools` 循环,反复调 `get_drug_info` /
+> `get_alternatives_for` / `verify_alternative_safety` 三个工具做交叉验证。
 
 ### 一个容易踩的坑:开关必须在图执行前生效
 
