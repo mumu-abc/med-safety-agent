@@ -1,13 +1,13 @@
 # 💊 智能用药安全审查系统
 
-> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(500+药物/440+相互作用) + 规则引擎(11类规则/41+药物-条件对) + LLM推理**三层保障,模拟临床药师的审查流程。
+> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(540药物/396相互作用) + 规则引擎(9类规则) + LLM推理**三层保障,模拟临床药师的审查流程。
 
 **这是一个面向秋招 Agent 开发方向的简历级项目。** 它展示的不是"会调 API",而是:
 
 - **安全关键AI** — 不是聊天机器人,是能救命的系统,LLM只是辅助,规则才是底线
-- **可量化的 LLM 增量** — 主集 F1 高是因为图谱;难例集证明解析/剂量/化验语义上 LLM 把二分类从 77.8% 拉到 100%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
+- **可量化的 LLM 增量** — 主集 F1 高是因为图谱;20 条规则/图谱覆盖不到的难例上,LLM 语义评估把二分类从 70.0% 拉到 **95.0%**、精确匹配 55.0%→80.0%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
 - **LangChain 深度使用** — structured output 强约束处方解析,bind_tools 让LLM自主调用图谱工具,LangGraph StateGraph 编排全流程
-- **知识图谱推理** — 213种药物、199条相互作用的知识图谱,结构化查询比 RAG 更可靠
+- **知识图谱推理** — 540种药物、396条相互作用、48条替代关系的知识图谱,结构化查询比 RAG 更可靠
 - **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,overall_risk 不得被 LLM 降级
 
 ---
@@ -92,14 +92,14 @@ flowchart TD
 | 能力 | 在项目哪里 | 面试怎么说 |
 |---|---|---|
 | LangChain深度使用 | `agents/` + `workflow.py` | structured output强约束,create_react_agent ReAct循环,LangGraph StateGraph + 多Agent Supervisor编排 |
-| 知识图谱 | `graph/drug_graph.py` | 213种药物/199条相互作用,结构化查询比RAG可靠 |
-| 规则引擎 | `rules/safety_rules.py` | 11类安全规则(41+药物-条件对),LLM+规则混合架构 |
+| 知识图谱 | `graph/drug_graph.py` | 540种药物/396条相互作用/48条替代关系,结构化查询比RAG可靠 |
+| 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
 | 可解释性 | workflow.py | 每步输出结构化,推理链完整可追溯 |
 | 多Agent协作 | `agents/supervisor_agent.py` | Supervisor编排,fan-out并行,dynamic dispatch |
 | 向量记忆 | `memory.py` | FAISS+bge-small-zh,历史案例检索,相似处方自动关联 |
-| 评测闭环 | `evaluation.py` | 77标注样本,F1/Recall回归检测,API触发评测 |
+| 评测闭环 | `evaluation.py` | 主集191 + 外部holdout 60 + 难例20,F1/Recall回归检测,API触发评测 |
 | LLM-as-Judge | `tests/test_llm_judge.py` | LLM自动评判,减少人工标注依赖 |
 | 用户反馈 | `database.py` + Streamlit | 评分反馈→记忆注入→持续改进闭环 |
 | Docker部署 | `Dockerfile` + `docker-compose.yml` | 一键容器化部署,FastAPI+Streamlit双服务 |
@@ -115,7 +115,7 @@ conda create -n medsafety python=3.11 -y
 conda activate medsafety
 pip install -r requirements.txt
 
-# 构建药物知识图谱(预置213种常用药)
+# 构建药物知识图谱(预置540种常用药)
 python scripts/build_graph.py
 
 # 启动
@@ -128,12 +128,21 @@ uvicorn app.main:app --reload
 docker compose up --build -d
 ```
 
-- FastAPI: http://localhost:8000
-- Streamlit: http://localhost:8501
+- FastAPI + 前端(同一端口): http://localhost:8000
 
 浏览器打开 **http://127.0.0.1:8000**:
 - 左侧:处方输入(支持自由文本)
 - 右侧:审查报告(风险等级 + 交互详情 + 替代建议)
+
+### 公网部署(Render 免费层)
+
+仓库已带 `render.yaml`,Render 面板 → New → Blueprint → 选本仓库即可。
+
+**必须设 `ENABLE_MEMORY=false`**:记忆系统依赖 sentence-transformers + faiss,首次调用要下载约 400MB 的
+`bge-small-zh` 模型,常驻后占数百 MB 内存——Render 免费层只有 512MB,**必 OOM**。
+关闭后核心链路(知识图谱 + 规则引擎 + LLM 推理)完全不受影响,只是没有跨次审查的向量记忆。
+
+> 免费层 15 分钟无访问会休眠,首次唤醒约 30–50 秒,属正常现象。
 
 ---
 
@@ -144,17 +153,17 @@ med_safety/
 ├── app/
 │   ├── main.py                     # FastAPI 入口 + CORS + 日志配置
 │   ├── config.py                   # Pydantic Settings 配置管理
-│   ├── llm.py                      # LLM 单例工厂 (智谱 GLM API, max_retries=3, timeout=60)
-│   ├── workflow.py                 # 🔗 LangGraph StateGraph + MemorySaver + HITL
+│   ├── llm.py                      # LLM 单例工厂 (智谱 GLM API, max_retries=3, timeout=120)
+│   ├── workflow.py                 # 🔗 LangGraph StateGraph + HITL(仅中断恢复用 MemorySaver)
 │   ├── memory.py                   # 🧠 向量记忆系统(FAISS+bge-small-zh)
-│   ├── evaluation.py               # 📊 评测闭环(77用例+回归检测)
+│   ├── evaluation.py               # 📊 评测闭环(191主集用例+回归检测)
 │   ├── database.py                 # 💾 SQLite持久化(评测+反馈+记忆)
 │   ├── conversation.py             # 💬 多轮对话记忆 + LLM 指令解析
 │   ├── reporter.py                 # 报告生成模块
 │   ├── models.py                   # 共享 Pydantic 模型
 │   ├── graph/                      # 💊 药物知识图谱
 │   │   ├── drug_graph.py           #   NetworkX 图存储 + 查询 + 图算法
-│   │   ├── drug_data.py            #   预置 213 种药物 + 199 条交互数据
+│   │   ├── drug_data.py            #   预置 540 种药物 + 396 条交互数据
 │   │   └── patient_store.py        #   患者档案 (线程安全 Lock + 原子写入)
 │   ├── agents/                     # 🤖 LangChain Agent
 │   │   ├── prescription_agent.py   #   处方解析(with_structured_output)
@@ -164,7 +173,7 @@ med_safety/
 │   │   ├── alternative_agent.py    #   替代方案(ReAct + response_format)
 │   │   └── supervisor_agent.py     #   Supervisor 多Agent编排(Send fan-out)
 │   ├── rules/                      # 📐 安全规则引擎
-│   │   ├── safety_rules.py         #   11类硬编码规则(41+药物-条件对)
+│   │   ├── safety_rules.py         #   9类硬编码规则(年龄/孕期/肾肝/过敏/QT/出血/CNS/5-HT)
 │   │   ├── rule_optimizer.py       #   反馈驱动规则权重优化器
 │   │   └── rules_config.json       #   规则权重/阈值配置(可热更新)
 │   └── routers/                    # API
@@ -172,8 +181,8 @@ med_safety/
 │       ├── evaluation.py           #   评测 API (运行/查询/对比/反馈)
 │       ├── drugs.py                #   药物查询 + 图算法 API
 │       └── patients.py             #   患者档案 CRUD
-├── streamlit_app.py                # Streamlit 前端(含反馈+记忆面板)
-├── frontend/index.html             # 原生前端界面(患者选择器+HITL开关+SSE进度条)
+├── frontend/index.html             # 统一前端(患者选择器+HITL开关+SSE进度+记忆库+反馈评分+图谱可视化)
+│                                   # 由 FastAPI 静态托管在 /,单进程即可提供完整体验
 ├── scripts/
 │   ├── build_graph.py              # 构建图谱脚本
 │   ├── expand_drugs.py             # 药物数据扩展脚本
@@ -201,7 +210,7 @@ med_safety/
 ## 📊 评测体系
 
 主评测集衡量「已覆盖分布」上的回归;**LLM 增量难例集**衡量「分布外」Agent 价值。
-两套都要看——只报主集 F1=97.9% 无法回答「为什么要 LLM」。
+两套都要看——只报主集 F1=95.9% 无法回答「为什么要 LLM」。
 
 ### 2.1 主评测集（191 样本，图谱内分布）
 
@@ -219,15 +228,19 @@ med_safety/
 
 > 主集上「纯图谱+规则」与「含 LLM」F1 几乎相同——**这正是需要增量难例的原因**。
 
-### 2.2 LLM 增量难例集(9 条,规则/图谱覆盖不到)
+### 2.2 LLM 增量难例集(20 条,规则/图谱覆盖不到)
 
 | 轨道 | 说明 | 精确匹配 | 二分类正确率 |
 |------|------|----------|--------------|
-| A. Graph+Rules @ 标注药名(无 LLM) | 确定性基线 | 66.7% | 77.8% |
-| C. LLM 解析 + 语义评估 + 规则兜底 | Agent 路径 | **77.8%** | **100%** |
+| A. Graph+Rules @ 标注药名(无 LLM) | 确定性基线 | 55.0% (11/20) | 70.0% |
+| B. LLM 解析 → Graph+Rules | 只加解析 | 50.0% (10/20) | 60.0% |
+| C. 解析 + 语义评估 + 规则兜底 | Agent 完整路径 | **80.0% (16/20)** | **95.0%** |
 
-**净增量**:修好 2 条 Oracle 错判(同成分重复用药、对乙酰氨基酚超日剂量),净 +1 精确匹配;
-二分类从 77.8% → **100%**。
+**诚实读法(面试建议主动讲)**:增量**不在解析,在推理**。
+B 轨道把药名交给 LLM 解析后反而比 A 更低(50% < 55%)——说明在这批难例上,
+LLM 解析引入的归一误差大于它解决的匹配问题。真正的增益来自 C 的语义评估:
+修好 Oracle 错判 **5** 条(同成分重复用药、对乙酰氨基酚超日剂量、肾功能/eGFR 入参等),
+弄坏 0 条,净 **+5** 条精确匹配;二分类 70.0% → **95.0%**,精确匹配 55.0% → **80.0%**。
 
 ### 2.2b 外部临床 Holdout（60 条,非自产）
 
@@ -384,7 +397,7 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ### Q1b: 那 LLM 到底带来了什么?能量化吗?
 
-> 主评测集(77条)里图谱+规则 F1 已经 97.9%,看起来 LLM 没用——因为样本是从图谱生成的。所以我专门做了 9 条「规则/图谱覆盖不到」的难例:商品名归一(波立维→氯吡格雷)、同成分重复(立普妥+阿托伐他汀)、剂量语义(对乙酰氨基酚日剂量4g)、化验值入参(eGFR 28)。无 LLM 基线二分类 77.8%,加上解析+语义评估后 100%,精确匹配 66.7%→77.8%。同时 overall_risk 有规则地板,LLM 不能把 critical 降成 safe。
+> 主评测集(191条)里图谱+规则 F1 已 95.9%,看起来 LLM 没用——因为 175 条样本是从图谱生成的。所以我专门做了 20 条「规则/图谱覆盖不到」的难例:商品名归一(波立维→氯吡格雷)、同成分重复(立普妥+阿托伐他汀)、剂量语义(对乙酰氨基酚日剂量4g)、化验值入参(eGFR 28)。无 LLM 基线二分类 70.0%,加上解析+语义评估后 95.0%,精确匹配 55.0%→80.0%。注意单加 LLM 解析反而降到 60.0%——增益在语义推理不在解析。同时 overall_risk 有规则地板,LLM 不能把 critical 降成 safe。
 
 ### Q2: LangChain在这个项目里怎么用的?
 
@@ -396,11 +409,11 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ### Q4: 知识图谱怎么构建的?
 
-> 预置了213种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等104个药物分类,以及199条药物相互作用和22条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
+> 预置了540种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及396条药物相互作用和48条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
 
 ### Q5: 为什么用知识图谱而不是RAG?
 
-> 我们做了对比实验。用 FAISS + sentence-transformers 做 embedding RAG baseline,F1 是 80.3%,图谱方案是 97.9%,差距 17.6%。RAG 的核心问题是精度只有 67.1%——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精度 95.9%,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
+> 我们做了对比实验。用 FAISS + sentence-transformers 做 embedding RAG baseline,F1 是 80.3%,图谱方案是 95.9%,差距 15.6%。RAG 的核心问题是精度只有 67.1%——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精度 95.9%,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
 
 ### Q6: 规则引擎和LLM怎么分工?
 
@@ -408,7 +421,7 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ### Q7: 规则引擎覆盖了哪些安全场景?
 
-> 11类规则,41+药物-条件对。除了基础的年龄、孕妇、肾功能、肝功能规则,还覆盖了过敏交叉反应、QT延长风险、出血风险(抗凝+抗血小板+NSAID组合)、中枢神经抑制(FDA黑框警告:阿片+苯二氮卓)、5-羟色胺综合征(SSRI+MAOI绝对禁忌)。每条规则都是临床指南中的硬性要求。而且规则权重可以根据用户反馈自动调整——高频误报的规则权重降低,漏报的规则权重升高。
+> 9类规则。除了基础的年龄、孕妇、肾功能、肝功能规则,还覆盖了过敏交叉反应、QT延长风险、出血风险(抗凝+抗血小板+NSAID组合)、中枢神经抑制(FDA黑框警告:阿片+苯二氮卓)、5-羟色胺综合征(SSRI+MAOI绝对禁忌)。每条规则都是临床指南中的硬性要求。而且规则权重可以根据用户反馈自动调整——高频误报的规则权重降低,漏报的规则权重升高。
 
 ### Q8: 向量记忆系统有什么用?
 
@@ -435,7 +448,7 @@ LANGSMITH_PROJECT=med-safety-agent
 ---
 
 *技术栈:LangChain + LangGraph + NetworkX + FastAPI + Pydantic + FAISS + 智谱 GLM API*
-*测试:89个测试函数 | 评测:F1=97.9% (77标注样本)*
+*测试:140 个测试函数(135 通过 / 5 条慢速标记跳过) | 评测:主集 191 样本 F1=95.9%,外部 holdout 60 条 + 难例 20 条*
 
 ---
 
@@ -444,8 +457,14 @@ LANGSMITH_PROJECT=med-safety-agent
 | 报告 | 内容 |
 |------|------|
 | [EVAL_REPORT.md](./EVAL_REPORT.md) | 二分类/多分类指标、混淆矩阵、逐案对比 |
+| [EXTERNAL_HOLDOUT_REPORT.md](./EXTERNAL_HOLDOUT_REPORT.md) | 外部临床 holdout(60 条手工,非自产) |
+| [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md) | LLM 增量难例三轨对照 |
 | [RAG_COMPARISON_REPORT.md](./RAG_COMPARISON_REPORT.md) | 图谱+规则 vs Embedding RAG 对比实验 |
 | [JUDGE_REPORT.md](./JUDGE_REPORT.md) | LLM-as-Judge 自动评判结果 |
+
+> **关于报告里的规模数字**:这些报告由脚本生成、带时间戳,记录的是**当时图谱版本下的快照**
+> (如 RAG 对比是 213 药物时期跑的)。当前图谱已扩到 **540 药物 / 396 交互**,
+> 最新的主集 / holdout / 难例指标以本 README 的「评测体系」一节为准。
 
 ---
 
@@ -453,12 +472,13 @@ LANGSMITH_PROJECT=med-safety-agent
 
 | 局限 | 现状 | 原因/规划 |
 |------|------|-----------|
-| 知识图谱规模 | 500+ 药物 / 440+ 相互作用对(含第四批扩展) | 仍小于真实临床库;规划接 DDInter |
+| 知识图谱规模 | 540 药物 / 396 相互作用对 | 仍小于真实临床库;规划接 DDInter |
 | 主评测自产样本偏多 | 191 条中 175 条由图谱程序生成 | **请同时看外部 holdout（60 条手工）与 LLM 增量难例（20 条）** |
 | severity 边界 | 外部 holdout 精确匹配 86.7% | 临界样本主观;规划校准集 |
 | high 等级识别偏弱 | 主集 high 类 F1 ~59% | 双联抗栓从 critical 降 high 后部分期望仍 critical |
 | ReAct 延迟 | 部分国产模型 tool-calling 循环很慢 | **默认 `DETECT_MODE=graph` + `RISK_MODE=semantic`** |
 | 非医疗建议 | 技术方案验证,不构成临床用药建议 | 真实上线需监管审批与临床验证 |
+| 相互作用是"药物对"粒度 | `INTERACTIONS` 只描述药-药关系,不含剂量/疗程维度 | 剂量上限、疗程过长等语义交给 LLM 在语义评估阶段补充(见难例 LI-R01:对乙酰氨基酚日剂量 4g) |
 
 ---
 
@@ -495,8 +515,16 @@ LLM 判 `safe`、规则已命中「孕妇禁用华法林=critical」时,报告�
 | 能力 | 实现 | 说明 |
 |------|------|------|
 | API 限流 | `app/rate_limit.py` | 自研滑动窗口中间件,零外部依赖。只保护昂贵端点:`/api/review/*` 60 秒 20 次、`/api/eval/run` 60 秒 5 次;静态资源、OPTIONS 预检、本机 IP 放行 |
-| CORS | `app/main.py` | `allow_origins=["*"]` + `allow_credentials=False`,符合 CORS 规范 |
+| 限流防绕过 | `app/rate_limit.py` | **默认不信任 `X-Forwarded-For`**(该头由客户端提供,伪造即重置配额)。确实部署在反向代理后时设 `TRUST_PROXY_HEADERS=true`,此时取最右侧一跳(代理追加的、客户端无法伪造的值) |
+| 限流内存回收 | `app/rate_limit.py` | 窗口桶每 5 分钟清理一次空条目,避免公网暴露后被扫段 IP 撑爆内存 |
+| CORS | `app/main.py` | `allow_origins=["*"]` + `allow_credentials=False`,符合 CORS 规范。限流中间件注册在 CORS **之前**,使 429 响应同样带 CORS 头 |
+| 健康检查 | `GET /api/health` | 不只返回 alive,而是探活三项依赖:LLM 是否已配置、知识图谱是否加载、数据库是否可用;任一项失败返回 `status: "degraded"` |
+| 审查缓存 | `app/database.py` | 缓存键 = `模式 ‖ patient_id ‖ 处方文本`,并带 7 天 TTL。避免孕期患者命中普通患者的缓存结论、以及 `/review` `/raw` `/multi` 三种返回结构互相污染 |
+| 事件循环保护 | `app/routers/review.py` | 记忆检索/写入走 `run_in_executor`,避免 SentenceTransformer 首次加载(联网下载 + CPU 编码)阻塞整个 FastAPI 事件循环 |
+| SSE 断连 | `app/routers/review.py` | 客户端断开时置 stop 事件,后台线程在下一个节点边界退出,不再继续调用 LLM 烧 token |
+| 图谱数据完整性 | `app/graph/drug_data.py` + `tests/test_graph_data_integrity.py` | `validate_data()` 检查交互/替代关系是否引用未建库的药物 id;建图不再用 `G.add_edge` 硬加(networkx 会**自动创建无属性的幽灵节点**,导致交互数虚高且查询拿到空药物),改为跳过并打 warning。14 项回归测试守住,CI 可 `validate_data(strict=True)` 直接失败 |
+| 解析失败不报"安全" | `agents/prescription_agent.py` + `workflow.py` + `routers/review.py` | 安全关键系统的红线:**绝不能把"我解析失败"当成"这张处方没风险"**。三层防御——① `PatientInfo` 容错归一化(`age` 空串/未知/`68岁` 都不再拖垮整张处方);② LLM 连续失败或零药物时启用药名字面兜底抽取;③ 原文非空却零药物时,风险强制 `unknown` 并输出人工复核提示,且该结果**不写入缓存**(避免一次瞬时故障在 TTL 内反复命中) |
 
 **已知取舍(面试可主动讲)**:
-- HITL 会话状态仍使用内存 `MemorySaver` —— 单进程部署足够,代价是重启后未完成的审核会话丢失。若后续多实例部署,再换 `SqliteSaver`/Redis 做持久化
+- HITL 会话状态仍使用内存 `MemorySaver` —— 单进程部署足够,代价是重启后未完成的审核会话丢失。**因此 HITL 模式必须单进程运行**:`uvicorn app.main:app`(不要加 `--workers N`),否则中断恢复会因为状态不在本进程而失败。自动完成模式已不依赖 checkpointer,不受此限制
 - 限流为进程内滑动窗口 —— 单机 demo 无需 Redis;多实例部署时窗口按实例独立,需全局限流再换 Redis 后端

@@ -38,5 +38,11 @@ class Settings(BaseSettings):
     # rules: 纯图谱+规则,不调 LLM
     risk_mode: str = "semantic"
 
+    # ---- 记忆系统(向量检索) ----
+    # 依赖 sentence-transformers + faiss,首次调用会下载 bge-small-zh 模型(约 400MB)
+    # 并常驻占用数百 MB 内存。公网免费层(Render 512MB / Railway 500MB)会直接 OOM,
+    # 部署时设 ENABLE_MEMORY=false 关闭,核心审查链路(图谱+规则+LLM)不受影响。
+    enable_memory: bool = True
+
 
 settings = Settings()

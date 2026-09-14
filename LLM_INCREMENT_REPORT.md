@@ -1,7 +1,7 @@
 # LLM 增量价值评测报告
 
-> 生成时间: 2026-09-13 05:32:38
-> 难例数: 9  (parse / reason / negative)
+> 生成时间: 2026-09-14 03:24:04
+> 难例数: 20  (parse / reason / negative)
 
 ## 1. 为什么需要这份报告
 
@@ -13,8 +13,9 @@
 
 | 轨道 | 说明 | 精确匹配 | 精确率 | 二分类正确率 |
 |------|------|----------|--------|--------------|
-| A. Graph+Rules @ 标注药名(无 LLM) | 9 条 | 6/9 | 66.7% | 77.8% |
-| C. 解析 + 语义评估 + 规则兜底 | 9 条 | 7/9 | 77.8% | 100.0% |
+| A. Graph+Rules @ 标注药名(无 LLM) | 20 条 | 11/20 | 55.0% | 70.0% |
+| B. LLM 解析 → Graph+Rules | 20 条 | 10/20 | 50.0% | 60.0% |
+| C. 解析 + 语义评估 + 规则兜底 | 20 条 | 16/20 | 80.0% | 95.0% |
 
 ## 3. 逐案:Oracle 基线 vs Full
 
@@ -24,21 +25,32 @@
 | LI-P02 | parse | critical | critical | critical | Y | Y | 口语病历+商品名芬必得;归一后规则命中抗凝+NSAID |
 | LI-P03 | parse | high | safe | high | N | Y | 需识别商品名与通用名是同一成分,判定重复用药/剂量加倍 |
 | LI-P04 | parse | high | high | high | Y | Y | 强的松不在图谱节点;LLM 应归一为泼尼松,并结合老年+激素+NSAID 判断消化道风险 |
-| LI-R01 | reason | high | safe | high | N | Y | 单药、图谱无边、规则不查剂量;需 LLM 判断日剂量上限与肝毒性 |
-| LI-R02 | reason | critical | critical | high | Y | N | 肾功能在自由文本中;只有 LLM 解析出 renal_function=impaired,规则引 |
+| LI-R01 | reason | high | safe | medium | N | N | 单药、图谱无边、规则不查剂量;需 LLM 判断日剂量上限与肝毒性 |
+| LI-R02 | reason | critical | critical | critical | Y | Y | 肾功能在自由文本中;只有 LLM 解析出 renal_function=impaired,规则引 |
 | LI-R03 | reason | critical | critical | critical | Y | Y | 规则可能只覆盖阿片+苯二氮卓;加巴喷丁叠加需综合评估呼吸抑制 |
 | LI-N01 | negative | safe | safe | safe | Y | Y | 防止 LLM 因多药/慢病就升级报警 |
-| LI-N02 | negative | safe | medium | medium | N | N | 吸收干扰可通过服药时间解决,不应 high |
+| LI-N02 | negative | safe | low | low | N | N | 吸收干扰可通过服药时间解决,不应 high |
+| LI-P05 | parse | high | high | high | Y | Y | 英文药名+商品名需归一到中文通用名才能查图谱 |
+| LI-P06 | parse | critical | critical | critical | Y | Y | 口语剂量+商品名,关键词匹配难 |
+| LI-R04 | reason | high | critical | high | N | Y | 病史在叙述中;若未解析成 conditions,规则不会触发 |
+| LI-R05 | reason | high | safe | high | N | Y | 商品名与通用名同一成分,剂量加倍 |
+| LI-R06 | reason | critical | safe | critical | N | Y | 严重肾损需解析进 renal_function 才能触发禁忌规则 |
+| LI-R07 | reason | high | critical | critical | N | N | 多通路风险需综合,不能只看单边 |
+| LI-R08 | reason | critical | safe | critical | N | Y | 远超日剂量上限,肝毒性高危;规则不查剂量 |
+| LI-N03 | negative | safe | safe | safe | Y | Y | ICS+按需SABA是标准方案,不应报警 |
+| LI-N04 | negative | safe | safe | safe | Y | Y | 标准联用,防止过度报警 |
+| LI-P07 | parse | safe | safe | safe | Y | Y | 商品名归一后应识别为合理联合降压 |
+| LI-P08 | parse | high | safe | critical | N | N | 复方名/商品名需归一,CYP2C9抑制增强抗凝 |
 
 ## 4. LLM 净增量
 
-- Full 修好 Oracle 错判: **2** 条 `['LI-P03', 'LI-R01']`
-- Full 弄坏 Oracle 对判: **1** 条 `['LI-R02']`
-- 净增量: **+1** 条精确匹配
+- Full 修好 Oracle 错判: **5** 条 `['LI-P03', 'LI-R04', 'LI-R05', 'LI-R06', 'LI-R08']`
+- Full 弄坏 Oracle 对判: **0** 条 `[]`
+- 净增量: **+5** 条精确匹配
 
 ## 5. 结论(面试可用)
 
-在 9 条「规则/图谱覆盖不到」的难例上:确定性基线精确率 **66.7%**,加入 LLM 解析与语义评估后 **77.8%**,提升 **+11.1%**。
+在 20 条「规则/图谱覆盖不到」的难例上:确定性基线精确率 **55.0%**,加入 LLM 解析与语义评估后 **80.0%**,提升 **+25.0%**。
 
 这回答了「为什么不能只写规则引擎」:
 1. 自由文本/商品名解析 —— LLM 负责把病历变成结构化药名

@@ -9,4 +9,5 @@ __pycache__
 tests/
 docs/
 *.md
-.streamlit
+
+# 注意:不要加 .dockerignore 自身,否则它不会被排除、反而可能让 COPY . . 把 .venv 打进镜像

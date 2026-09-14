@@ -4,7 +4,7 @@ import json
 import logging
 import queue
 import threading
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from app.workflow import (
@@ -147,6 +147,44 @@ def _get(result, key, default=None):
     return getattr(result, key, default)
 
 
+def _memory_enabled() -> bool:
+    """记忆系统是否开启。
+
+    记忆依赖 sentence-transformers + faiss,首次调用要下载约 400MB 的 bge-small-zh 模型,
+    常驻后占用数百 MB 内存。公网免费层(Render 512MB / Railway 500MB)会直接 OOM,
+    部署时设 ENABLE_MEMORY=false 即可关闭;核心审查链路(图谱 + 规则 + LLM)不受影响。
+    """
+    from app.config import settings
+    return bool(getattr(settings, "enable_memory", True))
+
+
+def _is_review_cacheable(result_or_resp) -> bool:
+    """判断一次审查结果是否值得写入缓存。
+
+    不缓存「一个药都没识别出来」或「风险未知」的结果。这类结果通常意味着
+    解析失败或依赖异常(LLM 超时、图谱未加载等);如果把它缓存 7 天,
+    错误的"安全"结论会在 TTL 内被反复命中——这是安全关键系统最糟的失败模式:
+    一次瞬时故障,变成长期错误的临床判断。
+
+    入参可以是工作流状态(对象/AttrDict),也可以是已构建好的响应 dict。
+    """
+    if isinstance(result_or_resp, dict):
+        rx = result_or_resp.get("prescription") or {}
+        drugs = rx.get("drugs") or [] if isinstance(rx, dict) else (getattr(rx, "drugs", None) or [])
+        if not drugs:
+            return False
+        return result_or_resp.get("risk_level") != "unknown"
+
+    rx = _get(result_or_resp, "prescription")
+    drugs = (getattr(rx, "drugs", None) or []) if rx is not None else []
+    if not drugs:
+        return False
+    risk = _get(result_or_resp, "risk_assessment")
+    if risk is not None and getattr(risk, "overall_risk", None) == "unknown":
+        return False
+    return True
+
+
 def _build_raw_response(result) -> dict:
     """从审查结果构建结构化响应(复用于 /raw、/stream、/hitl)。"""
     rx = _get(result, "prescription")
@@ -228,6 +266,8 @@ async def review(req: ReviewRequest):
         # 同步执行会阻塞整个事件循环,必须放进 executor
         memory_context = ""
         try:
+            if not _memory_enabled():
+                raise ImportError("记忆系统已通过 ENABLE_MEMORY=false 关闭")
             from app.memory import retrieve_memories, format_memories_for_context
             memories = await loop.run_in_executor(
                 None, lambda: retrieve_memories(req.prescription_text, top_k=3)
@@ -254,6 +294,8 @@ async def review(req: ReviewRequest):
 
     # 保存审查案例到记忆
     try:
+        if not _memory_enabled():
+            raise ImportError("记忆系统已通过 ENABLE_MEMORY=false 关闭")
         from app.memory import extract_and_save_case
         risk_level = risk_assessment.overall_risk if risk_assessment else "unknown"
         rx_for_mem = _get(result, "prescription")
@@ -301,11 +343,12 @@ async def review(req: ReviewRequest):
     if memory_context:
         resp["memory_context"] = memory_context
 
-    # 保存到审查缓存
+    # 保存到审查缓存(解析失败/风险未知的结果不缓存,避免错误结论在 TTL 内反复命中)
     try:
-        get_db().save_review_cache(
-            req.prescription_text, resp, patient_id=req.patient_id or "", mode="summary"
-        )
+        if _is_review_cacheable(result):
+            get_db().save_review_cache(
+                req.prescription_text, resp, patient_id=req.patient_id or "", mode="summary"
+            )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 
@@ -342,11 +385,12 @@ async def review_raw(req: ReviewRequest):
     resp["thread_id"] = thread_id
     resp["cached"] = False
 
-    # 保存到审查缓存
+    # 保存到审查缓存(同上:不缓存解析失败的结果)
     try:
-        get_db().save_review_cache(
-            req.prescription_text, resp, patient_id=req.patient_id or "", mode="raw"
-        )
+        if _is_review_cacheable(result):
+            get_db().save_review_cache(
+                req.prescription_text, resp, patient_id=req.patient_id or "", mode="raw"
+            )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 
@@ -418,7 +462,7 @@ async def review_followup(req: FollowupRequest):
 
 
 @router.post("/stream")
-async def review_stream(req: ReviewRequest):
+async def review_stream(req: ReviewRequest, request: Request):
     """流式审查:用 SSE 返回每个步骤进度 + 最终结构化结果。
 
     前端用 fetch + ReadableStream 消费:
@@ -459,9 +503,15 @@ async def review_stream(req: ReviewRequest):
         # 自动完成模式无 checkpointer,直接从流式输出累积最终状态
         state_values: dict = {"raw_text": prescription_text}
 
+        # 客户端断开(关页面/取消请求)时置位,让后台线程尽快停下,
+        # 否则它会继续跑完整个图并持续调用 LLM,白白烧 token。
+        stop = threading.Event()
+
         def run_stream():
             try:
                 for chunk in graph.stream({"raw_text": prescription_text}, config=config):
+                    if stop.is_set():
+                        return
                     q.put(("chunk", chunk))
                 q.put(("done", None))
             except Exception as e:
@@ -471,6 +521,11 @@ async def review_stream(req: ReviewRequest):
         thread.start()
 
         while True:
+            if await request.is_disconnected():
+                stop.set()
+                logger.info("客户端断开连接,已中止流式审查")
+                break
+
             try:
                 kind, data = await loop.run_in_executor(None, q.get, 300.0)
             except Exception:
@@ -489,12 +544,13 @@ async def review_stream(req: ReviewRequest):
                         yield f"data: {json.dumps({'error': f'构建响应失败: {e2}'}, ensure_ascii=False)}\n\n"
                         break
                 response_data["cached"] = False
-                # 保存到审查缓存
+                # 保存到审查缓存(不缓存解析失败的结果)
                 try:
-                    get_db().save_review_cache(
-                        req.prescription_text, response_data,
-                        patient_id=req.patient_id or "", mode="raw",
-                    )
+                    if _is_review_cacheable(response_data):
+                        get_db().save_review_cache(
+                            req.prescription_text, response_data,
+                            patient_id=req.patient_id or "", mode="raw",
+                        )
                 except Exception as e:
                     logger.debug(f"缓存保存跳过: {e}")
                 yield f"data: {json.dumps({'status': 'complete', 'result': response_data}, ensure_ascii=False, default=str)}\n\n"
@@ -619,11 +675,12 @@ async def review_multi(req: ReviewRequest):
     resp = _build_raw_response(result)
     resp["cached"] = False
 
-    # 保存到审查缓存
+    # 保存到审查缓存(同上:不缓存解析失败的结果)
     try:
-        get_db().save_review_cache(
-            req.prescription_text, resp, patient_id=req.patient_id or "", mode="multi"
-        )
+        if _is_review_cacheable(resp):
+            get_db().save_review_cache(
+                req.prescription_text, resp, patient_id=req.patient_id or "", mode="multi"
+            )
     except Exception as e:
         logger.debug(f"缓存保存跳过: {e}")
 
@@ -682,6 +739,8 @@ async def submit_review_feedback(req: FeedbackRequest):
 
         # 存入向量记忆
         try:
+            if not _memory_enabled():
+                raise ImportError("记忆系统已通过 ENABLE_MEMORY=false 关闭")
             from app.memory import extract_memories_from_feedback
             extract_memories_from_feedback(req.prescription_text, req.rating, req.comment, req.risk_level)
         except Exception as e:

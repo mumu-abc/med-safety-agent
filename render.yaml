@@ -1,0 +1,31 @@
+# Render 部署配置(Blueprint)
+#
+# 用法:Render 面板 → New → Blueprint → 连这个仓库 → 自动读取本文件
+# 也可以用 Dockerfile 手动建 Web Service,环境变量照下面填即可。
+#
+# 注意:免费层只有 512MB 内存,而记忆系统(sentence-transformers + faiss)
+# 首次调用要下载约 400MB 的 bge-small-zh 模型,常驻后占数百 MB —— 必崩。
+# 所以这里强制 ENABLE_MEMORY=false;核心审查链路(图谱+规则+LLM)不受影响。
+services:
+  - type: web
+    name: med-safety-agent
+    runtime: docker
+    plan: free
+    region: singapore          # 新加坡,国内访问相对最快
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: LLM_BASE_URL
+        sync: false            # 在 Render 面板里手填,不进仓库
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: glm-4-flash
+      - key: DETECT_MODE
+        value: graph           # 确定性图谱直查,毫秒级,不跑慢速 ReAct
+      - key: RISK_MODE
+        value: semantic        # 单次 structured output,延迟可控
+      - key: ENABLE_MEMORY
+        value: "false"         # 免费层内存不足,关闭向量记忆
+      - key: PYTHONUNBUFFERED
+        value: "1"

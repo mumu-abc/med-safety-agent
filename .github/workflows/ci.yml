@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        # 暂时不放 3.13:faiss-cpu 在 3.13 上的 wheel 不稳定,会让整个矩阵变红。
+        # 等 faiss-cpu 正式支持 3.13 后再加回来。
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4

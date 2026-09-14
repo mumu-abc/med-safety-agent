@@ -6,9 +6,12 @@
 3. 查询不依赖LLM,直接图遍历,确保可靠性。
 """
 import json
+import logging
 from pathlib import Path
 import networkx as nx
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 _graph: nx.DiGraph | None = None
 
@@ -67,13 +70,24 @@ def add_drug(drug_id: str, name: str, category: str = "",
 
 def add_interaction(drug_a: str, drug_b: str, severity: str,
                     mechanism: str, bidirectional: bool = True) -> None:
-    """添加药物相互作用。"""
+    """添加药物相互作用。
+
+    注意：若任一端药物尚未入图，直接跳过。
+    不能用 G.add_edge 硬加——networkx 会自动创建无属性的"幽灵节点"，
+    导致交互数虚高、且查询时拿到没有 name/category 的空药物。
+    """
     G = get_graph()
+    missing = [d for d in (drug_a, drug_b) if not G.has_node(d)]
+    if missing:
+        logger.warning("跳过相互作用 %s <-> %s：药物尚未入图 %s",
+                       drug_a, drug_b, missing)
+        return False
     G.add_edge(drug_a, drug_b, relation="INTERACTS_WITH",
                severity=severity, mechanism=mechanism)
     if bidirectional:
         G.add_edge(drug_b, drug_a, relation="INTERACTS_WITH",
                    severity=severity, mechanism=mechanism)
+    return True
 
 
 def add_contraindication(drug_id: str, condition: str, severity: str = "high") -> None:
@@ -92,9 +106,16 @@ def add_contraindication(drug_id: str, condition: str, severity: str = "high") -
 
 
 def add_alternative(drug_a: str, drug_b: str, reason: str = "") -> None:
+    """添加替代药物关系（同样不创建幽灵节点）。"""
     G = get_graph()
+    missing = [d for d in (drug_a, drug_b) if not G.has_node(d)]
+    if missing:
+        logger.warning("跳过替代关系 %s <-> %s：药物尚未入图 %s",
+                       drug_a, drug_b, missing)
+        return False
     G.add_edge(drug_a, drug_b, relation="ALTERNATIVE_OF", reason=reason)
     G.add_edge(drug_b, drug_a, relation="ALTERNATIVE_OF", reason=reason)
+    return True
 
 
 # ---- 查询 ----

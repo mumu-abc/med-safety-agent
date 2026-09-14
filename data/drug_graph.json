@@ -9435,104 +9435,376 @@
       }
     },
     {
-      "id": "oxazepam",
-      "attrs": {}
-    },
-    {
-      "id": "epirubicin",
-      "attrs": {}
-    },
-    {
-      "id": "edoxaban",
-      "attrs": {}
-    },
-    {
       "id": "ketoconazole",
-      "attrs": {}
-    },
-    {
-      "id": "liposomal_doxorubicin",
-      "attrs": {}
-    },
-    {
-      "id": "lovastatin",
-      "attrs": {}
-    },
-    {
-      "id": "dabigatran",
-      "attrs": {}
-    },
-    {
-      "id": "magnesium_antacid",
-      "attrs": {}
-    },
-    {
-      "id": "rifampicin",
-      "attrs": {}
-    },
-    {
-      "id": "oral_contraceptives",
-      "attrs": {}
-    },
-    {
-      "id": "pimozide",
-      "attrs": {}
+      "attrs": {
+        "name": "酮康唑",
+        "category": "唑类抗真菌药",
+        "drug": true,
+        "generic_name": "酮康唑",
+        "contraindications": [
+          "肝功能不全",
+          "酗酒"
+        ],
+        "side_effects": [
+          "肝毒性",
+          "恶心",
+          "男性乳房发育"
+        ],
+        "metabolism": "CYP3A4强抑制剂"
+      }
     },
     {
       "id": "fluvoxamine",
-      "attrs": {}
-    },
-    {
-      "id": "contrast_dye",
-      "attrs": {}
+      "attrs": {
+        "name": "氟伏沙明",
+        "category": "SSRI抗抑郁药",
+        "drug": true,
+        "generic_name": "马来酸氟伏沙明",
+        "contraindications": [
+          "MAOI合用"
+        ],
+        "side_effects": [
+          "恶心",
+          "嗜睡",
+          "性功能障碍"
+        ],
+        "metabolism": "CYP1A2/CYP2C19抑制剂"
+      }
     },
     {
       "id": "ritonavir",
-      "attrs": {}
+      "attrs": {
+        "name": "利托那韦",
+        "category": "抗病毒药",
+        "drug": true,
+        "generic_name": "利托那韦",
+        "contraindications": [
+          "严重肝功能不全"
+        ],
+        "side_effects": [
+          "胃肠道反应",
+          "血脂异常",
+          "肝毒性"
+        ],
+        "metabolism": "CYP3A4强抑制剂"
+      }
     },
     {
-      "id": "NSAIDs",
-      "attrs": {}
+      "id": "lovastatin",
+      "attrs": {
+        "name": "洛伐他汀",
+        "category": "他汀类降脂药",
+        "drug": true,
+        "generic_name": "洛伐他汀",
+        "contraindications": [
+          "活动性肝病",
+          "妊娠"
+        ],
+        "side_effects": [
+          "肌痛",
+          "肝酶升高",
+          "横纹肌溶解"
+        ],
+        "metabolism": "CYP3A4"
+      }
     },
     {
-      "id": "methotrexate_onco",
-      "attrs": {}
+      "id": "dabigatran",
+      "attrs": {
+        "name": "达比加群酯",
+        "category": "直接凝血酶抑制剂",
+        "drug": true,
+        "generic_name": "甲磺酸达比加群酯",
+        "contraindications": [
+          "严重肾功能不全",
+          "活动性出血"
+        ],
+        "side_effects": [
+          "出血",
+          "消化不良"
+        ],
+        "metabolism": "P-gp底物,酯酶水解"
+      }
     },
     {
-      "id": "penicillins",
-      "attrs": {}
+      "id": "pimozide",
+      "attrs": {
+        "name": "匹莫齐特",
+        "category": "抗精神病药",
+        "drug": true,
+        "generic_name": "匹莫齐特",
+        "contraindications": [
+          "QT间期延长",
+          "CYP3A4抑制剂合用"
+        ],
+        "side_effects": [
+          "QT延长",
+          "锥体外系反应"
+        ],
+        "metabolism": "CYP3A4/CYP2D6"
+      }
     },
     {
       "id": "bupropion",
-      "attrs": {}
-    },
-    {
-      "id": "opioids",
-      "attrs": {}
-    },
-    {
-      "id": "MAO_inhibitors",
-      "attrs": {}
+      "attrs": {
+        "name": "安非他酮",
+        "category": "NDRI抗抑郁药",
+        "drug": true,
+        "generic_name": "盐酸安非他酮",
+        "contraindications": [
+          "癫痫",
+          "进食障碍",
+          "MAOI合用"
+        ],
+        "side_effects": [
+          "失眠",
+          "口干",
+          "癫痫发作风险"
+        ],
+        "metabolism": "CYP2B6底物/CYP2D6抑制剂"
+      }
     },
     {
       "id": "anakinra",
-      "attrs": {}
+      "attrs": {
+        "name": "阿那白滞素",
+        "category": "生物制剂",
+        "drug": true,
+        "generic_name": "阿那白滞素",
+        "contraindications": [
+          "活动性感染",
+          "中性粒细胞减少"
+        ],
+        "side_effects": [
+          "注射部位反应",
+          "感染风险增加"
+        ],
+        "metabolism": "蛋白水解"
+      }
     },
     {
       "id": "abatacept",
-      "attrs": {}
-    },
-    {
-      "id": "vitamin_a",
-      "attrs": {}
+      "attrs": {
+        "name": "阿巴西普",
+        "category": "生物制剂",
+        "drug": true,
+        "generic_name": "阿巴西普",
+        "contraindications": [
+          "活动性感染",
+          "COPD(慎用)"
+        ],
+        "side_effects": [
+          "头痛",
+          "感染风险增加",
+          "输液反应"
+        ],
+        "metabolism": "蛋白水解"
+      }
     },
     {
       "id": "trimethoprim",
-      "attrs": {}
+      "attrs": {
+        "name": "甲氧苄啶",
+        "category": "抗菌药",
+        "drug": true,
+        "generic_name": "甲氧苄啶",
+        "contraindications": [
+          "叶酸缺乏",
+          "严重肾功能不全"
+        ],
+        "side_effects": [
+          "高钾血症",
+          "皮疹",
+          "骨髓抑制"
+        ],
+        "metabolism": "部分肝代谢,主要肾排泄"
+      }
     },
     {
-      "id": "calcium",
-      "attrs": {}
+      "id": "oxazepam",
+      "attrs": {
+        "name": "奥沙西泮",
+        "category": "苯二氮卓类",
+        "drug": true,
+        "generic_name": "奥沙西泮",
+        "contraindications": [
+          "重症肌无力",
+          "严重呼吸功能不全"
+        ],
+        "side_effects": [
+          "嗜睡",
+          "共济失调"
+        ],
+        "metabolism": "葡萄糖醛酸结合(不经CYP)"
+      }
+    },
+    {
+      "id": "epirubicin",
+      "attrs": {
+        "name": "表柔比星",
+        "category": "蒽环类抗肿瘤药",
+        "drug": true,
+        "generic_name": "盐酸表柔比星",
+        "contraindications": [
+          "严重骨髓抑制",
+          "既往蒽环类累积剂量超标"
+        ],
+        "side_effects": [
+          "心脏毒性",
+          "骨髓抑制",
+          "脱发"
+        ],
+        "metabolism": "肝脏代谢"
+      }
+    },
+    {
+      "id": "edoxaban",
+      "attrs": {
+        "name": "艾多沙班",
+        "category": "Xa因子抑制剂",
+        "drug": true,
+        "generic_name": "甲苯磺酸艾多沙班",
+        "contraindications": [
+          "活动性出血",
+          "CrCl>95ml/min(疗效下降)"
+        ],
+        "side_effects": [
+          "出血",
+          "贫血"
+        ],
+        "metabolism": "P-gp底物,少经CYP3A4"
+      }
+    },
+    {
+      "id": "liposomal_doxorubicin",
+      "attrs": {
+        "name": "脂质体多柔比星",
+        "category": "蒽环类抗肿瘤药",
+        "drug": true,
+        "generic_name": "盐酸多柔比星脂质体",
+        "contraindications": [
+          "严重骨髓抑制",
+          "既往蒽环类累积剂量超标"
+        ],
+        "side_effects": [
+          "手足综合征",
+          "心脏毒性较低",
+          "骨髓抑制"
+        ],
+        "metabolism": "肝脏代谢"
+      }
+    },
+    {
+      "id": "magnesium_antacid",
+      "attrs": {
+        "name": "含镁抗酸药",
+        "category": "抗酸药",
+        "drug": true,
+        "generic_name": "氢氧化镁/三硅酸镁",
+        "contraindications": [
+          "严重肾功能不全"
+        ],
+        "side_effects": [
+          "腹泻",
+          "高镁血症(肾功能不全)"
+        ],
+        "metabolism": "不吸收,肠道作用"
+      }
+    },
+    {
+      "id": "MAO_inhibitors",
+      "attrs": {
+        "name": "单胺氧化酶抑制剂(类)",
+        "category": "药物类别",
+        "drug": true,
+        "generic_name": "MAOI",
+        "contraindications": [
+          "SSRI/SNRI合用",
+          "拟交感神经药合用"
+        ],
+        "side_effects": [
+          "5-羟色胺综合征",
+          "高血压危象"
+        ],
+        "metabolism": "MAO抑制"
+      }
+    },
+    {
+      "id": "NSAIDs",
+      "attrs": {
+        "name": "非甾体抗炎药(类)",
+        "category": "药物类别",
+        "drug": true,
+        "generic_name": "NSAIDs",
+        "contraindications": [
+          "活动性消化道溃疡",
+          "重度心衰",
+          "严重肾功能不全"
+        ],
+        "side_effects": [
+          "胃肠道出血",
+          "水钠潴留",
+          "肾功能下降"
+        ],
+        "metabolism": "肝代谢,抑制COX"
+      }
+    },
+    {
+      "id": "oral_contraceptives",
+      "attrs": {
+        "name": "口服避孕药(类)",
+        "category": "药物类别",
+        "drug": true,
+        "generic_name": "雌孕激素复方",
+        "contraindications": [
+          "血栓病史",
+          "严重肝病",
+          "哺乳期"
+        ],
+        "side_effects": [
+          "血栓风险",
+          "恶心",
+          "突破性出血"
+        ],
+        "metabolism": "CYP3A4底物"
+      }
+    },
+    {
+      "id": "vitamin_a",
+      "attrs": {
+        "name": "维生素A(视黄醇类)",
+        "category": "药物类别",
+        "drug": true,
+        "generic_name": "视黄醇/异维A酸类",
+        "contraindications": [
+          "妊娠",
+          "严重肝功能不全"
+        ],
+        "side_effects": [
+          "致畸",
+          "肝毒性",
+          "颅内压升高"
+        ],
+        "metabolism": "肝脏代谢"
+      }
+    },
+    {
+      "id": "contrast_dye",
+      "attrs": {
+        "name": "含碘对比剂",
+        "category": "药物类别",
+        "drug": true,
+        "generic_name": "碘对比剂",
+        "contraindications": [
+          "严重甲状腺功能亢进",
+          "碘过敏"
+        ],
+        "side_effects": [
+          "过敏反应",
+          "造影剂肾病"
+        ],
+        "metabolism": "原形肾排泄"
+      }
     }
   ],
   "edges": [
@@ -9827,7 +10099,7 @@
     },
     {
       "source": "warfarin",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
@@ -11034,7 +11306,7 @@
     },
     {
       "source": "simvastatin",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
@@ -12056,7 +12328,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "双重中枢抑制,呼吸抑制风险极高"
+        "mechanism": "苯二氮卓+阿片,呼吸抑制风险极高(黑框警告)"
       }
     },
     {
@@ -13033,7 +13305,7 @@
     },
     {
       "source": "voriconazole",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
@@ -13108,7 +13380,7 @@
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "双重中枢抑制,呼吸抑制风险极高"
+        "mechanism": "苯二氮卓+阿片,呼吸抑制风险极高(黑框警告)"
       }
     },
     {
@@ -13163,15 +13435,6 @@
         "relation": "INTERACTS_WITH",
         "severity": "high",
         "mechanism": "双重中枢抑制,呼吸抑制风险"
-      }
-    },
-    {
-      "source": "diazepam",
-      "target": "opioids",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "苯二氮卓+阿片,呼吸抑制风险极高(黑框警告)"
       }
     },
     {
@@ -14423,15 +14686,6 @@
       }
     },
     {
-      "source": "levothyroxine",
-      "target": "calcium",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "low",
-        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
-      }
-    },
-    {
       "source": "salbutamol",
       "target": "propranolol",
       "attrs": {
@@ -14730,7 +14984,7 @@
     },
     {
       "source": "cyclosporine",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
@@ -14830,7 +15084,7 @@
     },
     {
       "source": "tacrolimus",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
@@ -14977,6 +15231,24 @@
         "relation": "INTERACTS_WITH",
         "severity": "high",
         "mechanism": "双重免疫抑制+肝毒性叠加"
+      }
+    },
+    {
+      "source": "methotrexate",
+      "target": "NSAIDs",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "NSAIDs降低甲氨蝶呤肾脏清除,严重骨髓抑制"
+      }
+    },
+    {
+      "source": "methotrexate",
+      "target": "penicillin_v",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "青霉素类降低甲氨蝶呤肾脏清除"
       }
     },
     {
@@ -15923,15 +16195,6 @@
       }
     },
     {
-      "source": "cotrimoxazole",
-      "target": "methotrexate_onco",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "双重抗叶酸,严重骨髓抑制"
-      }
-    },
-    {
       "source": "amphotericin_b",
       "target": "gentamicin",
       "attrs": {
@@ -16460,6 +16723,15 @@
       }
     },
     {
+      "source": "penicillin_v",
+      "target": "methotrexate",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "青霉素类降低甲氨蝶呤肾脏清除"
+      }
+    },
+    {
       "source": "tetracycline",
       "target": "isotretinoin",
       "attrs": {
@@ -16710,7 +16982,7 @@
     },
     {
       "source": "baricitinib",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
@@ -16728,7 +17000,7 @@
     },
     {
       "source": "tofacitinib",
-      "target": "rifampicin",
+      "target": "rifampin",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
@@ -17049,27 +17321,75 @@
       }
     },
     {
-      "source": "oxazepam",
-      "target": "diazepam",
-      "attrs": {
-        "relation": "ALTERNATIVE_OF",
-        "reason": "奥沙西泮仅经葡萄糖醛酸化,老年患者首选"
-      }
-    },
-    {
-      "source": "epirubicin",
-      "target": "doxorubicin",
-      "attrs": {
-        "relation": "ALTERNATIVE_OF",
-        "reason": "表柔比星心脏毒性较低"
-      }
-    },
-    {
-      "source": "edoxaban",
+      "source": "rifampin",
       "target": "warfarin",
       "attrs": {
-        "relation": "ALTERNATIVE_OF",
-        "reason": "新型口服抗凝药,每日一次"
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平强效CYP诱导,华法林效果大幅降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "oral_contraceptives",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平诱导CYP3A4,口服避孕药失效"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "simvastatin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "利福平诱导CYP3A4,他汀效果降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "tacrolimus",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平诱导CYP3A4,他克莫司血药浓度大幅降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "cyclosporine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平诱导CYP3A4,环孢素血药浓度大幅降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "voriconazole",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平强效诱导CYP,伏立康唑血药浓度大幅降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "tofacitinib",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "利福平诱导CYP3A4,托法替布效果降低"
+      }
+    },
+    {
+      "source": "rifampin",
+      "target": "baricitinib",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "利福平诱导CYP3A4,巴瑞替尼效果降低"
       }
     },
     {
@@ -17126,149 +17446,6 @@
       }
     },
     {
-      "source": "liposomal_doxorubicin",
-      "target": "doxorubicin",
-      "attrs": {
-        "relation": "ALTERNATIVE_OF",
-        "reason": "脂质体多柔比星心脏毒性低"
-      }
-    },
-    {
-      "source": "lovastatin",
-      "target": "verapamil",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "维拉帕米强效抑制CYP3A4,横纹肌溶解风险"
-      }
-    },
-    {
-      "source": "dabigatran",
-      "target": "dronedarone",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "决奈达隆抑制P-gp,达比加群血药浓度升高"
-      }
-    },
-    {
-      "source": "magnesium_antacid",
-      "target": "nitrofurantoin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "抗酸剂降低呋喃妥因吸收"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "warfarin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平强效CYP诱导,华法林效果大幅降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "oral_contraceptives",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平诱导CYP3A4,口服避孕药失效"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "simvastatin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "利福平诱导CYP3A4,他汀效果降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "tacrolimus",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平诱导CYP3A4,他克莫司血药浓度大幅降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "cyclosporine",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平诱导CYP3A4,环孢素血药浓度大幅降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "voriconazole",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平强效诱导CYP,伏立康唑血药浓度大幅降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "tofacitinib",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "利福平诱导CYP3A4,托法替布效果降低"
-      }
-    },
-    {
-      "source": "rifampicin",
-      "target": "baricitinib",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "利福平诱导CYP3A4,巴瑞替尼效果降低"
-      }
-    },
-    {
-      "source": "oral_contraceptives",
-      "target": "rifampicin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "利福平诱导CYP3A4,口服避孕药失效"
-      }
-    },
-    {
-      "source": "oral_contraceptives",
-      "target": "griseofulvin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "灰黄霉素可能降低口服避孕药效果"
-      }
-    },
-    {
-      "source": "oral_contraceptives",
-      "target": "carbamazepine",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "卡马西平诱导CYP3A4,口服避孕药失效"
-      }
-    },
-    {
-      "source": "pimozide",
-      "target": "sertraline",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "CYP2D6抑制+pimozide,QT延长风险"
-      }
-    },
-    {
       "source": "fluvoxamine",
       "target": "olanzapine",
       "attrs": {
@@ -17305,15 +17482,6 @@
       }
     },
     {
-      "source": "contrast_dye",
-      "target": "metformin",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "碘造影剂致肾功能损害,二甲双胍蓄积→乳酸酸中毒"
-      }
-    },
-    {
       "source": "ritonavir",
       "target": "fluticasone",
       "attrs": {
@@ -17332,66 +17500,30 @@
       }
     },
     {
-      "source": "NSAIDs",
-      "target": "cyclosporine",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "NSAIDs加重环孢素肾毒性"
-      }
-    },
-    {
-      "source": "NSAIDs",
-      "target": "methotrexate_onco",
+      "source": "lovastatin",
+      "target": "verapamil",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "NSAIDs降低甲氨蝶呤肾脏清除,严重骨髓抑制"
+        "mechanism": "维拉帕米强效抑制CYP3A4,横纹肌溶解风险"
       }
     },
     {
-      "source": "NSAIDs",
-      "target": "fondaparinux",
+      "source": "dabigatran",
+      "target": "dronedarone",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "抗凝+NSAIDs,出血风险增加"
+        "mechanism": "决奈达隆抑制P-gp,达比加群血药浓度升高"
       }
     },
     {
-      "source": "methotrexate_onco",
-      "target": "NSAIDs",
+      "source": "pimozide",
+      "target": "sertraline",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "critical",
-        "mechanism": "NSAIDs降低甲氨蝶呤肾脏清除,严重骨髓抑制"
-      }
-    },
-    {
-      "source": "methotrexate_onco",
-      "target": "penicillins",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "青霉素类降低甲氨蝶呤肾脏清除"
-      }
-    },
-    {
-      "source": "methotrexate_onco",
-      "target": "cotrimoxazole",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "双重抗叶酸,严重骨髓抑制"
-      }
-    },
-    {
-      "source": "penicillins",
-      "target": "methotrexate_onco",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "青霉素类降低甲氨蝶呤肾脏清除"
+        "mechanism": "CYP2D6抑制+pimozide,QT延长风险"
       }
     },
     {
@@ -17404,12 +17536,80 @@
       }
     },
     {
-      "source": "opioids",
-      "target": "diazepam",
+      "source": "anakinra",
+      "target": "infliximab",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "critical",
-        "mechanism": "苯二氮卓+阿片,呼吸抑制风险极高(黑框警告)"
+        "severity": "high",
+        "mechanism": "双重免疫抑制,感染风险显著增加"
+      }
+    },
+    {
+      "source": "anakinra",
+      "target": "adalimumab",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "双重免疫抑制,感染风险显著增加"
+      }
+    },
+    {
+      "source": "abatacept",
+      "target": "infliximab",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "双重免疫抑制,感染风险显著增加"
+      }
+    },
+    {
+      "source": "trimethoprim",
+      "target": "amantadine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "甲氧苄啶降低金刚烷胺肾脏清除"
+      }
+    },
+    {
+      "source": "oxazepam",
+      "target": "diazepam",
+      "attrs": {
+        "relation": "ALTERNATIVE_OF",
+        "reason": "奥沙西泮仅经葡萄糖醛酸化,老年患者首选"
+      }
+    },
+    {
+      "source": "epirubicin",
+      "target": "doxorubicin",
+      "attrs": {
+        "relation": "ALTERNATIVE_OF",
+        "reason": "表柔比星心脏毒性较低"
+      }
+    },
+    {
+      "source": "edoxaban",
+      "target": "warfarin",
+      "attrs": {
+        "relation": "ALTERNATIVE_OF",
+        "reason": "新型口服抗凝药,每日一次"
+      }
+    },
+    {
+      "source": "liposomal_doxorubicin",
+      "target": "doxorubicin",
+      "attrs": {
+        "relation": "ALTERNATIVE_OF",
+        "reason": "脂质体多柔比星心脏毒性低"
+      }
+    },
+    {
+      "source": "magnesium_antacid",
+      "target": "nitrofurantoin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "抗酸剂降低呋喃妥因吸收"
       }
     },
     {
@@ -17449,30 +17649,57 @@
       }
     },
     {
-      "source": "anakinra",
-      "target": "infliximab",
+      "source": "NSAIDs",
+      "target": "cyclosporine",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "双重免疫抑制,感染风险显著增加"
+        "mechanism": "NSAIDs加重环孢素肾毒性"
       }
     },
     {
-      "source": "anakinra",
-      "target": "adalimumab",
+      "source": "NSAIDs",
+      "target": "methotrexate",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "high",
-        "mechanism": "双重免疫抑制,感染风险显著增加"
+        "severity": "critical",
+        "mechanism": "NSAIDs降低甲氨蝶呤肾脏清除,严重骨髓抑制"
       }
     },
     {
-      "source": "abatacept",
-      "target": "infliximab",
+      "source": "NSAIDs",
+      "target": "fondaparinux",
       "attrs": {
         "relation": "INTERACTS_WITH",
         "severity": "high",
-        "mechanism": "双重免疫抑制,感染风险显著增加"
+        "mechanism": "抗凝+NSAIDs,出血风险增加"
+      }
+    },
+    {
+      "source": "oral_contraceptives",
+      "target": "rifampin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "利福平诱导CYP3A4,口服避孕药失效"
+      }
+    },
+    {
+      "source": "oral_contraceptives",
+      "target": "griseofulvin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "灰黄霉素可能降低口服避孕药效果"
+      }
+    },
+    {
+      "source": "oral_contraceptives",
+      "target": "carbamazepine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "卡马西平诱导CYP3A4,口服避孕药失效"
       }
     },
     {
@@ -17485,21 +17712,12 @@
       }
     },
     {
-      "source": "trimethoprim",
-      "target": "amantadine",
+      "source": "contrast_dye",
+      "target": "metformin",
       "attrs": {
         "relation": "INTERACTS_WITH",
-        "severity": "medium",
-        "mechanism": "甲氧苄啶降低金刚烷胺肾脏清除"
-      }
-    },
-    {
-      "source": "calcium",
-      "target": "levothyroxine",
-      "attrs": {
-        "relation": "INTERACTS_WITH",
-        "severity": "low",
-        "mechanism": "钙剂吸附降低甲状腺素吸收,间隔4小时可解"
+        "severity": "critical",
+        "mechanism": "碘造影剂致肾功能损害,二甲双胍蓄积→乳酸酸中毒"
       }
     }
   ]

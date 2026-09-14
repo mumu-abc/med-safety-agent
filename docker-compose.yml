@@ -3,8 +3,8 @@ services:
     build: .
     container_name: med-safety-app
     ports:
-      - "8000:8000"   # FastAPI
-      - "8501:8501"   # Streamlit
+      # 只暴露 8000:FastAPI 同时提供 API 与前端静态文件(/ 挂载 frontend/)
+      - "8000:8000"
     env_file:
       - .env
     environment:

@@ -116,6 +116,28 @@ def node_assess(state: ReviewState) -> dict:
         patient=state["patient"],
         drugs=state["drugs_info"],
     )
+
+    # ---- 安全兜底(安全关键系统的红线) ----
+    # 原文非空却一个药都没识别出来 = 解析环节失败了。
+    # 此时风险列表是空的,LLM 会顺势给出 safe —— 这是最危险的假阴性:
+    # "我解析失败" 被当成了 "这张处方没风险"。
+    # 因此必须显式升级为 unknown 并给出人工复核提示。
+    if not state.get("drug_names") and (state.get("raw_text") or "").strip():
+        from app.agents.risk_agent import RiskItem
+        risk_assessment.risks.append(RiskItem(
+            drug="(未识别)",
+            risk_type="rule",
+            severity="medium",
+            description="未能从处方文本中识别出任何药品,无法完成审查,请人工复核。"
+                        "常见原因:药品名写法不在知识图谱内、文本格式异常、或解析服务异常。",
+            source="rule",
+            suggestion="请确认处方文本,或改用通用名/标准药品名后重新提交。",
+        ))
+        if risk_assessment.overall_risk in ("safe", "low", ""):
+            risk_assessment.overall_risk = "unknown"
+        if not risk_assessment.summary:
+            risk_assessment.summary = "解析未获得药品信息,审查未完成,需人工复核。"
+
     return {"risk_assessment": risk_assessment}
 
 

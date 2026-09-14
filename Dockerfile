@@ -18,8 +18,8 @@ COPY . .
 # 构建知识图谱
 RUN python scripts/build_graph.py
 
-# 暴露端口
-EXPOSE 8000 8501
+# 暴露端口(单一服务:API + 前端静态文件)
+EXPOSE 8000
 
 # 启动脚本
 COPY docker-entrypoint.sh /docker-entrypoint.sh

@@ -3,6 +3,9 @@
 覆盖:心血管/消化/呼吸/神经/抗感染/内分泌/镇痛/精神科/眼科/皮肤/免疫/抗肿瘤
 数据来源:药品说明书 + 临床指南 (面试时说"基于说明书和指南预置")
 """
+import logging
+
+logger = logging.getLogger(__name__)
 
 DRUGS = [
     # ==================== 心血管 ====================
@@ -1114,20 +1117,181 @@ _EXTRA_INTERACTIONS_4.append(
 )
 
 
+# ==================== 第 5 批：补全被静默丢弃的交互所引用的药物 ====================
+# 背景：早期批次中部分 INTERACTIONS / ALTERNATIVES 引用了当时尚未建库的药物 id，
+#       建图时被静默跳过（约 51 条引用 / 数十条交互丢失）。本批补齐这些节点。
+_EXTRA_DRUGS_5 = [
+    # ---- 具体药物 ----
+    {"id": "ketoconazole", "name": "酮康唑", "category": "唑类抗真菌药",
+     "generic_name": "酮康唑", "contraindications": ["肝功能不全", "酗酒"],
+     "side_effects": ["肝毒性", "恶心", "男性乳房发育"], "metabolism": "CYP3A4强抑制剂"},
+    {"id": "fluvoxamine", "name": "氟伏沙明", "category": "SSRI抗抑郁药",
+     "generic_name": "马来酸氟伏沙明", "contraindications": ["MAOI合用"],
+     "side_effects": ["恶心", "嗜睡", "性功能障碍"], "metabolism": "CYP1A2/CYP2C19抑制剂"},
+    {"id": "ritonavir", "name": "利托那韦", "category": "抗病毒药",
+     "generic_name": "利托那韦", "contraindications": ["严重肝功能不全"],
+     "side_effects": ["胃肠道反应", "血脂异常", "肝毒性"], "metabolism": "CYP3A4强抑制剂"},
+    {"id": "lovastatin", "name": "洛伐他汀", "category": "他汀类降脂药",
+     "generic_name": "洛伐他汀", "contraindications": ["活动性肝病", "妊娠"],
+     "side_effects": ["肌痛", "肝酶升高", "横纹肌溶解"], "metabolism": "CYP3A4"},
+    {"id": "dabigatran", "name": "达比加群酯", "category": "直接凝血酶抑制剂",
+     "generic_name": "甲磺酸达比加群酯", "contraindications": ["严重肾功能不全", "活动性出血"],
+     "side_effects": ["出血", "消化不良"], "metabolism": "P-gp底物,酯酶水解"},
+    {"id": "pimozide", "name": "匹莫齐特", "category": "抗精神病药",
+     "generic_name": "匹莫齐特", "contraindications": ["QT间期延长", "CYP3A4抑制剂合用"],
+     "side_effects": ["QT延长", "锥体外系反应"], "metabolism": "CYP3A4/CYP2D6"},
+    {"id": "bupropion", "name": "安非他酮", "category": "NDRI抗抑郁药",
+     "generic_name": "盐酸安非他酮", "contraindications": ["癫痫", "进食障碍", "MAOI合用"],
+     "side_effects": ["失眠", "口干", "癫痫发作风险"], "metabolism": "CYP2B6底物/CYP2D6抑制剂"},
+    {"id": "anakinra", "name": "阿那白滞素", "category": "生物制剂",
+     "generic_name": "阿那白滞素", "contraindications": ["活动性感染", "中性粒细胞减少"],
+     "side_effects": ["注射部位反应", "感染风险增加"], "metabolism": "蛋白水解"},
+    {"id": "abatacept", "name": "阿巴西普", "category": "生物制剂",
+     "generic_name": "阿巴西普", "contraindications": ["活动性感染", "COPD(慎用)"],
+     "side_effects": ["头痛", "感染风险增加", "输液反应"], "metabolism": "蛋白水解"},
+    {"id": "trimethoprim", "name": "甲氧苄啶", "category": "抗菌药",
+     "generic_name": "甲氧苄啶", "contraindications": ["叶酸缺乏", "严重肾功能不全"],
+     "side_effects": ["高钾血症", "皮疹", "骨髓抑制"], "metabolism": "部分肝代谢,主要肾排泄"},
+    {"id": "oxazepam", "name": "奥沙西泮", "category": "苯二氮卓类",
+     "generic_name": "奥沙西泮", "contraindications": ["重症肌无力", "严重呼吸功能不全"],
+     "side_effects": ["嗜睡", "共济失调"], "metabolism": "葡萄糖醛酸结合(不经CYP)"},
+    {"id": "epirubicin", "name": "表柔比星", "category": "蒽环类抗肿瘤药",
+     "generic_name": "盐酸表柔比星", "contraindications": ["严重骨髓抑制", "既往蒽环类累积剂量超标"],
+     "side_effects": ["心脏毒性", "骨髓抑制", "脱发"], "metabolism": "肝脏代谢"},
+    {"id": "edoxaban", "name": "艾多沙班", "category": "Xa因子抑制剂",
+     "generic_name": "甲苯磺酸艾多沙班", "contraindications": ["活动性出血", "CrCl>95ml/min(疗效下降)"],
+     "side_effects": ["出血", "贫血"], "metabolism": "P-gp底物,少经CYP3A4"},
+    {"id": "liposomal_doxorubicin", "name": "脂质体多柔比星", "category": "蒽环类抗肿瘤药",
+     "generic_name": "盐酸多柔比星脂质体", "contraindications": ["严重骨髓抑制", "既往蒽环类累积剂量超标"],
+     "side_effects": ["手足综合征", "心脏毒性较低", "骨髓抑制"], "metabolism": "肝脏代谢"},
+    {"id": "magnesium_antacid", "name": "含镁抗酸药", "category": "抗酸药",
+     "generic_name": "氢氧化镁/三硅酸镁", "contraindications": ["严重肾功能不全"],
+     "side_effects": ["腹泻", "高镁血症(肾功能不全)"], "metabolism": "不吸收,肠道作用"},
+    # ---- 类别级节点（用于表达"类效应"相互作用，如 SSRI+MAOI、锂盐+NSAIDs）----
+    {"id": "MAO_inhibitors", "name": "单胺氧化酶抑制剂(类)", "category": "药物类别",
+     "generic_name": "MAOI", "contraindications": ["SSRI/SNRI合用", "拟交感神经药合用"],
+     "side_effects": ["5-羟色胺综合征", "高血压危象"], "metabolism": "MAO抑制"},
+    {"id": "NSAIDs", "name": "非甾体抗炎药(类)", "category": "药物类别",
+     "generic_name": "NSAIDs", "contraindications": ["活动性消化道溃疡", "重度心衰", "严重肾功能不全"],
+     "side_effects": ["胃肠道出血", "水钠潴留", "肾功能下降"], "metabolism": "肝代谢,抑制COX"},
+    {"id": "oral_contraceptives", "name": "口服避孕药(类)", "category": "药物类别",
+     "generic_name": "雌孕激素复方", "contraindications": ["血栓病史", "严重肝病", "哺乳期"],
+     "side_effects": ["血栓风险", "恶心", "突破性出血"], "metabolism": "CYP3A4底物"},
+    {"id": "vitamin_a", "name": "维生素A(视黄醇类)", "category": "药物类别",
+     "generic_name": "视黄醇/异维A酸类", "contraindications": ["妊娠", "严重肝功能不全"],
+     "side_effects": ["致畸", "肝毒性", "颅内压升高"], "metabolism": "肝脏代谢"},
+    {"id": "contrast_dye", "name": "含碘对比剂", "category": "药物类别",
+     "generic_name": "碘对比剂", "contraindications": ["严重甲状腺功能亢进", "碘过敏"],
+     "side_effects": ["过敏反应", "造影剂肾病"], "metabolism": "原形肾排泄"},
+]
+DRUGS.extend(_EXTRA_DRUGS_5)
+
+
+# ==================== id 别名重映射 ====================
+# 同一药物的不同英文拼写 / 复方-单药关系，统一到图谱中已存在的 id，
+# 避免这些交互因"药名对不上"被静默丢弃。
+_ID_ALIAS = {
+    "rifampicin": "rifampin",                    # 利福平：英美拼写差异
+    "methotrexate_onco": "methotrexate",         # 甲氨蝶呤：肿瘤剂量与低剂量同药
+    "calcium": "calcium_carbonate",              # 钙剂 → 碳酸钙
+    "opioids": "morphine",                       # 阿片类 → 代表药吗啡
+    "penicillins": "penicillin_v",               # 青霉素类 → 代表药青霉素V
+}
+
+
+def _apply_id_alias():
+    """就地修正 INTERACTIONS / ALTERNATIVES 中的药物 id 别名。"""
+    for i, item in enumerate(INTERACTIONS):
+        a, b, sev, mech = item
+        a2, b2 = _ID_ALIAS.get(a, a), _ID_ALIAS.get(b, b)
+        if (a2, b2) != (a, b):
+            INTERACTIONS[i] = (a2, b2, sev, mech)
+    for i, item in enumerate(ALTERNATIVES):
+        a, b, reason = item
+        a2, b2 = _ID_ALIAS.get(a, a), _ID_ALIAS.get(b, b)
+        if (a2, b2) != (a, b):
+            ALTERNATIVES[i] = (a2, b2, reason)
+
+
+_apply_id_alias()
+
+
+def _dedupe_drugs():
+    """就地去除重复药物 id（保留首个定义，与 build_graph_from_data 行为一致）。
+
+    历史上不同批次重复定义了 9 个药物（如 theophylline 分属"黄嘌呤类"/"平喘药"）。
+    建图时只取首个、其余静默丢弃；这里在数据层就先去重，让 DRUGS 长度等于真实药物数，
+    避免"数出来的药物数"和"图谱里的药物数"对不上。
+    """
+    seen = set()
+    dup_log: list = []
+    unique: list = []
+    for d in DRUGS:
+        if d["id"] in seen:
+            dup_log.append(d["id"])
+            continue
+        seen.add(d["id"])
+        unique.append(d)
+    if dup_log:
+        logger.warning("去除重复药物定义（保留首个）: %s", sorted(set(dup_log)))
+        DRUGS[:] = unique
+    return sorted(set(dup_log))
+
+
+DUPLICATE_DRUG_IDS = _dedupe_drugs()
+
+
+def validate_data(strict: bool = False) -> dict:
+    """校验数据完整性：交互/替代关系是否引用了不存在的药物。
+
+    Args:
+        strict: True 时若存在悬挂引用则抛 ValueError（建议在 CI 中使用）。
+
+    Returns:
+        {"drugs": 去重后药物数, "interactions": 交互条数,
+         "dangling": {id: 被引用次数}, "dangling_count": 总悬挂引用数}
+    """
+    idset = {d["id"] for d in DRUGS}
+    dangling: dict = {}
+    for a, b, _sev, _mech in INTERACTIONS:
+        for x in (a, b):
+            if x not in idset:
+                dangling[x] = dangling.get(x, 0) + 1
+    for a, b, _r in ALTERNATIVES:
+        for x in (a, b):
+            if x not in idset:
+                dangling[x] = dangling.get(x, 0) + 1
+    result = {
+        "drugs": len(idset),
+        "interactions": len(INTERACTIONS),
+        "alternatives": len(ALTERNATIVES),
+        "dangling": dict(sorted(dangling.items(), key=lambda kv: -kv[1])),
+        "dangling_count": sum(dangling.values()),
+    }
+    if strict and dangling:
+        raise ValueError(f"药物数据存在悬挂引用: {result['dangling']}")
+    return result
+
+
 def build_graph_from_data():
-    """从预置数据构建药物知识图谱。"""
+    """从预置数据构建药物知识图谱。
+
+    建图前先做数据完整性校验；若存在引用了不存在药物的交互/替代关系，
+    会以 warning 记录并返回在结果里，而不是静默丢失。
+    """
     from app.graph.drug_graph import (
         add_drug, add_interaction, add_alternative, save_graph, get_graph
     )
 
-    # 清空重建
+    check = validate_data()
+    if check["dangling_count"]:
+        logger.warning("药物数据存在 %d 条悬挂引用: %s",
+                       check["dangling_count"], check["dangling"])
+
+    # 重置内存中的图实例；图谱文件由 save_graph() 整体覆盖写，无需先删除
+    # （旧实现用 os.remove / unlink 预删，在只读或受限环境下会抛异常）
     import app.graph.drug_graph as dg
     dg._graph = None
-    from pathlib import Path
-    import os
-    p = Path(dg.settings.graph_path)
-    if p.exists():
-        os.remove(p)
 
     # 添加药物(去重)
     seen_ids = set()
@@ -1158,4 +1322,13 @@ def build_graph_from_data():
     drug_count = sum(1 for _, d in G.nodes(data=True) if d.get("drug"))
     interaction_count = sum(1 for _, _, d in G.edges(data=True)
                            if d.get("relation") == "INTERACTS_WITH")
-    return {"drugs": drug_count, "interactions": interaction_count // 2}
+    # 幽灵节点自检：有边相连但没有 drug 标记的节点
+    phantoms = [n for n, d in G.nodes(data=True) if not d.get("drug")]
+    if phantoms:
+        logger.error("图谱出现幽灵节点: %s", phantoms)
+    return {
+        "drugs": drug_count,
+        "interactions": interaction_count // 2,
+        "dangling_count": check["dangling_count"],
+        "phantom_nodes": phantoms,
+    }
