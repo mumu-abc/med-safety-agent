@@ -153,7 +153,7 @@ med_safety/
 ├── app/
 │   ├── main.py                     # FastAPI 入口 + CORS + 日志配置
 │   ├── config.py                   # Pydantic Settings 配置管理
-│   ├── llm.py                      # LLM 单例工厂 (智谱 GLM API, max_retries=3, timeout=120)
+│   ├── llm.py                      # LLM 单例工厂 (OpenAI 兼容接口, max_retries=3, timeout=120)
 │   ├── workflow.py                 # 🔗 LangGraph StateGraph + HITL(仅中断恢复用 MemorySaver)
 │   ├── memory.py                   # 🧠 向量记忆系统(FAISS+bge-small-zh)
 │   ├── evaluation.py               # 📊 评测闭环(191主集用例+回归检测)
@@ -210,7 +210,7 @@ med_safety/
 ## 📊 评测体系
 
 主评测集衡量「已覆盖分布」上的回归;**LLM 增量难例集**衡量「分布外」Agent 价值。
-两套都要看——只报主集 F1=95.9% 无法回答「为什么要 LLM」。
+两套都要看——只报主集 F1=94.8% 无法回答「为什么要 LLM」。
 
 ### 2.1 主评测集（191 样本，图谱内分布）
 
@@ -366,7 +366,7 @@ graph LR
 
 ## 🔍 LangSmith 可观测性
 
-项目支持 LangSmith tracing,可追踪每次 LLM 调用和工具调用链。
+项目已接入 LangSmith tracing,并用脚本实测验证(不是"配了就算")。
 
 ### 配置
 
@@ -377,15 +377,43 @@ LANGSMITH_API_KEY=your-langsmith-api-key
 LANGSMITH_PROJECT=med-safety-agent
 ```
 
+### 实测结果
+
+一次完整审查(3 药联用的 critical 案例)会在 LangSmith 生成一棵调用树:
+
+- 根节点 `LangGraph`,7 个直接子节点:`parse → detect → rules → assess → recommend → gen_report`
+- 替代方案节点里的 ReAct 子循环完整可见:`agent → call_model → ChatOpenAI`、`tools → get_alternatives_for`
+- 总 token 17.3K,端到端 100.5s(含多轮 LLM 往返与工具循环)
+
+每条节点都能看到输入输出、延迟和 token 用量,可用来定位是解析、图谱查询还是评估环节出的问题。
+
+### 一个容易踩的坑:开关必须在图执行前生效
+
+tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env` 只会被 pydantic 读进配置对象,
+**不会自动写进 `os.environ`**。原先 `_setup_langsmith()` 只在 `get_llm()` 里懒调用,时序就变成:
+
+| 步骤 | 实际发生的事 |
+|------|--------------|
+| 1. `graph.invoke()` 开始 | 环境里还没有 tracing 开关 → **LangGraph 不建根 run** |
+| 2. 执行到 `node_parse` 调 LLM | 这时才把 `LANGSMITH_TRACING=true` 写进环境 |
+| 3. LLM 调用被记录 | 但它**没有父节点** → 项目里只有一堆互不相连的孤立 run |
+
+症状很有迷惑性:**「单次调用追踪成功」的自检会通过,但截不出一张能说明问题的流水线图。**
+修法是把 `_setup_langsmith()` 提到 `app/llm.py` 模块导入时执行,并由
+`tests/test_langsmith_setup.py` 守住(把调用改回懒加载,该用例立刻失败)。
+
+配套两点:
+
+- `tests/conftest.py` 在测试期间关闭 tracing —— 否则跑一次单测就会把大量 run 传到线上,
+  把真实审查的 trace 冲散在噪音里(需要调试测试时用 `LANGSMITH_TEST_TRACING=true` 覆盖)。
+- `scripts/check_langsmith.py` 分三步自检:**key 生效 → 单次调用能查到 → 项目里存在含子节点的树形 trace**。
+  第三步是关键,只看前两步会把「只有单调用」误判成「可观测性已配好」。
+
 ### 面试展示
 
-启用后,每次审查请求都会在 LangSmith UI 中生成完整的 trace:
-- 处方解析的 structured output 调用
-- ReAct Agent 的每步推理和工具调用
-- 风险评估的 prompt 和 LLM 响应
-- 每步的延迟和 token 用量
-
 > "我们通过 LangSmith 做全链路可观测性,每个审查请求的推理过程都可以追溯和调试。"
+> 追问成本时:单次完整审查约 1.7 万 token、端到端 ~100s;其中确定性环节(图谱查交互、规则引擎)
+> 不消耗 token,LLM 只用在解析、语义评估和替代方案这三处。
 
 ---
 
@@ -397,7 +425,7 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ### Q1b: 那 LLM 到底带来了什么?能量化吗?
 
-> 主评测集(191条)里图谱+规则 F1 已 95.9%,看起来 LLM 没用——因为 175 条样本是从图谱生成的。所以我专门做了 20 条「规则/图谱覆盖不到」的难例:商品名归一(波立维→氯吡格雷)、同成分重复(立普妥+阿托伐他汀)、剂量语义(对乙酰氨基酚日剂量4g)、化验值入参(eGFR 28)。无 LLM 基线二分类 70.0%,加上解析+语义评估后 95.0%,精确匹配 55.0%→80.0%。注意单加 LLM 解析反而降到 60.0%——增益在语义推理不在解析。同时 overall_risk 有规则地板,LLM 不能把 critical 降成 safe。
+> 主评测集(191条)里图谱+规则 F1 已 94.8%,看起来 LLM 没用——因为 175 条样本是从图谱生成的。所以我专门做了 20 条「规则/图谱覆盖不到」的难例:商品名归一(波立维→氯吡格雷)、同成分重复(立普妥+阿托伐他汀)、剂量语义(对乙酰氨基酚日剂量4g)、化验值入参(eGFR 28)。无 LLM 基线二分类 70.0%,加上解析+语义评估后 95.0%,精确匹配 55.0%→80.0%。注意单加 LLM 解析反而降到 60.0%——增益在语义推理不在解析。同时 overall_risk 有规则地板,LLM 不能把 critical 降成 safe。
 
 ### Q2: LangChain在这个项目里怎么用的?
 
@@ -447,8 +475,8 @@ LANGSMITH_PROJECT=med-safety-agent
 
 ---
 
-*技术栈:LangChain + LangGraph + NetworkX + FastAPI + Pydantic + FAISS + 智谱 GLM API*
-*测试:140 个测试函数(135 通过 / 5 条慢速标记跳过) | 评测:主集 191 样本 F1=95.9%,外部 holdout 60 条 + 难例 20 条*
+*技术栈:LangChain + LangGraph + NetworkX + FastAPI + Pydantic + FAISS + OpenAI 兼容 LLM 接口*
+*测试:143 个测试函数(138 通过 / 5 条慢速标记跳过) | 评测:主集 191 样本 F1=94.8%,外部 holdout 60 条 + 难例 20 条*
 
 ---
 

@@ -15,12 +15,26 @@ _lock = threading.Lock()
 
 
 def _setup_langsmith():
-    """配置 LangSmith 环境变量,启用 tracing。"""
+    """配置 LangSmith 环境变量,启用 tracing。
+
+    必须在「任何 LangGraph 图开始执行之前」调用,否则图不会产生根 trace。
+    见文件末尾的模块级调用与注释。
+    """
     if settings.langsmith_tracing and settings.langsmith_api_key:
         os.environ["LANGSMITH_TRACING"] = "true"
         os.environ["LANGSMITH_API_KEY"] = settings.langsmith_api_key
         os.environ["LANGSMITH_PROJECT"] = settings.langsmith_project
         os.environ["LANGSMITH_ENDPOINT"] = "https://api.smith.langchain.com"
+        # 兼容旧变量名(部分 langchain/langgraph 版本仍只认这个)
+        os.environ["LANGCHAIN_TRACING_V2"] = "true"
+
+
+# 模块导入即生效。
+# 为什么不能只在 get_llm() 里调用:Settings 只把 .env 读进对象,不会写进 os.environ,
+# 而 tracing 开关是在「一次 run 开始时」读取环境变量的。若等到第一次 get_llm() 才设置,
+# graph.invoke() 早已开始(此时开关还是 false) → LangGraph 不建根 run;
+# 之后节点内的 LLM 调用才被追踪,于是变成一堆互不相连的孤立 run,看不到流水线结构。
+_setup_langsmith()
 
 
 def get_llm() -> ChatOpenAI:
@@ -31,6 +45,7 @@ def get_llm() -> ChatOpenAI:
     with _lock:
         if _llm is not None:
             return _llm
+        # 幂等,重复调用无害:保证运行期若改了配置也能立即生效
         _setup_langsmith()
         _llm = ChatOpenAI(
             base_url=settings.llm_base_url,
