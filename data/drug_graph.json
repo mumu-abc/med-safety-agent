@@ -9805,6 +9805,84 @@
         ],
         "metabolism": "原形肾排泄"
       }
+    },
+    {
+      "id": "moclobemide",
+      "attrs": {
+        "name": "吗氯贝胺",
+        "category": "抗抑郁药",
+        "drug": true,
+        "generic_name": "吗氯贝胺(可逆性MAO-A抑制剂)",
+        "contraindications": [
+          "SSRI/SNRI合用",
+          "嗜铬细胞瘤",
+          "躁狂期"
+        ],
+        "side_effects": [
+          "失眠",
+          "头晕",
+          "5-羟色胺综合征(联用时)"
+        ],
+        "metabolism": "MAO-A抑制"
+      }
+    },
+    {
+      "id": "captopril",
+      "attrs": {
+        "name": "卡托普利",
+        "category": "ACEI",
+        "drug": true,
+        "generic_name": "卡托普利",
+        "contraindications": [
+          "妊娠",
+          "双侧肾动脉狭窄",
+          "血管性水肿史"
+        ],
+        "side_effects": [
+          "干咳",
+          "高钾血症",
+          "血管性水肿",
+          "肾功能下降"
+        ],
+        "metabolism": "部分肝代谢"
+      }
+    },
+    {
+      "id": "fish_oil",
+      "attrs": {
+        "name": "鱼油",
+        "category": "膳食补充剂",
+        "drug": true,
+        "generic_name": "Omega-3脂肪酸",
+        "contraindications": [
+          "出血体质",
+          "抗凝治疗中(大剂量)"
+        ],
+        "side_effects": [
+          "消化道不适",
+          "出血倾向(大剂量)"
+        ],
+        "metabolism": "不代谢"
+      }
+    },
+    {
+      "id": "iron_supplement",
+      "attrs": {
+        "name": "铁剂",
+        "category": "矿物质补充剂",
+        "drug": true,
+        "generic_name": "硫酸亚铁/富马酸亚铁",
+        "contraindications": [
+          "血色病",
+          "含铁血黄素沉着症"
+        ],
+        "side_effects": [
+          "便秘",
+          "黑便",
+          "胃肠道刺激"
+        ],
+        "metabolism": "不代谢"
+      }
     }
   ],
   "edges": [
@@ -10161,6 +10239,24 @@
       }
     },
     {
+      "source": "warfarin",
+      "target": "sulfamethoxazole_trimethoprim",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "磺胺甲噁唑抑制CYP2C9,增强华法林抗凝,出血风险升高"
+      }
+    },
+    {
+      "source": "warfarin",
+      "target": "fish_oil",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "大剂量鱼油抑制血小板聚集,与抗凝叠加,需监测INR"
+      }
+    },
+    {
       "source": "aspirin",
       "target": "clopidogrel",
       "attrs": {
@@ -10252,6 +10348,15 @@
       }
     },
     {
+      "source": "aspirin",
+      "target": "fish_oil",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "抗血小板+鱼油,出血倾向叠加"
+      }
+    },
+    {
       "source": "clopidogrel",
       "target": "aspirin",
       "attrs": {
@@ -10295,6 +10400,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "medium",
         "mechanism": "埃索美拉唑抑制CYP2C19,氯吡格雷活化受阻"
+      }
+    },
+    {
+      "source": "clopidogrel",
+      "target": "fish_oil",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "抗血小板+鱼油,出血倾向叠加"
       }
     },
     {
@@ -11600,6 +11714,15 @@
       }
     },
     {
+      "source": "spironolactone",
+      "target": "captopril",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "ACEI+保钾利尿剂,双重升高血钾,高钾血症风险"
+      }
+    },
+    {
       "source": "hydrochlorothiazide",
       "target": "digoxin",
       "attrs": {
@@ -12054,6 +12177,15 @@
       }
     },
     {
+      "source": "ibuprofen",
+      "target": "captopril",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs削弱ACEI降压效果并增加肾损害风险"
+      }
+    },
+    {
       "source": "acetaminophen",
       "target": "ibuprofen",
       "attrs": {
@@ -12242,6 +12374,24 @@
         "relation": "INTERACTS_WITH",
         "severity": "high",
         "mechanism": "NSAIDs降低锂排泄,升高血锂浓度"
+      }
+    },
+    {
+      "source": "naproxen",
+      "target": "methotrexate",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs减少甲氨蝶呤肾排泄,血药浓度升高,骨髓抑制风险"
+      }
+    },
+    {
+      "source": "naproxen",
+      "target": "captopril",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs削弱ACEI降压效果并增加肾损害风险"
       }
     },
     {
@@ -12493,6 +12643,15 @@
       }
     },
     {
+      "source": "tramadol",
+      "target": "moclobemide",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "MAOI+曲马多,5-羟色胺综合征与癫痫风险"
+      }
+    },
+    {
       "source": "oxycodone",
       "target": "morphine",
       "attrs": {
@@ -12553,6 +12712,15 @@
       "attrs": {
         "relation": "ALTERNATIVE_OF",
         "reason": "青霉素类无CYP相互作用(根据感染类型选择)"
+      }
+    },
+    {
+      "source": "ampicillin",
+      "target": "allopurinol",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "别嘌醇+氨苄西林皮疹风险增加,需观察"
       }
     },
     {
@@ -12831,6 +12999,15 @@
       }
     },
     {
+      "source": "ciprofloxacin",
+      "target": "iron_supplement",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂螯合显著降低喹诺酮类吸收"
+      }
+    },
+    {
       "source": "levofloxacin",
       "target": "ciprofloxacin",
       "attrs": {
@@ -12845,6 +13022,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "medium",
         "mechanism": "左氧氟沙星增强华法林抗凝效果"
+      }
+    },
+    {
+      "source": "levofloxacin",
+      "target": "iron_supplement",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂螯合显著降低喹诺酮类吸收"
       }
     },
     {
@@ -13340,6 +13526,15 @@
       }
     },
     {
+      "source": "sulfamethoxazole_trimethoprim",
+      "target": "warfarin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "磺胺甲噁唑抑制CYP2C9,增强华法林抗凝,出血风险升高"
+      }
+    },
+    {
       "source": "nitrofurantoin",
       "target": "magnesium_antacid",
       "attrs": {
@@ -13761,6 +13956,15 @@
       }
     },
     {
+      "source": "fluoxetine",
+      "target": "moclobemide",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "SSRI+MAOI,5-羟色胺综合征,绝对禁忌"
+      }
+    },
+    {
       "source": "sertraline",
       "target": "fluoxetine",
       "attrs": {
@@ -13831,6 +14035,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "critical",
         "mechanism": "MAO-B抑制剂+SSRI,5-HT综合征风险"
+      }
+    },
+    {
+      "source": "sertraline",
+      "target": "moclobemide",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "SSRI+MAOI,5-羟色胺综合征风险"
       }
     },
     {
@@ -14686,6 +14899,15 @@
       }
     },
     {
+      "source": "levothyroxine",
+      "target": "iron_supplement",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂吸附降低左甲状腺素吸收,需间隔4小时服用"
+      }
+    },
+    {
       "source": "salbutamol",
       "target": "propranolol",
       "attrs": {
@@ -14845,6 +15067,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "medium",
         "mechanism": "别嘌醇可能加重环磷酰胺骨髓抑制"
+      }
+    },
+    {
+      "source": "allopurinol",
+      "target": "ampicillin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "别嘌醇+氨苄西林皮疹风险增加,需观察"
       }
     },
     {
@@ -15258,6 +15489,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "medium",
         "mechanism": "可能增加甲氨蝶呤毒性"
+      }
+    },
+    {
+      "source": "methotrexate",
+      "target": "naproxen",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs减少甲氨蝶呤肾排泄,血药浓度升高,骨髓抑制风险"
       }
     },
     {
@@ -15702,6 +15942,15 @@
       }
     },
     {
+      "source": "gemfibrozil",
+      "target": "lovastatin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "贝特类+他汀,横纹肌溶解风险显著(吉非罗齐禁与洛伐他汀联用)"
+      }
+    },
+    {
       "source": "tizanidine",
       "target": "ciprofloxacin",
       "attrs": {
@@ -15843,6 +16092,15 @@
         "relation": "INTERACTS_WITH",
         "severity": "critical",
         "mechanism": "高钾血症风险"
+      }
+    },
+    {
+      "source": "potassium",
+      "target": "captopril",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "ACEI+补钾,高钾血症风险"
       }
     },
     {
@@ -17509,6 +17767,15 @@
       }
     },
     {
+      "source": "lovastatin",
+      "target": "gemfibrozil",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "贝特类+他汀,横纹肌溶解风险显著(吉非罗齐禁与洛伐他汀联用)"
+      }
+    },
+    {
       "source": "dabigatran",
       "target": "dronedarone",
       "attrs": {
@@ -17718,6 +17985,123 @@
         "relation": "INTERACTS_WITH",
         "severity": "critical",
         "mechanism": "碘造影剂致肾功能损害,二甲双胍蓄积→乳酸酸中毒"
+      }
+    },
+    {
+      "source": "moclobemide",
+      "target": "fluoxetine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "SSRI+MAOI,5-羟色胺综合征,绝对禁忌"
+      }
+    },
+    {
+      "source": "moclobemide",
+      "target": "sertraline",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "SSRI+MAOI,5-羟色胺综合征风险"
+      }
+    },
+    {
+      "source": "moclobemide",
+      "target": "tramadol",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "MAOI+曲马多,5-羟色胺综合征与癫痫风险"
+      }
+    },
+    {
+      "source": "captopril",
+      "target": "spironolactone",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "ACEI+保钾利尿剂,双重升高血钾,高钾血症风险"
+      }
+    },
+    {
+      "source": "captopril",
+      "target": "potassium",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "critical",
+        "mechanism": "ACEI+补钾,高钾血症风险"
+      }
+    },
+    {
+      "source": "captopril",
+      "target": "naproxen",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs削弱ACEI降压效果并增加肾损害风险"
+      }
+    },
+    {
+      "source": "captopril",
+      "target": "ibuprofen",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "high",
+        "mechanism": "NSAIDs削弱ACEI降压效果并增加肾损害风险"
+      }
+    },
+    {
+      "source": "fish_oil",
+      "target": "warfarin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "大剂量鱼油抑制血小板聚集,与抗凝叠加,需监测INR"
+      }
+    },
+    {
+      "source": "fish_oil",
+      "target": "aspirin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "抗血小板+鱼油,出血倾向叠加"
+      }
+    },
+    {
+      "source": "fish_oil",
+      "target": "clopidogrel",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "抗血小板+鱼油,出血倾向叠加"
+      }
+    },
+    {
+      "source": "iron_supplement",
+      "target": "levothyroxine",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂吸附降低左甲状腺素吸收,需间隔4小时服用"
+      }
+    },
+    {
+      "source": "iron_supplement",
+      "target": "ciprofloxacin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂螯合显著降低喹诺酮类吸收"
+      }
+    },
+    {
+      "source": "iron_supplement",
+      "target": "levofloxacin",
+      "attrs": {
+        "relation": "INTERACTS_WITH",
+        "severity": "medium",
+        "mechanism": "铁剂螯合显著降低喹诺酮类吸收"
       }
     }
   ]

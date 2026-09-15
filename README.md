@@ -1,13 +1,13 @@
 # 💊 智能用药安全审查系统
 
-> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(540药物/396相互作用) + 规则引擎(9类规则) + LLM推理**三层保障,模拟临床药师的审查流程。
+> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(544药物/413相互作用) + 规则引擎(9类规则) + LLM推理**三层保障,模拟临床药师的审查流程。
 
 **这是一个面向秋招 Agent 开发方向的简历级项目。** 它展示的不是"会调 API",而是:
 
 - **安全关键AI** — 不是聊天机器人,是能救命的系统,LLM只是辅助,规则才是底线
 - **可量化的 LLM 增量** — 主集 F1 高是因为图谱;20 条规则/图谱覆盖不到的难例上,LLM 语义评估把二分类从 70.0% 拉到 **95.0%**、精确匹配 55.0%→80.0%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
 - **LangChain 深度使用** — structured output 强约束处方解析,bind_tools 让LLM自主调用图谱工具,LangGraph StateGraph 编排全流程
-- **知识图谱推理** — 540种药物、396条相互作用、56条替代关系的知识图谱,结构化查询比 RAG 更可靠
+- **知识图谱推理** — 544种药物、413条相互作用、56条替代关系的知识图谱,结构化查询比 RAG 更可靠
 - **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,overall_risk 不得被 LLM 降级
 
 [![CI](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml)
@@ -98,7 +98,7 @@ flowchart TD
 | 能力 | 在项目哪里 | 面试怎么说 |
 |---|---|---|
 | LangChain深度使用 | `agents/` + `workflow.py` | structured output强约束,create_react_agent ReAct循环,LangGraph StateGraph + 多Agent Supervisor编排 |
-| 知识图谱 | `graph/drug_graph.py` | 540种药物/396条相互作用/56条替代关系,结构化查询比RAG可靠 |
+| 知识图谱 | `graph/drug_graph.py` | 544种药物/413条相互作用/56条替代关系,结构化查询比RAG可靠 |
 | 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
@@ -107,8 +107,8 @@ flowchart TD
 | 向量记忆 | `memory.py` | FAISS+bge-small-zh,历史案例检索,相似处方自动关联 |
 | 评测闭环 | `evaluation.py` | 主集191 + 外部holdout 60 + 难例20,F1/Recall回归检测,API触发评测 |
 | LLM-as-Judge | `tests/test_llm_judge.py` | LLM自动评判,减少人工标注依赖 |
-| 用户反馈 | `database.py` + Streamlit | 评分反馈→记忆注入→持续改进闭环 |
-| Docker部署 | `Dockerfile` + `docker-compose.yml` | 一键容器化部署,FastAPI+Streamlit双服务 |
+| 用户反馈 | `database.py` + `frontend/index.html` | 评分反馈→记忆注入→持续改进闭环(前端是原生 HTML 单页,点赞/点踩直接打回 SQLite) |
+| Docker部署 | `Dockerfile` + `docker-compose.yml` | 一键容器化部署,**单进程单端口**(FastAPI 同时托管 API 与静态前端) |
 
 ---
 
@@ -121,7 +121,7 @@ conda create -n medsafety python=3.11 -y
 conda activate medsafety
 pip install -r requirements.txt
 
-# 构建药物知识图谱(预置540种常用药)
+# 构建药物知识图谱(预置544种常用药)
 python scripts/build_graph.py
 
 # 启动
@@ -169,7 +169,7 @@ med_safety/
 │   ├── models.py                   # 共享 Pydantic 模型
 │   ├── graph/                      # 💊 药物知识图谱
 │   │   ├── drug_graph.py           #   NetworkX 图存储 + 查询 + 图算法
-│   │   ├── drug_data.py            #   预置 540 种药物 + 396 条交互数据
+│   │   ├── drug_data.py            #   预置 544 种药物 + 413 条交互数据
 │   │   └── patient_store.py        #   患者档案 (线程安全 Lock + 原子写入)
 │   ├── agents/                     # 🤖 LangChain Agent
 │   │   ├── prescription_agent.py   #   处方解析(with_structured_output)
@@ -268,13 +268,13 @@ LLM 解析引入的归一误差大于它解决的匹配问题。真正的增益�
 
 | 指标 | 图谱+规则（无 LLM） |
 |------|---------------------|
-| 二分类 F1 | **94.4%** |
-| 二分类正确率 | **91.7%** |
-| Precision / Recall | 100% / 89.4% |
-| 精确匹配（多分类） | **75.0%**（45/60） |
-| 药名均在图谱内 | 56/60（**仍有 4 条含图谱外药名**） |
+| 二分类 F1 | **100%** |
+| 二分类正确率 | **100%** |
+| Precision / Recall | 100% / 100% |
+| 精确匹配（多分类） | **88.3%**（53/60） |
+| 药名均在图谱内 | 60/60 |
 
-剩余误差来源透明：部分药名图谱仍缺（如「口服避孕药」）、severity 边界（high vs critical）、复方/酶诱导场景。这比主集虚高 F1 更有面试价值。
+剩余误差全部是 severity 边界（high vs critical 的过度升级/降级），不是「有没有风险」的漏检。这比主集虚高 F1 更有面试价值。
 
 ```bash
 python -u scripts/eval_external_holdout.py --report
@@ -479,14 +479,20 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 ### Q4: 知识图谱怎么构建的?
 
-> 预置了540种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及396条药物相互作用(去重后的药对数,原始条目439条含反向重复)和56条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
+> 预置了544种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及413条药物相互作用(去重后的药对数)和56条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
 
 ### Q5: 为什么用知识图谱而不是RAG?
 
-> 我们做了对比实验(77 条标注样本,见 [RAG_COMPARISON_REPORT.md](./RAG_COMPARISON_REPORT.md))。用 FAISS + sentence-transformers 做 embedding RAG baseline,F1 是 80.3%、精确率 67.1%;图谱+规则方案 F1 **97.9%**、精确率 95.9%,**F1 差距 17.6%**。RAG 的核心问题是精度低——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精确率高,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
+> **先说当前数字**:主集 191 条上,图谱+规则 F1 **94.8%**。
 >
-> 注意别把两组数字混着说:**97.9% 是 77 条旧样本集**上的结果;主集扩到 191 条后图谱方案 F1 是 94.8%。
-> 样本从 77 扩到 191 之后数字反而降了,是因为新加的样本更难、召回不再虚高 100% —— 报数字时说清楚是哪个评测集,比报一个高分更重要。
+> 另外做过一组对照实验([RAG_COMPARISON_REPORT.md](./RAG_COMPARISON_REPORT.md)),那是在**扩容前的 77 条旧样本集**上跑的:FAISS + sentence-transformers 的 embedding RAG baseline F1 80.3%、精确率 67.1%;图谱+规则 F1 97.9%、精确率 95.9%,**F1 差距 17.6%**。
+>
+> RAG 的核心问题是精度低——向量检索能找到相关文本,但 LLM 拿到文本后无法准确判断 severity,安全组合也报 high。图谱方案精确率高,因为交互关系是确定性的——查到就有,查到就是那个 severity,不存在幻觉。另外图谱查询 < 10ms,embedding RAG 要 3-5 秒。
+>
+> ⚠️ 两个提醒:① 97.9% 和 94.8% **不是同一批样本**,别混着说,也别相减;
+> ② 那个 RAG baseline 是我自己实现的朴素版本(固定 chunk + 单次检索 + 单次 LLM 判断),
+> 没有做重排、 HyDE、多路召回——它证明的是"朴素 RAG 在这个任务上不行",
+> **不代表 RAG 方案的上限**。被追问时主动说这句,比被问出来强。
 
 ### Q6: 规则引擎和LLM怎么分工?
 
@@ -536,7 +542,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 | [JUDGE_REPORT.md](./JUDGE_REPORT.md) | LLM-as-Judge 自动评判结果 |
 
 > **关于报告里的规模数字**:这些报告由脚本生成、带时间戳,记录的是**当时图谱版本下的快照**
-> (如 RAG 对比是 213 药物时期跑的)。当前图谱已扩到 **540 药物 / 396 交互**,
+> (如 RAG 对比是 213 药物时期跑的)。当前图谱已扩到 **544 药物 / 413 交互**,
 > 最新的主集 / holdout / 难例指标以本 README 的「评测体系」一节为准。
 
 ---
@@ -545,10 +551,10 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 | 局限 | 现状 | 原因/规划 |
 |------|------|-----------|
-| 知识图谱规模 | 540 药物 / 396 相互作用对 | 仍小于真实临床库;规划接 DDInter |
-| **相互作用密度偏低** | 396 对 / C(540,2)=145,530 种可能组合 ≈ **0.27%** | 平均每种药只有 1.5 条交互。真实 DDI 库(如 DrugBank)密度高一个量级。**这是"540 种药"这个数字最大的水分**——规模好看,覆盖稀 |
+| 知识图谱规模 | 544 药物 / 413 相互作用对 | 仍小于真实临床库;规划接 DDInter |
+| **相互作用密度偏低** | 413 对 / C(544,2)≈147,696 种可能组合 ≈ **0.28%** | 平均每种药约 1.5 条交互。真实 DDI 库(如 DrugBank)密度高一个量级。**药数好看≠覆盖密** |
 | 主评测自产样本偏多 | 191 条中 175 条由图谱程序生成 | **请同时看外部 holdout（60 条手工）与 LLM 增量难例（20 条）** |
-| severity 边界 | 外部 holdout 精确匹配 **75.0%**（45/60） | 临界样本主观;规划校准集 |
+| severity 边界 | 外部 holdout 精确匹配 **88.3%**（53/60） | 临界样本主观;规划校准集 |
 | high 等级识别偏弱 | 主集 high 类 F1 **65.0%**,但**支持数仅 16 条** | 样本太少,这个数字置信区间很宽(16 条里错 1 条就跳 6pp),**面试时别把它当可靠的类别指标讲** |
 | 图谱对二分类的增量有限 | 纯规则 94.3% → 图谱+规则 94.8%,**仅 +0.5pp** | 图谱价值在精确匹配(+8.9pp)不在二分类;见 2.1 节 |
 | ReAct 延迟 | 部分国产模型 tool-calling 循环很慢 | **默认 `DETECT_MODE=graph` + `RISK_MODE=semantic`** |

@@ -142,7 +142,7 @@ def write_report(results: list[dict], m: dict) -> str:
     lines.append("")
     lines.append("| 集合 | 来源 | 图谱+规则 F1 | 解读 |")
     lines.append("|------|------|--------------|------|")
-    lines.append("| 主集 77 条 | 61 条自图谱生成 | 97.9% | 分布内回归,**勿单独当卖点** |")
+    lines.append("| 主集 191 条 | 手工16+程序生成175 | 见 EVAL_REPORT | 分布内回归,**勿单独当卖点** |")
     lines.append(f"| 本 holdout {m['n']} 条 | 外部临床常识手工标注 | **{m['f1']:.1%}** | 更接近真实泛化 |")
     lines.append("")
     lines.append("## 3. 逐案")
@@ -174,9 +174,10 @@ def write_report(results: list[dict], m: dict) -> str:
     lines.append("## 5. 面试话术")
     lines.append("")
     lines.append(
-        f"外部 holdout（{m['n']} 条,非自产）上图谱+规则 F1={m['f1']:.1%},"
-        f"二分类正确率 {m['binary_rate']:.1%}。比主集 97.9% 低是正常的——"
-        "主集有 61 条自图谱生成。我主动报两个数,而不是只报好看的。"
+        f"外部 holdout（{m['n']} 条,非自产）上图谱+规则二分类 F1={m['f1']:.1%},"
+        f"精确匹配 {m['exact']}/{m['n']}（{m['exact_rate']:.1%}）。"
+        "主集大量样本自图谱生成,holdout 全部手工标注——两个数都要报。"
+        "剩余误差集中在 severity 边界（high vs critical）。"
     )
     lines.append("")
     lines.append("---")

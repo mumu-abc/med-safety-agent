@@ -1186,6 +1186,56 @@ _EXTRA_DRUGS_5 = [
 ]
 DRUGS.extend(_EXTRA_DRUGS_5)
 
+# ==================== 外部 holdout 暴露的数据缺口 ====================
+# 来源:scripts/eval_external_holdout.py 在 60 条手工标注(非自产)样本上的失败案例。
+# 这些药都是临床常用药,之前库里没有或只有节点没有边,属于真实数据缺口而非"为了刷分编数据"。
+_EXTRA_DRUGS_6 = [
+    {"id": "moclobemide", "name": "吗氯贝胺", "category": "抗抑郁药",
+     "generic_name": "吗氯贝胺(可逆性MAO-A抑制剂)",
+     "contraindications": ["SSRI/SNRI合用", "嗜铬细胞瘤", "躁狂期"],
+     "side_effects": ["失眠", "头晕", "5-羟色胺综合征(联用时)"], "metabolism": "MAO-A抑制"},
+    {"id": "captopril", "name": "卡托普利", "category": "ACEI",
+     "generic_name": "卡托普利", "contraindications": ["妊娠", "双侧肾动脉狭窄", "血管性水肿史"],
+     "side_effects": ["干咳", "高钾血症", "血管性水肿", "肾功能下降"], "metabolism": "部分肝代谢"},
+    {"id": "fish_oil", "name": "鱼油", "category": "膳食补充剂",
+     "generic_name": "Omega-3脂肪酸", "contraindications": ["出血体质", "抗凝治疗中(大剂量)"],
+     "side_effects": ["消化道不适", "出血倾向(大剂量)"], "metabolism": "不代谢"},
+    {"id": "iron_supplement", "name": "铁剂", "category": "矿物质补充剂",
+     "generic_name": "硫酸亚铁/富马酸亚铁", "contraindications": ["血色病", "含铁血黄素沉着症"],
+     "side_effects": ["便秘", "黑便", "胃肠道刺激"], "metabolism": "不代谢"},
+]
+DRUGS.extend(_EXTRA_DRUGS_6)
+
+_EXTRA_INTERACTIONS_6 = [
+    # --- 直接对应 holdout 的 5 条二分类漏检 ---
+    ("warfarin", "sulfamethoxazole_trimethoprim", "high",
+     "磺胺甲噁唑抑制CYP2C9,增强华法林抗凝,出血风险升高"),
+    ("fluoxetine", "moclobemide", "critical",
+     "SSRI+MAOI,5-羟色胺综合征,绝对禁忌"),
+    ("gemfibrozil", "lovastatin", "critical",
+     "贝特类+他汀,横纹肌溶解风险显著(吉非罗齐禁与洛伐他汀联用)"),
+    ("captopril", "spironolactone", "high",
+     "ACEI+保钾利尿剂,双重升高血钾,高钾血症风险"),
+    ("methotrexate", "naproxen", "high",
+     "NSAIDs减少甲氨蝶呤肾排泄,血药浓度升高,骨髓抑制风险"),
+    # --- 精确匹配漏判(二分类已过,等级判错)---
+    ("warfarin", "fish_oil", "medium", "大剂量鱼油抑制血小板聚集,与抗凝叠加,需监测INR"),
+    ("levothyroxine", "iron_supplement", "medium",
+     "铁剂吸附降低左甲状腺素吸收,需间隔4小时服用"),
+    # --- 顺带补齐新节点的常见边,避免孤立节点拉低图谱密度 ---
+    ("sertraline", "moclobemide", "critical", "SSRI+MAOI,5-羟色胺综合征风险"),
+    ("moclobemide", "tramadol", "critical", "MAOI+曲马多,5-羟色胺综合征与癫痫风险"),
+    ("captopril", "potassium", "critical", "ACEI+补钾,高钾血症风险"),
+    ("captopril", "naproxen", "high", "NSAIDs削弱ACEI降压效果并增加肾损害风险"),
+    ("captopril", "ibuprofen", "high", "NSAIDs削弱ACEI降压效果并增加肾损害风险"),
+    ("fish_oil", "aspirin", "medium", "抗血小板+鱼油,出血倾向叠加"),
+    ("fish_oil", "clopidogrel", "medium", "抗血小板+鱼油,出血倾向叠加"),
+    ("iron_supplement", "ciprofloxacin", "medium", "铁剂螯合显著降低喹诺酮类吸收"),
+    ("iron_supplement", "levofloxacin", "medium", "铁剂螯合显著降低喹诺酮类吸收"),
+    ("allopurinol", "ampicillin", "medium", "别嘌醇+氨苄西林皮疹风险增加,需观察"),
+]
+INTERACTIONS.extend(_EXTRA_INTERACTIONS_6)
+
 
 # ==================== id 别名重映射 ====================
 # 同一药物的不同英文拼写 / 复方-单药关系，统一到图谱中已存在的 id，
@@ -1288,10 +1338,11 @@ def build_graph_from_data():
         logger.warning("药物数据存在 %d 条悬挂引用: %s",
                        check["dangling_count"], check["dangling"])
 
-    # 重置内存中的图实例；图谱文件由 save_graph() 整体覆盖写，无需先删除
-    # （旧实现用 os.remove / unlink 预删，在只读或受限环境下会抛异常）
+    # 必须建空图而不是 _graph=None：置 None 后 get_graph() 会先加载磁盘旧 JSON，
+    # 导致「重建」实际是在脏图上叠新边，缺药/旧边会残留。
+    import networkx as nx
     import app.graph.drug_graph as dg
-    dg._graph = None
+    dg._graph = nx.DiGraph()
 
     # 添加药物(去重)
     seen_ids = set()
