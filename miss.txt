@@ -1,0 +1,8 @@
+﻿EX-003  exp=high  got=critical
+EX-011  exp=critical  got=high
+EX-016  exp=high  got=critical
+EX-024  exp=safe  got=low
+EX-046  exp=high  got=critical
+EX-051  exp=high  got=critical
+EX-052  exp=high  got=critical
+EX-053  exp=medium  got=safe
