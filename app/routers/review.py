@@ -191,6 +191,28 @@ def _brief(text, n: int = 90) -> str:
     return s[:n] + ("…" if len(s) > n else "")
 
 
+# 缓存条目必须带上的字段 —— 结构升级后,老缓存不能原样返回给前端。
+# 2026-09-19 踩坑:reasoning_chain 是新加的字段,存量和线上老缓存里都没有;
+# 而缓存命中时是**原样返回**的,于是前端"推理链"tab 依旧空白,
+# 看起来像"代码改了却没生效"。所以结构过期的缓存一律当作 miss 重新计算。
+_CACHE_REQUIRED_FIELDS = ("reasoning_chain",)
+
+
+def _is_cache_schema_current(payload) -> bool:
+    """缓存条目的结构是否还是当前版本;缺字段/空值即作废重算。"""
+    if not isinstance(payload, dict):
+        return False
+    for field in _CACHE_REQUIRED_FIELDS:
+        value = payload.get(field)
+        if field == "reasoning_chain":
+            # 空列表同样视为过期:前端拿到空数组还是显示空面板
+            if not isinstance(value, list) or not value:
+                return False
+        elif value is None:
+            return False
+    return True
+
+
 def _build_reasoning_chain(result) -> list[dict]:
     """把流水线各节点的**实际输出**整理成一条可追溯的推理链。
 
@@ -350,6 +372,9 @@ async def review(req: ReviewRequest):
     cached = get_db().get_cached_review(
         req.prescription_text, patient_id=req.patient_id or "", mode="summary"
     )
+    if cached and not _is_cache_schema_current(cached):
+        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        cached = None
     if cached:
         logger.info("⚡ 缓存命中，直接返回历史结果")
         cached["cached"] = True
@@ -460,6 +485,9 @@ async def review_raw(req: ReviewRequest):
     cached = get_db().get_cached_review(
         req.prescription_text, patient_id=req.patient_id or "", mode="raw"
     )
+    if cached and not _is_cache_schema_current(cached):
+        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        cached = None
     if cached:
         cached["cached"] = True
         return cached
@@ -572,6 +600,9 @@ async def review_stream(req: ReviewRequest, request: Request):
     cached = get_db().get_cached_review(
         req.prescription_text, patient_id=req.patient_id or "", mode="raw"
     )
+    if cached and not _is_cache_schema_current(cached):
+        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        cached = None
     if cached:
         async def cached_generator():
             cached["cached"] = True
@@ -755,6 +786,9 @@ async def review_multi(req: ReviewRequest):
     cached = get_db().get_cached_review(
         req.prescription_text, patient_id=req.patient_id or "", mode="multi"
     )
+    if cached and not _is_cache_schema_current(cached):
+        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        cached = None
     if cached:
         cached["cached"] = True
         return cached

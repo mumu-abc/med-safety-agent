@@ -11,7 +11,11 @@
     1. 后端从已有 state 派生 `reasoning_chain`(不额外调 LLM,成本 0)
     2. 六步与 LangGraph 节点一一对应,便于对着 trace 看
     3. 前端空数据时给占位文案,不再白屏
+    4. **缓存结构自检** —— 老缓存里没有这个字段,命中时会被原样返回,
+       所以结构过期的缓存一律当 miss 重算,否则"改了代码也不生效"
 """
+from fastapi.testclient import TestClient
+
 from app.models import (
     AlternativeDrug,
     AlternativeReport,
@@ -22,7 +26,11 @@ from app.models import (
     Prescription,
     RiskAssessment,
 )
-from app.routers.review import _build_raw_response, _build_reasoning_chain
+from app.routers.review import (
+    _build_raw_response,
+    _build_reasoning_chain,
+    _is_cache_schema_current,
+)
 
 
 def _fake_result(**overrides):
@@ -171,3 +179,63 @@ def test_long_summary_is_truncated():
     detail = {s["node"]: s["detail"] for s in _build_reasoning_chain(r)}["assess"]
     assert len(detail) < 260
     assert detail.endswith("…")
+
+
+# ---------- 缓存结构自检:老缓存不能把新字段"吃掉" ----------
+# 背景:实例都有自己的 SQLite 审查缓存,里面存的是"加这个字段之前"的历史结果,
+#       而缓存命中时是**原样返回**的。只把代码改对、不处理老缓存的话,
+#       用户提交同一个处方还是会看到空白推理链,以为"改了没生效"。
+#       (线上 demo 就是这个场景:它的缓存里没有 reasoning_chain。)
+
+def test_cache_schema_rejects_payload_without_chain():
+    """缺字段 → 过期。"""
+    assert not _is_cache_schema_current({"report": "老缓存", "interactions": []})
+
+
+def test_cache_schema_rejects_empty_chain():
+    """空数组同样算过期 —— 前端拿到空数组还是显示空面板。"""
+    assert not _is_cache_schema_current({"reasoning_chain": []})
+
+
+def test_cache_schema_rejects_non_dict():
+    assert not _is_cache_schema_current(None)
+    assert not _is_cache_schema_current(["reasoning_chain"])
+
+
+def test_cache_schema_accepts_fresh_payload():
+    """刚存进去的结果必须被认作"当前版本",否则缓存永远命不中。"""
+    assert _is_cache_schema_current(_build_raw_response(_fake_result()))
+
+
+def test_stale_cache_is_not_served_by_review_endpoint(monkeypatch):
+    """端到端:缓存里是缺 reasoning_chain 的老结构时,/review 必须重算而不是原样返回。"""
+    import app.database as database
+    from app.routers import review as review_mod
+    from app.main import app as fastapi_app
+
+    stale = {"report": "老缓存内容", "interactions": [], "cached": True}
+
+    class _FakeDB:
+        def get_cached_review(self, *a, **k):
+            return dict(stale)
+
+        def save_review_cache(self, *a, **k):
+            return None
+
+        def __getattr__(self, name):          # 其余方法一律 no-op
+            return lambda *a, **k: None
+
+    monkeypatch.setattr(database, "get_db", lambda: _FakeDB())
+    monkeypatch.setattr(review_mod, "review_prescription", lambda text: _fake_result())
+    monkeypatch.setattr(review_mod, "_memory_enabled", lambda: False)
+    monkeypatch.setattr(review_mod, "_save_review", lambda *a, **k: None)
+    monkeypatch.setattr(review_mod, "_enrich_with_patient", lambda text, pid: text)
+
+    with TestClient(fastapi_app) as c:
+        r = c.post("/api/review", json={"prescription_text": "华法林 5mg qd;阿司匹林 100mg qd"})
+
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["report"] != "老缓存内容", "过期缓存被原样返回了 —— 改代码也不会生效"
+    assert body.get("reasoning_chain"), "重算之后仍然没有推理链"
+
