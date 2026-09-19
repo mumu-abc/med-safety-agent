@@ -185,6 +185,101 @@ def _is_review_cacheable(result_or_resp) -> bool:
     return True
 
 
+def _brief(text, n: int = 90) -> str:
+    """压成一行短句,用于推理链的 detail。"""
+    s = " ".join(str(text or "").split())
+    return s[:n] + ("…" if len(s) > n else "")
+
+
+def _build_reasoning_chain(result) -> list[dict]:
+    """把流水线各节点的**实际输出**整理成一条可追溯的推理链。
+
+    设计要点:
+      · 纯派生 —— 不额外调用 LLM。成本 0,也不会和报告内容打架。
+      · 每一步都带真实计数/等级,不是"正在分析中…"这类套话。
+      · 与 LangGraph 的节点一一对应(parse/detect/rules/assess/recommend/gen_report),
+        前端点开任意一步都能对到 trace 里的同名节点。
+    """
+    rx = _get(result, "prescription")
+    risk = _get(result, "risk_assessment")
+    alt = _get(result, "alternatives")
+
+    patient = _get(result, "patient") or {}
+    drug_names = _get(result, "drug_names") or []
+    interactions = _get(result, "interactions") or []
+    contraindications = _get(result, "contraindications") or []
+    rule_risks = _get(result, "rule_risks") or []
+    report = _get(result, "report", "") or ""
+
+    chain: list[dict] = []
+
+    # 1. 处方解析
+    if not drug_names and rx is not None:
+        drug_names = [getattr(d, "name", "") for d in (_get(rx, "drugs") or [])]
+    drug_names = [n for n in drug_names if n]
+    if drug_names:
+        detail = f"从处方文本中识别出 {len(drug_names)} 种药物:{'、'.join(drug_names)}"
+    else:
+        detail = "未从处方文本中识别出药物(解析失败或文本不含药名)"
+    if patient.get("age"):
+        detail += f";患者 {patient['age']} 岁"
+    if patient.get("conditions"):
+        detail += f",基础疾病:{'、'.join(patient['conditions'])}"
+    chain.append({"step": "① 处方解析", "detail": detail, "node": "parse"})
+
+    # 2. 知识图谱检索
+    if interactions:
+        top = interactions[0]
+        a = _get(top, "drug_a", "?")
+        b = _get(top, "drug_b", "?")
+        sev = _get(top, "severity", "")
+        detail = f"图谱命中 {len(interactions)} 条相互作用,其中最高危为 {a} + {b}({sev})"
+        mech = _get(top, "mechanism", "")
+        if mech:
+            detail += f" —— {_brief(mech, 60)}"
+    elif len(drug_names) == 1:
+        detail = f"处方仅含 1 种药物({drug_names[0]}),不存在药物-药物相互作用"
+    else:
+        detail = "图谱未命中相互作用(药名可能未归一,或确实无已知交互)"
+    chain.append({"step": "② 知识图谱检索", "detail": detail, "node": "detect"})
+
+    # 3. 规则引擎
+    detail = f"触发 {len(rule_risks)} 条安全规则、{len(contraindications)} 条禁忌判定"
+    if contraindications:
+        c0 = contraindications[0]
+        detail += f";首条禁忌:{_get(c0, 'drug', '?')} × {_get(c0, 'condition', '?')}"
+    chain.append({"step": "③ 规则引擎", "detail": detail, "node": "rules"})
+
+    # 4. 语义风险评估
+    level = _get(risk, "overall_risk", "unknown") if risk else "unknown"
+    detail = f"LLM 综合图谱与规则结果,判定整体风险等级为 {level}"
+    summary = _get(risk, "summary", "") if risk else ""
+    if summary:
+        detail += f"。{_brief(summary, 100)}"
+    chain.append({"step": "④ 语义风险评估", "detail": detail, "node": "assess"})
+
+    # 5. 替代方案(条件分支:仅在触发高风险时执行)
+    sugs = (_get(alt, "suggestions", []) or []) if alt else []
+    if sugs:
+        names = "、".join(str(_get(s, "original_drug", "?")) for s in sugs)
+        detail = f"高风险触发替代方案分支,为 {len(sugs)} 种药物给出替换建议:{names}"
+        asum = _get(alt, "summary", "")
+        if asum:
+            detail += f"。{_brief(asum, 80)}"
+    else:
+        detail = "未触发替代方案分支(整体风险未达阈值,无需换药)"
+    chain.append({"step": "⑤ 替代方案推荐", "detail": detail, "node": "recommend"})
+
+    # 6. 报告聚合
+    chain.append({
+        "step": "⑥ 报告聚合",
+        "detail": f"汇总以上各步结论,生成 {len(report)} 字的审查报告",
+        "node": "gen_report",
+    })
+
+    return chain
+
+
 def _build_raw_response(result) -> dict:
     """从审查结果构建结构化响应(复用于 /raw、/stream、/hitl)。"""
     rx = _get(result, "prescription")
@@ -243,6 +338,7 @@ def _build_raw_response(result) -> dict:
             "drugs": drugs_list,
             "patient": patient_info,
         },
+        "reasoning_chain": _build_reasoning_chain(result),
     }
 
 
@@ -338,6 +434,7 @@ async def review(req: ReviewRequest):
         "interactions_count": len(_get(result, "interactions", [])),
         "rule_risks_count": len(_get(result, "rule_risks", [])),
         "has_alternatives": bool(_get(result, "alternatives")),
+        "reasoning_chain": _build_reasoning_chain(result),
         "cached": False,
     }
     if memory_context:

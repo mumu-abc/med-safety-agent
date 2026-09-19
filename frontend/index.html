@@ -982,8 +982,10 @@ async function submitReview(){
   const t=document.getElementById('prescription').value.trim();if(!t){alert('请输入处方');return}
   const pid=document.getElementById('patient-select').value||null;const btn=document.getElementById('submitBtn');
 
+  // 本地缓存可能是旧结构(例如早于 reasoning_chain 字段上线),直接渲染会让人
+  // 以为"功能坏了"。这里只认结构完整的缓存,过期的就当没有、走服务端重新算。
   const cachedResult = _getCachedResult(t, pid);
-  if (cachedResult) {
+  if (cachedResult && Array.isArray(cachedResult.reasoning_chain) && cachedResult.reasoning_chain.length) {
     console.log('⚡ 前端缓存命中,直接返回结果');
     document.getElementById('emptyState').style.display='none';
     document.getElementById('resultArea').style.display='';
@@ -1070,13 +1072,27 @@ function switchTab(k){document.querySelectorAll('.tabs button').forEach(b=>b.cla
 function getPane(k){return document.querySelector(`.tp[data-p="${k}"]`)}
 
 function fillReport(rp){const el=getPane('report');if(!el||!rp)return;el.innerHTML=`<div class="report">${esc(typeof rp==='string'?rp:JSON.stringify(rp,null,2))}</div>`}
-function fillInteractions(its){const el=getPane('interactions');if(!el||!its||!its.length)return;el.innerHTML=its.map(it=>`<div class="ic"><div class="ic-h"><span class="ic-t">${esc(it.drug_a||it.drug1)} + ${esc(it.drug_b||it.drug2)}</span><span class="pill ${it.severity||''}">${SEV_ZH[it.severity]||it.severity||'?'}</span></div><div class="ic-b">${esc(it.mechanism||it.description||'')}</div>${it.clinical_effect?`<div class="ic-b" style="margin-top:3px"><b>临床后果:</b> ${esc(it.clinical_effect)}</div>`:''}${it.suggestion?`<div class="ic-tip">💡 ${esc(it.suggestion)}</div>`:''}${it.evidence_level?`<div class="ic-meta">证据等级: ${esc(it.evidence_level)}</div>`:''}</div>`).join('')}
+function fillInteractions(its){const el=getPane('interactions');if(!el)return;if(!its||!its.length){el.innerHTML='<div style="text-align:center;padding:28px;color:var(--faint);font-size:13px">✅ 未检出药物相互作用</div>';return}el.innerHTML=its.map(it=>`<div class="ic"><div class="ic-h"><span class="ic-t">${esc(it.drug_a||it.drug1)} + ${esc(it.drug_b||it.drug2)}</span><span class="pill ${it.severity||''}">${SEV_ZH[it.severity]||it.severity||'?'}</span></div><div class="ic-b">${esc(it.mechanism||it.description||'')}</div>${it.clinical_effect?`<div class="ic-b" style="margin-top:3px"><b>临床后果:</b> ${esc(it.clinical_effect)}</div>`:''}${it.suggestion?`<div class="ic-tip">💡 ${esc(it.suggestion)}</div>`:''}${it.evidence_level?`<div class="ic-meta">证据等级: ${esc(it.evidence_level)}</div>`:''}</div>`).join('')}
 function fillRules(rules,contras){const el=getPane('rules');if(!el)return;let h='';
   if(contras?.length)h+=contras.map(c=>`<div class="ic danger"><div class="ic-h"><span class="ic-t">🚫 ${esc(c.drug)}</span><span class="pill critical">禁忌</span></div><div class="ic-b">${esc(c.condition||'')} → ${esc(c.contraindication||'')}</div></div>`).join('');
   if(rules?.length)h+=rules.map(r=>`<div class="ic"><div class="ic-h"><span class="ic-t">${esc(r.drug)}</span><span class="pill ${r.severity||''}">${SEV_ZH[r.severity]||r.severity||'?'}</span></div><div class="ic-b">${esc(r.risk||r.description||'')}</div>${r.suggestion?`<div class="ic-tip">💡 ${esc(r.suggestion)}</div>`:''}<div class="ic-meta">来源: 规则引擎</div></div>`).join('');
   el.innerHTML=h||'<div style="text-align:center;padding:28px;color:var(--faint);font-size:13px">✅ 无规则风险</div>'}
-function fillAlts(alts){const el=getPane('alternatives');if(!el||!alts||!alts.suggestions?.length)return;let h='';if(alts.summary)h+=`<div class="ic-b" style="margin-bottom:10px">${esc(alts.summary)}</div>`;h+=alts.suggestions.map(s=>`<div class="alt-c"><div class="ac-o">🔄 替换: ${esc(s.original)}</div><div class="ac-r">${esc(s.reason||'')}</div>${s.alternatives?.length?`<div class="ac-tags">${s.alternatives.map(a=>`<span class="alt-tag">${esc(a.name)} <span class="at-c">(${esc(a.category||'')})</span></span>`).join('')}</div>`:''}</div>`).join('');el.innerHTML=h}
-function fillReasoning(ch){const el=getPane('reasoning');if(!el||!ch?.length)return;el.innerHTML=ch.map((s,i)=>`<div class="chain"><div class="cn">${i+1}</div><div class="cb"><div class="cl">${esc(s.step||s.label||`步骤 ${i+1}`)}</div><div class="cd">${esc(s.detail||s.description||s.result||JSON.stringify(s))}</div></div></div>`).join('')}
+function fillAlts(alts){
+  const el=getPane('alternatives');if(!el)return;
+  if(!alts||!alts.suggestions?.length){
+    el.innerHTML='<div style="text-align:center;padding:28px;color:var(--faint);font-size:13px">✅ 无需替代方案<br><span style="font-size:12px">（未触发高风险换药分支）</span></div>';
+    return;
+  }
+  let h='';if(alts.summary)h+=`<div class="ic-b" style="margin-bottom:10px">${esc(alts.summary)}</div>`;h+=alts.suggestions.map(s=>`<div class="alt-c"><div class="ac-o">🔄 替换: ${esc(s.original)}</div><div class="ac-r">${esc(s.reason||'')}</div>${s.alternatives?.length?`<div class="ac-tags">${s.alternatives.map(a=>`<span class="alt-tag">${esc(a.name)} <span class="at-c">(${esc(a.category||'')})</span></span>`).join('')}</div>`:''}</div>`).join('');el.innerHTML=h
+}
+function fillReasoning(ch){
+  const el=getPane('reasoning');if(!el)return;
+  if(!ch?.length){
+    el.innerHTML='<div style="text-align:center;padding:28px;color:var(--faint);font-size:13px">本条结果没有推理链数据<br><span style="font-size:12px">（多为旧缓存命中的历史结果，重新提交一次处方即可看到完整链路）</span></div>';
+    return;
+  }
+  el.innerHTML=ch.map((s,i)=>`<div class="chain"><div class="cn">${i+1}</div><div class="cb"><div class="cl">${esc(s.step||s.label||`步骤 ${i+1}`)}</div><div class="cd">${esc(s.detail||s.description||s.result||JSON.stringify(s))}</div></div></div>`).join('')
+}
 function fillGraphTab(data){const el=getPane('graph');if(!el)return;el.innerHTML=`<div class="gbox"><div class="gbtns"><button onclick="zoomP(1.2)">+</button><button onclick="zoomP(0.8)">−</button><button onclick="resetP()">⟲</button></div><div class="gleg"><div class="gleg-r"><span class="gleg-d" style="background:#dc2626"></span>极高</div><div class="gleg-r"><span class="gleg-d" style="background:#d97706"></span>高</div><div class="gleg-r"><span class="gleg-d" style="background:#059669"></span>低/安全</div></div><canvas id="pCanvas"></canvas></div>`;window._pd=data}
 
 let pSc=1;function zoomP(f){pSc*=f;drawPrescGraph()}function resetP(){pSc=1;drawPrescGraph()}

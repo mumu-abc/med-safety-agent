@@ -1,0 +1,38 @@
+﻿python.exe : C:\Users\閽熷埄鏋梊Desktop\med_safety\.venv\Lib\site-packages\langgraph
+\checkpoint\base\__init__.py:21: LangChainPendingDeprecationWarning: The defaul
+t value of `allowed_objects` will change in a future version. Pass an explicit 
+value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress 
+this warning.
+所在位置 行:445 字符: 77
++ ... RY="false"; & ".\.venv\Scripts\python.exe" scripts\_verify_chain_e2e. ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\閽熷埄鏋梊D...s this warning. 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+鍘婚櫎閲嶅鑽墿瀹氫箟锛堜繚鐣欓涓級: ['azathioprine', 'cefdinir', 'cimetidine', 'cyclophospha
+mide', 'mercaptopurine', 'methotrexate', 'mycophenolate', 'tacrolimus', 'theoph
+ylline']
+C:\Users\閽熷埄鏋梊Desktop\med_safety\.venv\Lib\site-packages\pydantic\main.py:475: 
+UserWarning: Pydantic serializer warnings:
+  PydanticSerializationUnexpectedValue(Expected `none` - serialized value may n
+ot be as expected [field_name='parsed', input_value=LLMRiskAssessment(overall..
+.鏃犻渶涓村簥骞查銆?), input_type=LLMRiskAssessment])
+  return self.__pydantic_serializer__.to_python(
+
+=== reasoning_chain: 6 姝?===
+[parse     ] 鈶?澶勬柟瑙ｆ瀽
+           浠庡鏂规枃鏈腑璇嗗埆鍑?1 绉嶈嵂鐗?瀵逛箼閰版皑鍩洪厷;鎮ｈ€?45 宀?
+[detect    ] 鈶?鐭ヨ瘑鍥捐氨妫€绱?
+           鍥捐氨鏈懡涓浉浜掍綔鐢?鑽悕鍙兘鏈綊涓€,鎴栫‘瀹炴棤宸茬煡浜や簰)
+[rules     ] 鈶?瑙勫垯寮曟搸
+           瑙﹀彂 0 鏉″畨鍏ㄨ鍒欍€? 鏉＄蹇屽垽瀹?
+[assess    ] 鈶?璇箟椋庨櫓璇勪及
+           LLM 缁煎悎鍥捐氨涓庤鍒欑粨鏋?鍒ゅ畾鏁翠綋椋庨櫓绛夌骇涓?safe銆傛偅鑰呰倽鑲惧姛鑳芥甯革紝鏃犺繃鏁忓彶锛屾棤瀛曟湡锛屼笖澶勬柟涓粎瀵逛箼閰版皑鍩洪厷锛屾湭鎻愪緵鍓傞噺淇℃伅浣嗗熀浜庣幇鏈夋潯浠舵棤鏄庣‘鐢ㄨ嵂椋庨櫓銆傛棤闇€涓村簥骞查銆?
+[recommend ] 鈶?鏇夸唬鏂规鎺ㄨ崘
+           鏈Е鍙戞浛浠ｆ柟妗堝垎鏀?鏁翠綋椋庨櫓鏈揪闃堝€?鏃犻渶鎹㈣嵂)
+[gen_report] 鈶?鎶ュ憡鑱氬悎
+           姹囨€讳互涓婂悇姝ョ粨璁?鐢熸垚 474 瀛楃殑瀹℃煡鎶ュ憡
+
+OK: 鎺ㄧ悊閾鹃潪绌轰笖瀛楁瀹屾暣
