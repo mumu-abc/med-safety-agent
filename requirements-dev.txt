@@ -5,6 +5,12 @@
 # 对应测试在 tests/test_rag_baseline.py 里标了 @pytest.mark.slow,
 # 默认 `pytest`(-m "not slow")不会跑,所以 CI 不装也不会挂。
 #
+# ⚠️ 但 numpy 必须单独留住(2026-09-19 CI 挂了才发现的):
+#   app/memory.py 第 22 行是 **模块级** `import numpy as np`
+#   (只有 sentence_transformers / faiss 是函数内惰性导入),
+#   tests/test_memory.py 也要用 np.random / np.array 造 mock 数据。
+#   去掉 sentence-transformers 后 numpy 不再被间接带入 => 收集阶段直接 ImportError。
+#
 # 要跑 RAG 对比实验时,用完整的 requirements.txt。
 
 # ===== Core =====
@@ -13,6 +19,9 @@ uvicorn[standard]>=0.30
 pydantic>=2.0
 pydantic-settings>=2.0
 python-dotenv>=1.0
+
+# ===== 数值(被 app/memory.py 模块级依赖,不能省)=====
+numpy>=1.24
 
 # ===== LangChain =====
 langchain-core>=0.3,<0.4
