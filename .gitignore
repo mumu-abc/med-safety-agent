@@ -43,3 +43,14 @@ data/judge_results.json
 # 本地工具/临时目录
 .trae-html-share-packages/
 agent-project-analysis/
+
+# ---- 调试产物白名单式拦截(2026-09-15 清理了 63 个误提交文件)----
+# 根目录的临时输出捕获(我习惯 `xxx > out.txt` 存终端输出,别再 git add -A 卷进来)
+/*.txt
+!/requirements.txt
+!/requirements-dev.txt
+!/requirements.deploy.txt
+# scripts/ 下划线开头的临时脚本
+/scripts/_*.py
+# Streamlit 时代遗留的静态资源(前端已改原生 HTML,已确认无任何引用)
+/lib/

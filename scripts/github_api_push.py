@@ -137,6 +137,11 @@ def main() -> int:
     ap.add_argument("--branch", default="main")
     ap.add_argument("--message", default="chore: 同步本地最新版（bugfix + LangSmith trace + 文档校准）")
     ap.add_argument("--exclude", default="", help="逗号分隔、本次不上传的路径")
+    ap.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="允许 git 追踪但磁盘缺失的文件被静默移除(默认禁止,防止误删远端)",
+    )
     ap.add_argument("--apply", action="store_true")
     args = ap.parse_args()
 
@@ -177,14 +182,31 @@ def main() -> int:
         # 先走"零上传"路径:上一轮(如果跑到一半失败)已经把 blob 都建过了,
         # 本地算出 sha 直接建树即可,避免再发上百个请求撞限流。
         payload = []
+        missing = []
         for path in files:
             full = os.path.join(root, path)
             if not os.path.isfile(full):
+                missing.append(path)
                 continue
             with open(full, "rb") as f:
                 data = f.read()
             mode = "100755" if path.endswith(_EXEC_SUFFIX) else "100644"
             payload.append((path, mode, data))
+
+        # ⚠️ 整树替换是"以本地为准"的:本地缺一个文件 = 远端删一个文件。
+        # 之前的实现是 `continue` 静默跳过 —— 一旦磁盘上少了个别文件
+        # (比如被外部进程/误删/IDE 清掉),推送就会把远端对应文件一起删掉,
+        # 而且因为是静默的,推完根本看不出来。这里改成硬失败。
+        # (2026-09-15 实测踩坑:scripts/ 下 13 个脚本从磁盘消失,险些被连带删除)
+        if missing:
+            print(f"\n[FAIL] 有 {len(missing)} 个 git 追踪的文件在磁盘上不存在:")
+            for p in missing:
+                print(f"  ! {p}")
+            print("       整树替换会把这些文件从远端一并删除,已中止推送。")
+            print("       恢复: git restore --worktree -- <路径>")
+            print("       确认要删: 加 --allow-missing")
+            if not args.allow_missing:
+                return 1
 
         def build_tree(entries):
             return request(
