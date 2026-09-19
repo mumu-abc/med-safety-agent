@@ -5,11 +5,11 @@
     但 api.github.com 是通的,所以绕过 git 协议,用 HTTPS API 直接写对象。
 
 做法(一次提交,不留中间态):
-    1. git ls-files 取本地待传文件(天然排除 .env/.venv/__pycache__)
-    2. 逐个 POST /git/blobs 建 blob(内容 base64)
-    3. POST /git/trees 建一棵「只含本地文件」的树 —— 不带 base_tree,
-       所以远端多出来的旧文件(比如已删除的 streamlit_app.py)会自动消失
-    4. POST /git/commits 以远端 main 当前 head 为父提交
+    1. git ls-tree -r HEAD 取「已提交」的文件清单 (path, mode, blob sha)
+    2. 直接用 git 自己的 blob sha 建树 —— 这些 blob 通常远端已经有了,0 次上传
+    3. POST /git/trees 建一棵「只含这批文件」的树 —— 不带 base_tree,
+       所以远端多出来的旧文件会自动消失(整树替换)
+    4. POST /git/commits 以远端分支当前 head 为父提交
     5. PATCH /git/refs/heads/<branch> 移动分支指针
 
 用法:
@@ -17,23 +17,37 @@
     python scripts/github_api_push.py --token <PAT> --apply      # 真正推送
 
 token 需求:
-    Fine-grained PAT,只有目标仓库的 Contents: Read and write 权限即可。
+    Fine-grained PAT 需要 Contents: Read and write;
+    如果仓库里有 .github/workflows/*,还需要 Workflows: Read and write,
+    否则推 CI 文件会 403(见下)。
+
+⚠️ 基准是 HEAD,不是工作区(2026-09-15 修正,之前是个真 bug):
+    旧版读工作区文件的原始字节上传。但本机 core.autocrlf=true ——
+    git 仓库里存 LF、工作区结出 CRLF,于是"上传工作区字节"= 上传 CRLF 版本,
+    建出来的树跟本地 HEAD^{tree} 对不上(97 个文件里 27 个中招),
+    **任何人 clone 下来这 27 个文件都会显示成"已修改"**,仓库在别人机器上是脏的。
+    现在改成取 git 对象库里的 blob(内容 + sha 都用 git 的),保证:
+      - 远端树 == 本地 HEAD 树(可以用 tree sha 直接比对核验)
+      - 工作区文件被删/被改都不影响推送结果(推的是提交,不是磁盘)
 
 ⚠️ .github/workflows/* 是例外(2026-09-16 实测):
-    fine-grained token 只有 Contents 权限时,任何"创建/修改 .github/workflows/ 下文件"的
-    操作都会返回 403 `Resource not accessible by personal access token` ——
+    只有 Contents 权限时,任何"创建/修改 .github/workflows/ 下文件"的操作都会
+    返回 403 `Resource not accessible by personal access token` ——
     Git Data API(POST /git/trees)和 Contents API(PUT /contents/...)都是,
-    而且这条报错看起来像"你权限不够",实际是**缺 Workflows 权限**,很容易误判成限流。
+    而且这条报错看起来像"你权限不够",实际是**缺 Workflows 权限**,容易误判成限流。
     两个办法:
-      1. 给 token 补 Workflows: Read and write(推荐,能一次性推完)
-      2. 用 --exclude ".github/workflows/ci.yml" 先推其余文件,CI 文件再走 GitHub 网页端手加
+      1. 给 token 补 Workflows: Read and write(推荐;或直接用本机
+         Git Credential Manager 里的凭据,它的 scope 通常是 gist,repo,workflow)
+      2. 用 --exclude ".github/workflows/ci.yml" 先推其余文件,CI 文件再走网页端手加
 
 其他踩过的坑:
-    - `git ls-files` 默认把非 ASCII 文件名输出成八进制转义,中文文件名会变成乱码路径,
-      必须加 `-c core.quotepath=false` 并按 utf-8 解码。
+    - `git ls-tree` 默认把非 ASCII 文件名输出成八进制转义,中文文件名会变成乱码路径,
+      必须加 `-c core.quotepath=false` 或直接用 `-z` 并按 utf-8 解码。
     - 连发上百个 blob 请求会撞次级限流,返回的也是 403 + 同一句误导性文案;
-      所以这里优先"本地算 blob sha 直接建树"(sha1(b"blob <len>\\0" + 内容)),
-      只在仓库里确实缺 blob(422)时才回退到逐个上传。
+      所以这里优先"直接用 git 的 blob sha 建树"(0 上传),
+      只在仓库里确实缺 blob(422 not a valid blob)时才回退到逐个上传。
+    - 整树替换是"以这批文件为准"的:清单里少一个文件 = 远端少一个文件。
+      所以下面会对"取不到内容的 blob"硬失败,不静默跳过。
 """
 
 import argparse
@@ -47,7 +61,7 @@ import time
 import httpx
 
 _API = "https://api.github.com"
-_EXEC_SUFFIX = (".sh",)
+_VALID_MODES = {"100644", "100755", "120000", "160000"}
 
 
 def _headers(token: str) -> dict:
@@ -59,35 +73,72 @@ def _headers(token: str) -> dict:
     }
 
 
-def local_files(root: str) -> list[str]:
-    """取 git 追踪的文件列表(已排除 .gitignore 命中项)。"""
+def _git(root: str, *args: str) -> bytes:
     # core.quotepath=false 必须加:git 默认把非 ASCII 文件名输出成八进制转义
     # (如 "346\231\256..."),不加这个参数中文文件名会变成一串乱码路径,
     # 结果就是"远端同名文件被判为多余要删掉,同时传上去一个乱码名的新文件"。
-    out = subprocess.run(
-        ["git", "-c", "core.quotepath=false", "ls-files"],
-        cwd=root,
-        capture_output=True,
-        encoding="utf-8",
-        check=True,
+    return subprocess.run(
+        ["git", "-c", "core.quotepath=false", *args],
+        cwd=root, capture_output=True, check=True,
     ).stdout
-    return [ln.strip() for ln in out.splitlines() if ln.strip()]
 
 
-def remote_head(cl: httpx.Client, h: dict, owner: str, repo: str, branch: str) -> str:
-    r = cl.get(f"{_API}/repos/{owner}/{repo}/git/ref/heads/{branch}", headers=h)
-    r.raise_for_status()
-    return r.json()["object"]["sha"]
+def tracked_blobs(root: str) -> list[tuple[str, str, str]]:
+    """取 HEAD 里所有 blob,返回 [(path, mode, blob_sha)]。
+
+    用 HEAD 而不是 `ls-files`(索引):推的是"提交",不是"暂存区/工作区",
+    这样远端树能跟本地 HEAD^{tree} 严格对上。
+    """
+    raw = _git(root, "ls-tree", "-r", "-z", "HEAD")
+    out: list[tuple[str, str, str]] = []
+    for rec in raw.split(b"\0"):
+        if not rec.strip():
+            continue
+        meta, path = rec.split(b"\t", 1)
+        mode, typ, sha = meta.split()
+        if typ != b"blob":
+            continue
+        out.append((path.decode("utf-8"), mode.decode(), sha.decode()))
+    return out
 
 
-def remote_files(cl: httpx.Client, h: dict, owner: str, repo: str, branch: str) -> set[str]:
-    r = cl.get(
-        f"{_API}/repos/{owner}/{repo}/git/trees/{branch}",
-        headers=h,
-        params={"recursive": "1"},
+def cat_blobs(root: str, shas: list[str]) -> tuple[dict[str, bytes], list[str]]:
+    """一次 `git cat-file --batch` 取回全部 blob 内容。
+
+    返回 (内容字典, 取不到的 sha 列表)。
+    """
+    if not shas:
+        return {}, []
+    proc = subprocess.Popen(
+        ["git", "cat-file", "--batch"], cwd=root,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE,
     )
-    r.raise_for_status()
-    return {t["path"] for t in r.json().get("tree", []) if t["type"] == "blob"}
+    raw, _ = proc.communicate(("\n".join(shas) + "\n").encode())
+    got: dict[str, bytes] = {}
+    missing: list[str] = []
+    i = 0
+    while i < len(raw):
+        nl = raw.find(b"\n", i)
+        if nl < 0:
+            break
+        parts = raw[i:nl].decode("utf-8", "replace").split()
+        i = nl + 1
+        if len(parts) != 3 or parts[1] != "blob":
+            # 形如 "<sha> missing"
+            missing.append(parts[0] if parts else "?")
+            continue
+        size = int(parts[2])
+        got[parts[0]] = raw[i:i + size]
+        i += size + 1
+    return got, missing
+
+
+def git_blob_sha(data: bytes) -> str:
+    """本地算 git blob 的 sha1 —— 与 GitHub 的算法一致:sha1(b"blob <len>\\0" + 内容)。"""
+    h = hashlib.sha1()
+    h.update(f"blob {len(data)}\0".encode())
+    h.update(data)
+    return h.hexdigest()
 
 
 def request(cl: httpx.Client, method: str, url: str, h: dict, **kw) -> httpx.Response:
@@ -105,18 +156,6 @@ def request(cl: httpx.Client, method: str, url: str, h: dict, **kw) -> httpx.Res
         print(f"  [retry {attempt}/4] {r.status_code} -> 等 {wait}s 重试")
         time.sleep(wait)
     return r
-
-
-def git_blob_sha(data: bytes) -> str:
-    """本地算 git blob 的 sha1 —— 与 GitHub 的算法一致:sha1(b"blob <len>\\0" + 内容)。
-
-    好处:如果 blob 之前已经 POST 过(比如上一轮跑到一半失败),可以直接复用,
-    不必再发上百个请求,也就不会再撞次级限流。
-    """
-    h = hashlib.sha1()
-    h.update(f"blob {len(data)}\0".encode())
-    h.update(data)
-    return h.hexdigest()
 
 
 def make_blob(cl: httpx.Client, h: dict, owner: str, repo: str, path: str, data: bytes) -> str:
@@ -137,11 +176,6 @@ def main() -> int:
     ap.add_argument("--branch", default="main")
     ap.add_argument("--message", default="chore: 同步本地最新版（bugfix + LangSmith trace + 文档校准）")
     ap.add_argument("--exclude", default="", help="逗号分隔、本次不上传的路径")
-    ap.add_argument(
-        "--allow-missing",
-        action="store_true",
-        help="允许 git 追踪但磁盘缺失的文件被静默移除(默认禁止,防止误删远端)",
-    )
     ap.add_argument("--apply", action="store_true")
     args = ap.parse_args()
 
@@ -151,62 +185,68 @@ def main() -> int:
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     excluded = {p.strip() for p in args.exclude.split(",") if p.strip()}
-    files = [f for f in local_files(root) if f not in excluded]
+
+    all_blobs = tracked_blobs(root)
+    blobs = [b for b in all_blobs if b[0] not in excluded]
+    weird = [b for b in blobs if b[1] not in _VALID_MODES]
+
     print("=" * 64)
     print(f"GitHub API 推送   {args.owner}/{args.repo}@{args.branch}")
     print("=" * 64)
     if excluded:
         print(f"本次排除 {len(excluded)} 个: {', '.join(sorted(excluded))}")
-    print(f"本地待传文件: {len(files)}")
+    print(f"HEAD 待传文件: {len(blobs)} (HEAD 共 {len(all_blobs)})")
+    if weird:
+        print("[FAIL] 出现 GitHub 不支持的 mode:")
+        for p, m, _ in weird:
+            print(f"  ! {p}  mode={m}")
+        return 1
+
+    contents, missing = cat_blobs(root, [s for _, _, s in blobs])
+    # ⚠️ 整树替换是"以这批文件为准"的:清单里少一个 = 远端被删一个。
+    # 所以取不到内容的 blob 必须硬失败,绝不静默跳过。
+    # (2026-09-15 踩坑:scripts/ 下 13 个脚本从磁盘消失,旧版会静默跳过 ==> 远端被连带删除)
+    if missing:
+        print(f"\n[FAIL] 有 {len(missing)} 个 blob 在本机 git 对象库里取不到:")
+        for s in missing:
+            paths = [p for p, _, sh in blobs if sh == s]
+            print(f"  ! {s}  <- {paths}")
+        print("      整树替换会把它们从远端一并删除,已中止。")
+        return 1
 
     h = _headers(args.token)
     with httpx.Client(timeout=60) as cl:
-        # 先验 token + 仓库可达
         me = cl.get(f"{_API}/repos/{args.owner}/{args.repo}", headers=h)
         if me.status_code >= 300:
             print(f"[FAIL] 仓库不可达或 token 无权限: {me.status_code} {me.text[:200]}")
             return 1
         print(f"仓库 OK: {me.json()['full_name']} (default={me.json()['default_branch']})")
 
-        head = remote_head(cl, h, args.owner, args.repo, args.branch)
-        before = remote_files(cl, h, args.owner, args.repo, args.branch)
-        gone = sorted(before - set(files))
+        head = cl.get(
+            f"{_API}/repos/{args.owner}/{args.repo}/git/ref/heads/{args.branch}", headers=h
+        )
+        head.raise_for_status()
+        parent = head.json()["object"]["sha"]
+
+        r = cl.get(
+            f"{_API}/repos/{args.owner}/{args.repo}/git/trees/{parent}",
+            headers=h, params={"recursive": "1"},
+        )
+        before = {t["path"] for t in r.json().get("tree", []) if t["type"] == "blob"}
+        gone = sorted(before - {p for p, _, _ in blobs})
         print(f"远端当前 {len(before)} 个文件;本次将移除 {len(gone)} 个")
         for p in gone:
             print(f"  - {p}")
 
+        local_tree = subprocess.run(
+            ["git", "-c", "core.quotepath=false", "rev-parse", "HEAD^{tree}"],
+            cwd=root, capture_output=True, encoding="utf-8",
+        ).stdout.strip()
+        print(f"本地 HEAD^{{tree}} = {local_tree}  (推完应与此一致)")
+
         if not args.apply:
             print("\n这是预览。加 --apply 真正推送。")
             return 0
-
-        # 先走"零上传"路径:上一轮(如果跑到一半失败)已经把 blob 都建过了,
-        # 本地算出 sha 直接建树即可,避免再发上百个请求撞限流。
-        payload = []
-        missing = []
-        for path in files:
-            full = os.path.join(root, path)
-            if not os.path.isfile(full):
-                missing.append(path)
-                continue
-            with open(full, "rb") as f:
-                data = f.read()
-            mode = "100755" if path.endswith(_EXEC_SUFFIX) else "100644"
-            payload.append((path, mode, data))
-
-        # ⚠️ 整树替换是"以本地为准"的:本地缺一个文件 = 远端删一个文件。
-        # 之前的实现是 `continue` 静默跳过 —— 一旦磁盘上少了个别文件
-        # (比如被外部进程/误删/IDE 清掉),推送就会把远端对应文件一起删掉,
-        # 而且因为是静默的,推完根本看不出来。这里改成硬失败。
-        # (2026-09-15 实测踩坑:scripts/ 下 13 个脚本从磁盘消失,险些被连带删除)
-        if missing:
-            print(f"\n[FAIL] 有 {len(missing)} 个 git 追踪的文件在磁盘上不存在:")
-            for p in missing:
-                print(f"  ! {p}")
-            print("       整树替换会把这些文件从远端一并删除,已中止推送。")
-            print("       恢复: git restore --worktree -- <路径>")
-            print("       确认要删: 加 --allow-missing")
-            if not args.allow_missing:
-                return 1
 
         def build_tree(entries):
             return request(
@@ -215,26 +255,21 @@ def main() -> int:
             )
 
         entries = [
-            {"path": p, "mode": m, "type": "blob", "sha": git_blob_sha(d)}
-            for p, m, d in payload
+            {"path": p, "mode": m, "type": "blob", "sha": s} for p, m, s in blobs
         ]
-        print(f"用本地计算的 {len(entries)} 个 blob sha 直接建树(0 次上传)...")
+        print(f"用 git 自带的 {len(entries)} 个 blob sha 直接建树(0 次上传)...")
         r = build_tree(entries)
 
         if r.status_code == 422 and "not a valid blob" in r.text:
             print("  部分 blob 仓库里还没有,回退到逐个上传...")
             entries = []
-            for i, (path, mode, data) in enumerate(payload, 1):
-                entries.append(
-                    {
-                        "path": path,
-                        "mode": mode,
-                        "type": "blob",
-                        "sha": make_blob(cl, h, args.owner, args.repo, path, data),
-                    }
-                )
-                if i % 20 == 0 or i == len(payload):
-                    print(f"  blob {i}/{len(payload)}")
+            for i, (path, mode, sha) in enumerate(blobs, 1):
+                up = make_blob(cl, h, args.owner, args.repo, path, contents[sha])
+                if up != sha:
+                    raise RuntimeError(f"{path}: 上传后 sha 变了 {sha} -> {up}")
+                entries.append({"path": path, "mode": mode, "type": "blob", "sha": up})
+                if i % 20 == 0 or i == len(blobs):
+                    print(f"  blob {i}/{len(blobs)}")
             r = build_tree(entries)
 
         if r.status_code >= 300:
@@ -242,9 +277,12 @@ def main() -> int:
             return 1
         tree_sha = r.json()["sha"]
 
+        if tree_sha != local_tree:
+            print(f"[WARN] 远端树 {tree_sha} != 本地树 {local_tree}")
+
         r = request(
             cl, "POST", f"{_API}/repos/{args.owner}/{args.repo}/git/commits", h,
-            json={"message": args.message, "tree": tree_sha, "parents": [head]},
+            json={"message": args.message, "tree": tree_sha, "parents": [parent]},
         )
         if r.status_code >= 300:
             print(f"[FAIL] commit: {r.status_code} {r.text[:300]}")
@@ -261,6 +299,7 @@ def main() -> int:
             return 1
 
         print(f"\n[完成] commit {commit_sha}")
+        print(f"       tree   {tree_sha}")
         print(f"       {args.owner}/{args.repo} 现在有 {len(entries)} 个文件")
     return 0
 
