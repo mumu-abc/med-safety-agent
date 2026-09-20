@@ -45,6 +45,10 @@ class RiskAssessment(BaseModel):
     overall_risk: str = Field(default="unknown", description="总体风险等级: critical/high/medium/low/safe")
     risks: list[RiskItem] = Field(default_factory=list)
     summary: str = ""
+    # 可解释性字段（见 risk_agent.assess_risk 的"确定性地板"）：
+    # floor_applied=True 表示最终等级是规则/图谱定的，不是 LLM 自己判的
+    floor_applied: bool = False
+    llm_original_risk: str = ""
 
 
 class InteractionItem(BaseModel):

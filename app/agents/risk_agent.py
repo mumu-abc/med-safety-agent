@@ -8,6 +8,7 @@
 """
 import logging
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
@@ -122,6 +123,18 @@ class RiskAssessment(BaseModel):
     overall_risk: str = Field(default="unknown", description="总体风险等级: critical/high/medium/low/safe")
     risks: list[RiskItem] = Field(default_factory=list, description="风险列表")
     summary: str = Field(default="", description="综合评估摘要")
+    # ---- 可解释性字段（系统回填，不是 LLM 的输出契约）----
+    # 为什么用 SkipJsonSchema：这个类是 ReAct 的 response_format，
+    # 不排除的话模型会被要求输出这两个系统字段（它根本判断不了），白耗 token 还可能乱填。
+    # 排除后 model_json_schema() 里只有 overall_risk/risks，但 model_dump() 仍带这两个字段。
+    floor_applied: SkipJsonSchema[bool] = Field(
+        default=False,
+        description="最终等级是否由规则/图谱地板决定（而非 LLM 自己的判断）：抬升、或 LLM 未给出可解析等级时为 True",
+    )
+    llm_original_risk: SkipJsonSchema[str] = Field(
+        default="",
+        description="地板生效前 LLM 自己给出的等级；\"\"=LLM 未参与，\"unknown\"=LLM 未给出可解析等级",
+    )
 
 
 # ---- LangGraph ReAct Agent ----
@@ -350,6 +363,8 @@ def assess_risk(
         )
 
     result.overall_risk = _normalize_risk(result.overall_risk)
+    # 先把 LLM 自己的判断记下来：后面地板抬升要拿它做对比，并透出给接口/界面
+    llm_judgement = result.overall_risk
     if result.overall_risk == "unknown":
         result.overall_risk = det_floor
 
@@ -362,9 +377,19 @@ def assess_risk(
             existing_keys.add(key)
 
     # 规则/图谱地板：不得被 LLM 降级
+    # 可解释性：以前这里只有一条 logger.warning —— 只进后端日志，不进接口、不进报告、不进界面，
+    # 药师没法分辨「极高危」到底是 LLM 自己判的，还是规则把它从低危强制抬上来的。
+    # 现在同一件事同时写进结构化字段，供 API / 前端透出（医疗 AI 的可追溯性要求）。
     rank = {"safe": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
     if rank.get(det_floor, 0) > rank.get(result.overall_risk, 0):
-        logger.warning("确定性地板(%s)高于 LLM(%s)，已抬升", det_floor, result.overall_risk)
+        logger.warning("确定性地板(%s)高于 LLM(%s)，已抬升", det_floor, llm_judgement)
         result.overall_risk = det_floor
+        result.floor_applied = True
+        result.llm_original_risk = llm_judgement
+    elif llm_judgement == "unknown":
+        # LLM 参与了、但没给出可解析的等级；最终等级实际由规则/图谱决定，同样属于"不是 LLM 判的"
+        logger.warning("LLM 未给出可解析等级，采用规则/图谱判定(%s)", det_floor)
+        result.floor_applied = True
+        result.llm_original_risk = "unknown"
 
     return result

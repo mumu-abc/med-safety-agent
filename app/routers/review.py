@@ -196,6 +196,9 @@ def _brief(text, n: int = 90) -> str:
 # 而缓存命中时是**原样返回**的,于是前端"推理链"tab 依旧空白,
 # 看起来像"代码改了却没生效"。所以结构过期的缓存一律当作 miss 重新计算。
 _CACHE_REQUIRED_FIELDS = ("reasoning_chain",)
+# risk_assessment 内部新增的系统字段：老缓存的 risk_assessment 里没有它，
+# 命中就会静默丢掉「地板抬升」提示 —— 与 reasoning_chain 是同一类坑，一并作废重算。
+_CACHE_REQUIRED_RISK_FIELDS = ("floor_applied",)
 
 
 def _is_cache_schema_current(payload) -> bool:
@@ -210,6 +213,11 @@ def _is_cache_schema_current(payload) -> bool:
                 return False
         elif value is None:
             return False
+    ra = payload.get("risk_assessment")
+    if isinstance(ra, dict):
+        for field in _CACHE_REQUIRED_RISK_FIELDS:
+            if field not in ra:
+                return False
     return True
 
 
@@ -278,6 +286,14 @@ def _build_reasoning_chain(result) -> list[dict]:
     summary = _get(risk, "summary", "") if risk else ""
     if summary:
         detail += f"。{_brief(summary, 100)}"
+    # 地板生效时,上面那句"LLM 判定为 X"其实不成立 —— 这里必须把真相写出来,
+    # 否则推理链本身就成了误导来源。
+    if risk and _get(risk, "floor_applied", False):
+        orig = _get(risk, "llm_original_risk", "") or "unknown"
+        if orig == "unknown":
+            detail += "。⚠️ 注:LLM 未给出有效等级,该等级由规则/图谱判定,并非 LLM 判断"
+        else:
+            detail += f"。⚠️ 注:LLM 原判为 {orig},该等级由安全规则/图谱地板抬升而来,并非 LLM 判断"
     chain.append({"step": "④ 语义风险评估", "detail": detail, "node": "assess"})
 
     # 5. 替代方案(条件分支:仅在触发高风险时执行)
@@ -342,6 +358,10 @@ def _build_raw_response(result) -> dict:
                 for r in (risk.risks if risk else [])
             ],
             "summary": risk.summary if risk else "",
+            # 可解释性：让前端/报告能区分「LLM 自己判的等级」和「规则强制抬升的等级」
+            # （risk 可能是 dict 也可能是对象，统一走 _get）
+            "floor_applied": bool(_get(risk, "floor_applied", False)),
+            "llm_original_risk": _get(risk, "llm_original_risk", "") or "",
         } if risk else None,
         "alternatives": {
             "suggestions": [
@@ -373,7 +393,7 @@ async def review(req: ReviewRequest):
         req.prescription_text, patient_id=req.patient_id or "", mode="summary"
     )
     if cached and not _is_cache_schema_current(cached):
-        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        logger.info("♻️ 缓存结构过期(字段不全),忽略该缓存重新审查")
         cached = None
     if cached:
         logger.info("⚡ 缓存命中，直接返回历史结果")
@@ -486,7 +506,7 @@ async def review_raw(req: ReviewRequest):
         req.prescription_text, patient_id=req.patient_id or "", mode="raw"
     )
     if cached and not _is_cache_schema_current(cached):
-        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        logger.info("♻️ 缓存结构过期(字段不全),忽略该缓存重新审查")
         cached = None
     if cached:
         cached["cached"] = True
@@ -601,7 +621,7 @@ async def review_stream(req: ReviewRequest, request: Request):
         req.prescription_text, patient_id=req.patient_id or "", mode="raw"
     )
     if cached and not _is_cache_schema_current(cached):
-        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        logger.info("♻️ 缓存结构过期(字段不全),忽略该缓存重新审查")
         cached = None
     if cached:
         async def cached_generator():
@@ -787,7 +807,7 @@ async def review_multi(req: ReviewRequest):
         req.prescription_text, patient_id=req.patient_id or "", mode="multi"
     )
     if cached and not _is_cache_schema_current(cached):
-        logger.info("♻️ 缓存结构过期(缺 reasoning_chain),忽略该缓存重新审查")
+        logger.info("♻️ 缓存结构过期(字段不全),忽略该缓存重新审查")
         cached = None
     if cached:
         cached["cached"] = True

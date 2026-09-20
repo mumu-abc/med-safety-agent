@@ -1046,18 +1046,28 @@ function renderPipe(ak){
 }
 function markPipe(k,st){const ps=document.querySelectorAll('.pipe-n');const i=STEPS.findIndex(s=>s.k===k);if(i>=0&&ps[i]){ps[i].classList.remove('active','done');ps[i].classList.add(st)}}
 
+const RISK_ZH_FULL = {critical:"极高危",high:"高危",medium:"中危",low:"低危",safe:"安全",unknown:"未知"};
+// 确定性地板提示：楼层等级是规则/图谱定的，不是 LLM 自己判的 —— 医疗场景必须让药师看得见
+function floorWarn(ra){
+  if(!ra||!ra.floor_applied)return '';
+  const orig=ra.llm_original_risk;
+  const txt=(orig&&orig!=='unknown')
+    ? `本条结论由安全规则强制抬升（LLM 原判：${esc(RISK_ZH_FULL[orig]||orig)}）`
+    : 'LLM 未能给出有效等级，本条结论由安全规则判定';
+  return `<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:#fef3c7;color:#92400e;font-size:12.5px;line-height:1.5">⚠️ ${txt}</div>`;
+}
 function renderRes(data,cached){
   STEPS.forEach(s=>markPipe(s.k,'done'));
   const drugs=data.prescription?.drugs||[];if(!drugs.length){showErr('未识别到有效药物信息',true);return}
   const risk=data.risk_assessment?.overall_risk||'unknown';const cfg=RC[risk]||RC.unknown;
-  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'已完成三层安全检测')}</div></div></div>`;
+  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'已完成三层安全检测')}</div>${floorWarn(data.risk_assessment)}</div></div>`;
   const rc=data.risk_assessment?.risks?.length||0,ic=data.interactions?.length||0,rlc=(data.rule_risks?.length||0)+(data.contraindications?.length||0),ac=data.alternatives?.suggestions?.length||0;
   document.getElementById('tilesArea').innerHTML=`<div class="tiles"><div class="tile"><div class="tv">${rc}</div><div class="tl">风险项</div></div><div class="tile"><div class="tv">${ic}</div><div class="tl">药物交互</div></div><div class="tile"><div class="tv">${rlc}</div><div class="tl">规则触发</div></div><div class="tile"><div class="tv">${ac}</div><div class="tl">替代方案</div></div></div>`;
   renderTabs(data);renderFb();
 }
 function renderPartial(data){
   const risk=data.risk_assessment?.overall_risk||'unknown';const cfg=RC[risk]||RC.unknown;
-  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'')}</div></div></div>`;
+  document.getElementById('riskArea').innerHTML=`<div class="rbanner ${risk}"><div class="rb-ring">${cfg.i}</div><div><div class="rb-lvl">${cfg.l}</div><div class="rb-sum">${esc(data.risk_assessment?.summary||'')}</div>${floorWarn(data.risk_assessment)}</div></div>`;
   const rc=data.risk_assessment?.risks?.length||0,ic=data.interactions?.length||0,rlc=(data.rule_risks?.length||0)+(data.contraindications?.length||0);
   document.getElementById('tilesArea').innerHTML=`<div class="tiles"><div class="tile"><div class="tv">${rc}</div><div class="tl">风险项</div></div><div class="tile"><div class="tv">${ic}</div><div class="tl">药物交互</div></div><div class="tile"><div class="tv">${rlc}</div><div class="tl">规则触发</div></div><div class="tile"><div class="tv" style="font-size:13px;color:var(--amber)">待确认</div><div class="tl">替代方案</div></div></div>`;
   renderTabs(data);

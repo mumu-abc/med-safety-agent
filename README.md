@@ -102,7 +102,7 @@ flowchart TD
 | 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
-| 可解释性 | workflow.py | 每步输出结构化,推理链完整可追溯 |
+| 可解释性 | workflow.py | 每步输出结构化,推理链完整可追溯;**规则强制抬升的等级会显式标注来源**(floor_applied),不让"规则兜底"被误读成"LLM 判断" |
 | 多Agent协作 | `agents/supervisor_agent.py` | Supervisor编排,fan-out并行,dynamic dispatch |
 | 向量记忆 | `memory.py` | FAISS+bge-small-zh,历史案例检索,相似处方自动关联 |
 | 评测闭环 | `evaluation.py` | 主集191 + 外部holdout 60 + 难例20,F1/Recall回归检测,API触发评测 |
@@ -572,6 +572,18 @@ LLM 判 `safe`、规则已命中「孕妇禁用华法林=critical」时,报告�
 
 **修复**(`app/agents/risk_agent.py`):合并后按全部 risks 的最高 severity **抬升** `overall_risk`。
 回归测试:`tests/test_llm_increment.py::test_assess_risk_merges_and_calibrates_without_live_llm`。
+
+**后半段:抬升本身又成了新的可解释性缺口。** 抬升最初只有一条 `logger.warning` ——
+只进后端日志,**不进接口响应、不进报告、不进界面**。于是药师看到「极高危」时无法分辨:
+这是 LLM 自己判的,还是规则把它从低危强制抬上来的?医疗场景里这属于可追溯性缺陷
+(结论必须能说清来源,否则无法复核)。
+**二次修复**:`RiskAssessment` 增加两个系统字段 `floor_applied` / `llm_original_risk`,
+随接口透出;前端在地板生效时显示「⚠️ 本条结论由安全规则强制抬升(LLM 原判:中危)」;
+推理链也不再谎称「LLM 判定为 X」。
+细节:这两个字段用 `SkipJsonSchema` 排除出了 structured-output 的 JSON Schema ——
+它们由系统回填,不该出现在 LLM 的输出契约里,否则 ReAct 的 `response_format`
+会要求模型输出它根本判断不了的字段。缓存侧同步加了结构自检(老缓存缺该字段即作废重算)。
+回归测试:`tests/test_risk_floor.py`(9 条)。
 
 ### 坑 2:ReAct 挂了等于图谱也瞎了
 

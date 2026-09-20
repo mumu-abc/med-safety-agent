@@ -50,7 +50,7 @@ agent-project-analysis/
 !/requirements.txt
 !/requirements-dev.txt
 !/requirements.deploy.txt
-# scripts/ 下划线开头的临时脚本
-/scripts/_*.py
+# scripts/ 下划线开头的临时脚本/调试产物(不限后缀:_*.py、_*.js 都算)
+/scripts/_*
 # Streamlit 时代遗留的静态资源(前端已改原生 HTML,已确认无任何引用)
 /lib/
