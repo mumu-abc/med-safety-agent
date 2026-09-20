@@ -527,7 +527,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 ---
 
 *技术栈:LangChain + LangGraph + NetworkX + FastAPI + Pydantic + FAISS + OpenAI 兼容 LLM 接口*
-*测试:143 个测试函数(138 通过 / 5 条慢速标记跳过) | 评测:主集 191 样本 F1=94.8%,外部 holdout 60 条 + 难例 20 条*
+*测试:153 个测试函数(本地与 CI 一致:pytest **162 通过 / 5 个慢速用例默认跳过**;`pytest -q` 可复现) | 评测:主集 191 样本 F1=94.8%,外部 holdout 60 条 + 难例 20 条*
 
 ---
 
