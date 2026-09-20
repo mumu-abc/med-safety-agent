@@ -422,7 +422,7 @@ def check_serotonin_syndrome(drugs: list[dict]) -> list[dict]:
 
 
 def run_all_rules(drugs: list[dict], patient: dict) -> list[dict]:
-    """运行所有安全规则（8大维度）,应用动态权重。"""
+    """运行所有安全规则（9 类）,应用动态权重。"""
     all_risks = []
     all_risks.extend(check_age_related(drugs, patient.get("age")))
     all_risks.extend(check_pregnancy(drugs, patient.get("pregnancy", "no")))

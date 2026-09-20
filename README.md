@@ -7,7 +7,7 @@
 - **安全关键AI** — 不是聊天机器人,是能救命的系统,LLM只是辅助,规则才是底线
 - **可量化的 LLM 增量** — 主集 F1 高是因为图谱;20 条规则/图谱覆盖不到的难例上,LLM 语义评估把二分类从 70.0% 拉到 **95.0%**、精确匹配 55.0%→80.0%（见 [LLM_INCREMENT_REPORT.md](./LLM_INCREMENT_REPORT.md)）
 - **LangChain 深度使用** — structured output 强约束处方解析,bind_tools 让LLM自主调用图谱工具,LangGraph StateGraph 编排全流程
-- **知识图谱推理** — 544种药物、413条相互作用、56条替代关系的知识图谱,结构化查询比 RAG 更可靠
+- **知识图谱推理** — 544种药物、413条相互作用、48条替代关系的知识图谱,结构化查询比 RAG 更可靠
 - **规则+LLM混合架构** — 关键安全规则硬编码+反馈驱动权重优化,overall_risk 不得被 LLM 降级
 
 [![CI](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/mumu-abc/med-safety-agent/actions/workflows/ci.yml)
@@ -98,7 +98,7 @@ flowchart TD
 | 能力 | 在项目哪里 | 面试怎么说 |
 |---|---|---|
 | LangChain深度使用 | `agents/` + `workflow.py` | structured output强约束,create_react_agent ReAct循环,LangGraph StateGraph + 多Agent Supervisor编排 |
-| 知识图谱 | `graph/drug_graph.py` | 544种药物/413条相互作用/56条替代关系,结构化查询比RAG可靠 |
+| 知识图谱 | `graph/drug_graph.py` | 544种药物/413条相互作用/48条替代关系,结构化查询比RAG可靠 |
 | 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
@@ -479,7 +479,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 ### Q4: 知识图谱怎么构建的?
 
-> 预置了544种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及413条药物相互作用(去重后的药对数)和56条替代关系。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
+> 预置了544种常用药的真实数据,覆盖心血管/抗感染/精神科/内分泌/肿瘤等200+个药物分类,以及413条药物相互作用(去重后的药对数)和48条替代关系(同样是图谱去重后的对数;数据源里是58条,部分与相互作用边重叠被覆盖)。数据基于药品说明书和临床指南。用 NetworkX 建图,药物是节点,相互作用是边,边有权重(严重程度)。
 
 ### Q5: 为什么用知识图谱而不是RAG?
 

@@ -133,7 +133,7 @@ def test_serotonin_syndrome():
 
 
 def test_all_rules_count():
-    """规则引擎应覆盖8大维度。"""
+    """规则引擎应覆盖 9 类规则。"""
     # 测试所有规则类别都能被触发
     drugs = [
         {"id": "warfarin", "name": "华法林"},       # 抗凝
