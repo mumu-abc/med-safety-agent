@@ -133,7 +133,7 @@ class RiskAssessment(BaseModel):
     )
     llm_original_risk: SkipJsonSchema[str] = Field(
         default="",
-        description="地板生效前 LLM 自己给出的等级；\"\"=LLM 未参与，\"unknown\"=LLM 未给出可解析等级",
+        description="LLM 自己给出的等级（地板生效前后都记录）；\"\"=LLM 未参与，\"unknown\"=LLM 未给出可解析等级",
     )
 
 
@@ -355,6 +355,8 @@ def assess_risk(
     else:
         result = _llm_semantic_assess(context)
 
+    llm_produced_judgement = result is not None
+
     if result is None:
         result = RiskAssessment(
             overall_risk=det_floor if det_floor != "safe" else "safe",
@@ -363,8 +365,11 @@ def assess_risk(
         )
 
     result.overall_risk = _normalize_risk(result.overall_risk)
-    # 先把 LLM 自己的判断记下来：后面地板抬升要拿它做对比，并透出给接口/界面
+    # LLM 的原判：只要 LLM 参与过就如实记录（地板生效与否都能回溯），
+    # 这样 llm_original_risk 为空字符串的语义收敛为唯一含义 —— "LLM 未参与"。
     llm_judgement = result.overall_risk
+    if llm_produced_judgement:
+        result.llm_original_risk = llm_judgement
     if result.overall_risk == "unknown":
         result.overall_risk = det_floor
 

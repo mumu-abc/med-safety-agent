@@ -75,7 +75,7 @@ def test_floor_raise_marks_floor_applied_with_llm_original(monkeypatch):
 
 
 def test_floor_not_applied_when_llm_already_at_floor(monkeypatch):
-    """LLM 自己也判 critical → 不是被抬升，两个字段保持默认。"""
+    """LLM 自己也判 critical → 不算被抬升；但 LLM 的原判仍要如实记录。"""
     ra_mod = _stub_semantic_llm(monkeypatch, "critical")
 
     result = ra_mod.assess_risk(
@@ -85,7 +85,7 @@ def test_floor_not_applied_when_llm_already_at_floor(monkeypatch):
 
     assert result.overall_risk == "critical"
     assert result.floor_applied is False, "LLM 自己判到的等级不应被标成'规则抬升'"
-    assert result.llm_original_risk == ""
+    assert result.llm_original_risk == "critical", "LLM 参与了就该记录它的原判"
 
 
 def test_llm_above_floor_is_kept_and_not_flagged(monkeypatch):
@@ -99,6 +99,30 @@ def test_llm_above_floor_is_kept_and_not_flagged(monkeypatch):
 
     assert result.overall_risk == "critical"
     assert result.floor_applied is False
+    assert result.llm_original_risk == "critical"
+
+
+def test_empty_llm_original_risk_means_no_llm_participation(monkeypatch):
+    """空字符串的语义必须唯一：只有"LLM 压根没参与"才会是空。"""
+    from app.agents import semantic_assess
+    from app.agents.risk_agent import assess_risk
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "risk_mode", "semantic")
+
+    def _boom():
+        raise RuntimeError("llm unavailable")
+
+    monkeypatch.setattr(semantic_assess, "get_llm", _boom)
+
+    result = assess_risk(
+        interactions=[], contraindications=[], rule_risks=[],
+        patient=_PATIENT, drugs=_DRUGS,
+    )
+
+    assert result.llm_original_risk == "", "LLM 未参与时才允许为空"
+    assert result.floor_applied is False
+    assert "LLM" in result.summary
 
 
 def test_unparseable_llm_level_is_flagged_as_unknown(monkeypatch):
