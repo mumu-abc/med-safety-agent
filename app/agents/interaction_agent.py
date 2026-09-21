@@ -1,6 +1,6 @@
 """药物交互检测Agent:用 LangGraph create_react_agent 实现 ReAct 循环。
 
-面试要点:
+设计要点:
 1. 统一用 create_react_agent,三个 Agent 架构一致。
 2. ReAct 循环:LLM 自主决定调哪些工具、调几轮,直到信息充足。
 3. 工具结果直接从 ReAct 消息历史中提取,不做重复查询。

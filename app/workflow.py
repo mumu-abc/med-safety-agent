@@ -1,6 +1,6 @@
 """用药安全审查工作流:用 LangGraph StateGraph 编排全流程。
 
-面试要点:
+设计要点:
 1. 用 LangGraph StateGraph 替代 LCEL | 串联。
 2. StateGraph 支持循环、条件分支、状态持久化,LCEL 只能线性管道。
 3. 每个节点是独立函数,通过 TypedDict 状态对象传递数据。
@@ -300,7 +300,7 @@ def resume_review(thread_id: str) -> ReviewState:
 def review_prescription_stream(text: str):
     """生成器:逐步产出审查进度,最终产出完整结果。
 
-    面试要点:用 LangGraph 的 stream mode 逐步获取每个节点的执行结果,
+    设计要点:用 LangGraph 的 stream mode 逐步获取每个节点的执行结果,
     前端可以实时展示当前执行到哪一步,提升用户体验。
 
     Yields:

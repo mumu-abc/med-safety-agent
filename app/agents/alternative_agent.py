@@ -1,6 +1,6 @@
 """替代方案Agent:用 LangGraph create_react_agent + response_format 实现 ReAct 循环。
 
-面试要点:
+设计要点:
 1. create_react_agent 的 response_format 参数直接输出结构化结果。
 2. 避免了"ReAct 结束后再调一次 structured_output"的额外 LLM 调用。
 3. 只在有高风险时触发——条件执行,不浪费资源。

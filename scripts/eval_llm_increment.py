@@ -1,6 +1,6 @@
 """LLM 增量价值评测:证明 Agent/LLM 在规则+图谱之外带来的可量化收益。
 
-设计原则(面试可讲):
+设计原则:
   Track A  Graph+Rules@Oracle  — 用标注的 ground-truth 药名跑确定性基线(无 LLM)
   Track B  Graph+Rules@LLMParse — 只用 LLM 解析药名,后续仍走图谱+规则(隔离解析增量)
   Track C  Parse + Semantic LLM + Rules Floor — 隔离推理增量(不跑慢速 ReAct)
@@ -311,7 +311,7 @@ def generate_report(all_tracks: dict[str, list[dict]], summaries: dict[str, dict
         lines.append(f"- 净增量: **{len(gained) - len(lost):+d}** 条精确匹配")
         lines.append("")
 
-    lines.append("## 5. 结论(面试可用)")
+    lines.append("## 5. 结论")
     lines.append("")
     o = summaries.get("oracle")
     f = summaries.get("full")

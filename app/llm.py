@@ -1,6 +1,6 @@
 """LLM 工厂:支持 LangSmith 可观测性追踪。
 
-面试要点:
+设计要点:
 1. 通过环境变量启用 LangSmith tracing,自动追踪每次 LLM 调用和工具调用链。
 2. 在 LangSmith UI 可查看 ReAct 循环的每步推理、工具输入输出、延迟。
 3. 用于调试 prompt、定位工具调用异常、对比不同模型的推理质量。

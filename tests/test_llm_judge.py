@@ -11,7 +11,7 @@
   3. LLM 输出: correct / partial / incorrect + 理由
   4. 汇总 LLM-Judge 准确率
 
-面试要点:
+设计要点:
   - "我们用 LLM-as-Judge 做自动化评测,减少人工标注依赖"
   - "评测方案本身不依赖被评测的 LLM,避免循环论证"
 """

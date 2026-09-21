@@ -14,7 +14,7 @@
   - 每个用例的判定差异
   - RAG 失败案例分析
 
-面试话术:
+结论要点:
   "我们做了 embedding RAG baseline 对比,用 FAISS + sentence-transformers 做向量检索,
    F1 是 XX%,图谱方案是 97.9%。知识图谱在结构化查询上的优势很明显。"
 """

@@ -171,7 +171,7 @@ def write_report(results: list[dict], m: dict) -> str:
                 f"i={r['n_interactions']} r={r['n_rules']} c={r['n_contras']} |"
             )
     lines.append("")
-    lines.append("## 5. 面试话术")
+    lines.append("## 5. 结论要点")
     lines.append("")
     lines.append(
         f"外部 holdout（{m['n']} 条,非自产）上图谱+规则二分类 F1={m['f1']:.1%},"

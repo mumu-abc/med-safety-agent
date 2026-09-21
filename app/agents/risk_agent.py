@@ -1,6 +1,6 @@
 """风险评估Agent:用 LangGraph create_react_agent + response_format 实现 ReAct 循环。
 
-面试要点:
+设计要点:
 1. create_react_agent 实现真正的 ReAct 循环:LLM → 工具 → 观察 → 再推理 → ... → 结论。
 2. response_format 直接输出 RiskAssessment,避免 ReAct 后额外的 LLM 调用。
 3. 区别于 LCEL:LCEL 是线性管道,LangGraph 是有状态图(可循环/分支)。

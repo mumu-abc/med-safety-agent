@@ -1,6 +1,6 @@
 """确定性地板的「可解释性」契约测试。
 
-背景（面试可讲）:
+背景:
     assess_risk 里有一条"规则/图谱地板" —— 最终 overall_risk 不得低于图谱/规则
     命中风险的最高 severity，LLM 想把 critical 降成 safe 是不行的。
     但改造之前，这件事**只有一条 logger.warning**：不进接口响应、不进报告、不进界面。

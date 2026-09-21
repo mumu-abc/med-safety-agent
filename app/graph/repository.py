@@ -1,6 +1,6 @@
 """药物知识图谱 Repository 抽象层。
 
-面试要点:
+设计要点:
 1. Repository 模式:将图存储与业务逻辑解耦,当前用 networkx 内存图,
    接口设计兼容 Neo4j(只需实现 GraphRepository 协议即可切换)。
 2. 图遍历查询:find_interactions 是图遍历,不是 SQL 查表。
