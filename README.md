@@ -1,6 +1,6 @@
 # 💊 智能用药安全审查系统
 
-> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(544药物/413相互作用) + 规则引擎(9类规则) + LLM推理**三层保障,模拟临床药师的审查流程。
+> 药品不是普通商品,用药安全容不得半点错误。这个系统用**知识图谱(544药物/413相互作用) + 规则引擎(10类规则) + LLM推理**三层保障,模拟临床药师的审查流程。
 
 **这是一个面向秋招 Agent 开发方向的简历级项目。** 它展示的不是"会调 API",而是:
 
@@ -99,7 +99,7 @@ flowchart TD
 |---|---|---|
 | LangChain深度使用 | `agents/` + `workflow.py` | structured output强约束,create_react_agent ReAct循环,LangGraph StateGraph + 多Agent Supervisor编排 |
 | 知识图谱 | `graph/drug_graph.py` | 544种药物/413条相互作用/48条替代关系,结构化查询比RAG可靠 |
-| 规则引擎 | `rules/safety_rules.py` | 9类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
+| 规则引擎 | `rules/safety_rules.py` | 10类安全规则(年龄/孕期/肾肝功能/过敏/QT/出血/CNS/5-HT),LLM+规则混合架构 |
 | 规则优化器 | `rules/rule_optimizer.py` | 反馈驱动权重调整,误报降权/漏报升权,自动衰减 |
 | 安全关键AI | 整体设计 | 医疗场景不能全靠LLM,规则兜底 |
 | 可解释性 | workflow.py | 每步输出结构化,推理链完整可追溯;**规则强制抬升的等级会显式标注来源**(floor_applied),不让"规则兜底"被误读成"LLM 判断" |
@@ -177,9 +177,9 @@ med_safety/
 │   │   ├── risk_agent.py           #   风险评估(ReAct + response_format + dedup + 规则地板)
 │   │   ├── semantic_assess.py      #   单次语义评估(评测/降级用,不跑 ReAct)
 │   │   ├── alternative_agent.py    #   替代方案(ReAct + response_format)
-│   │   └── supervisor_agent.py     #   Supervisor 多Agent编排(Send fan-out)
+│   │   └── supervisor_agent.py     #   Supervisor 多Agent编排(add_edge 并行边 fan-out)
 │   ├── rules/                      # 📐 安全规则引擎
-│   │   ├── safety_rules.py         #   9类硬编码规则(年龄/孕期/肾肝/过敏/QT/出血/CNS/5-HT)
+│   │   ├── safety_rules.py         #   10类硬编码规则(年龄/孕期/肾肝/过敏/QT/出血/CNS/5-HT)
 │   │   ├── rule_optimizer.py       #   反馈驱动规则权重优化器
 │   │   └── rules_config.json       #   规则权重/阈值配置(可热更新)
 │   └── routers/                    # API
@@ -471,7 +471,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 ### Q2: LangChain在这个项目里怎么用的?
 
-> 三个核心用法。第一,处方解析用 `with_structured_output` 强约束输出为 Pydantic schema,确保格式不会乱。第二,药物交互检测和风险评估用 `create_react_agent` 实现 ReAct 循环,LLM 自主决定调哪些工具、调几轮。第三,整个流程用 LangGraph StateGraph 编排,支持条件分支(高风险时触发替代方案推荐)。还有 Supervisor 多Agent编排模式,用 Send 实现 fan-out 并行。
+> 三个核心用法。第一,处方解析用 `with_structured_output` 强约束输出为 Pydantic schema,确保格式不会乱。第二,药物交互检测和风险评估用 `create_react_agent` 实现 ReAct 循环,LLM 自主决定调哪些工具、调几轮。第三,整个流程用 LangGraph StateGraph 编排,支持条件分支(高风险时触发替代方案推荐)。还有 Supervisor 多Agent编排模式,用 add_edge 并行边实现 fan-out(parse 后 detect 与 rules 并行,assess 汇合)。这里要分清:add_edge 是**静态并行边**(分支数写死在图里),`Send` 是**运行时动态 fan-out**(分支数按 state 现算),本项目用的是前者。
 
 ### Q3: 和deep_research_agent有什么区别?
 
@@ -500,7 +500,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 
 ### Q7: 规则引擎覆盖了哪些安全场景?
 
-> 9类规则。除了基础的年龄、孕妇、肾功能、肝功能规则,还覆盖了过敏交叉反应、QT延长风险、出血风险(抗凝+抗血小板+NSAID组合)、中枢神经抑制(FDA黑框警告:阿片+苯二氮卓)、5-羟色胺综合征(SSRI+MAOI绝对禁忌)。每条规则都是临床指南中的硬性要求。而且规则权重可以根据用户反馈自动调整——高频误报的规则权重降低,漏报的规则权重升高。
+> 10类规则。除了基础的年龄、孕妇、肾功能、肝功能规则,还覆盖了过敏交叉反应、QT延长风险、出血风险(抗凝+抗血小板+NSAID组合)、中枢神经抑制(FDA黑框警告:阿片+苯二氮卓)、5-羟色胺综合征(SSRI+MAOI绝对禁忌)、以及**老年人抗胆碱能负荷**(按药物抗胆碱能强度加权累计,≥3分报警,专治"单药都不危险、三联才危险"的图谱盲区)。每条规则都是临床指南中的硬性要求。而且规则权重可以根据用户反馈自动调整——高频误报的规则权重降低,漏报的规则权重升高。
 
 ### Q8: 向量记忆系统有什么用?
 
@@ -527,7 +527,7 @@ tracing 开关是在「一次 run 开始执行时」读环境变量的,而 `.env
 ---
 
 *技术栈:LangChain + LangGraph + NetworkX + FastAPI + Pydantic + FAISS + OpenAI 兼容 LLM 接口*
-*测试:153 个测试函数(本地与 CI 一致:pytest **162 通过 / 5 个慢速用例默认跳过**;`pytest -q` 可复现) | 评测:主集 191 样本 F1=94.8%,外部 holdout 60 条 + 难例 20 条*
+*测试:154 个测试函数（pytest 收集 168 条，其中 5 条 slow 默认跳过 → **163 通过**，本机实测约 65s；`pytest -q` 可复现） | 评测:主集 191 样本 F1=94.8%,外部 holdout 60 条 + 难例 20 条*
 
 ---
 

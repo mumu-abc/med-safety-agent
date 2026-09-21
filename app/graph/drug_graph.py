@@ -327,7 +327,7 @@ def get_stats() -> dict:
     # 统计安全规则数量
     try:
         from app.rules.safety_rules import run_all_rules
-        rule_count = 9  # check_age/pregnancy/renal/hepatic/allergies/qt/bleeding/cns/serotonin
+        rule_count = 10  # age/pregnancy/renal/hepatic/allergies/qt/bleeding/cns/serotonin/anticholinergic
     except Exception:
         rule_count = 0
     return {

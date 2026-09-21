@@ -421,8 +421,106 @@ def check_serotonin_syndrome(drugs: list[dict]) -> list[dict]:
     return risks
 
 
+def check_anticholinergic_burden(drugs: list[dict], age: int | None) -> list[dict]:
+    """老年人抗胆碱能负荷叠加。
+
+    为什么需要这条规则（图谱覆盖不到的部分）：
+        药物图谱是按"药物对"存边的，它只能回答"这两味药有没有已知相互作用"。
+        但抗胆碱能副作用是**剂量/种类累加**的 —— 三味各自"轻微抗胆碱能"的药
+        （阿米替林 + 苯扎托品 + 氯苯那敏）联用后，总抗胆碱能负荷可能很高，
+        而任意两味之间的边在药理教材里根本不存在，图谱查不到任何东西。
+        这是"单药都不危险、联用才危险"的典型场景，只能靠规则层按**计数**兜住。
+
+    临床后果（老年人尤其显著）：
+        认知障碍/谵妄、跌倒、便秘、尿潴留、口干、视物模糊。
+        老年人抗胆碱能负荷过高与住院率、死亡率上升相关（Beers 标准重点关注）。
+
+    分级依据（按抗胆碱能强度加权，非简单计数）：
+        strong(3分)  —— 明确的强抗胆碱能药
+        moderate(2分) —— 中度
+        mild(1分)     —— 较弱 / 第二代抗组胺药
+        年龄阈值 65 岁（与 check_age_related 保持一致）。
+    """
+    if age is None or age < 65:
+        return []
+
+    # 抗胆碱能强度分级（依据抗胆碱能负荷量表 Anticholinergic Burden Scale 常用分级）
+    anticholinergic_scale = {
+        # --- strong: 3 ---
+        "amitriptyline": ("阿米替林", 3),
+        "clomipramine": ("氯米帕明", 3),
+        "imipramine": ("丙咪嗪", 3),
+        "doxepin": ("多塞平", 3),
+        "chlorpromazine": ("氯丙嗪", 3),
+        "clozapine": ("氯氮平", 3),
+        "benztropine": ("苯扎托品", 3),
+        "trihexyphenidyl": ("苯海索", 3),
+        "atropine": ("阿托品", 3),
+        "scopolamine": ("东莨菪碱", 3),
+        "chlorpheniramine": ("氯苯那敏", 3),
+        # --- moderate: 2 ---
+        "nortriptyline": ("去甲替林", 2),
+        "olanzapine": ("奥氮平", 2),
+        "quetiapine": ("喹硫平", 2),
+        "promethazine": ("异丙嗪", 2),
+        "hydroxyzine": ("羟嗪", 2),
+        "meclizine": ("美克洛嗪", 2),
+        "dimenhydrinate": ("茶苯海明", 2),
+        "glycopyrrolate": ("格隆溴铵", 2),
+        # --- mild: 1 ---
+        "cetirizine": ("西替利嗪", 1),
+        "loratadine": ("氯雷他定", 1),
+        "ipratropium": ("异丙托溴铵", 1),   # 吸入,全身吸收少
+        "tiotropium": ("噻托溴铵", 1),      # 吸入,全身吸收少
+    }
+
+    found = []
+    for drug in drugs:
+        drug_id = drug.get("id", "")
+        if drug_id in anticholinergic_scale:
+            name, score = anticholinergic_scale[drug_id]
+            found.append((drug.get("name", name) or name, drug_id, score))
+
+    if not found:
+        return []
+
+    total_burden = sum(s for _, _, s in found)
+    names = " + ".join(n for n, _, _ in found)
+
+    # ── 判定：≥3 分算有临床意义的负荷 ──
+    # 单药 strong(3分) 也报，但等级较低；多药叠加升级。
+    if total_burden < 3:
+        return []
+
+    if total_burden >= 6:
+        severity = "critical"
+        summary = "抗胆碱能负荷显著偏高"
+        suggestion = "必须精简用药：优先停用抗胆碱能作用最强的一种，换用替代药物"
+    elif total_burden >= 4:
+        severity = "high"
+        summary = "抗胆碱能负荷偏高"
+        suggestion = "评估每种药物的必要性，能停则停；优先替换抗胆碱能作用强的药物"
+    else:  # total_burden in (3,) —— 单药强抗胆碱能，或 3 味 mild 叠加
+        severity = "medium"
+        summary = "存在抗胆碱能负荷"
+        suggestion = "监测认知功能、排便和排尿情况；避免再加用其他抗胆碱能药物"
+
+    detail = "、".join(f"{n}({s}分)" for n, _, s in found)
+
+    return [{
+        "drug": names,
+        "risk": (
+            f"{summary}（累计 {total_burden} 分）：{detail}。"
+            f"老年人抗胆碱能负荷叠加可致认知障碍/谵妄、跌倒、便秘、尿潴留"
+        ),
+        "severity": severity,
+        "rule": "anticholinergic_burden_elderly",
+        "suggestion": suggestion,
+    }]
+
+
 def run_all_rules(drugs: list[dict], patient: dict) -> list[dict]:
-    """运行所有安全规则（9 类）,应用动态权重。"""
+    """运行所有安全规则（10 类）,应用动态权重。"""
     all_risks = []
     all_risks.extend(check_age_related(drugs, patient.get("age")))
     all_risks.extend(check_pregnancy(drugs, patient.get("pregnancy", "no")))
@@ -433,6 +531,7 @@ def run_all_rules(drugs: list[dict], patient: dict) -> list[dict]:
     all_risks.extend(check_bleeding_risk(drugs, patient))
     all_risks.extend(check_cns_depression(drugs))
     all_risks.extend(check_serotonin_syndrome(drugs))
+    all_risks.extend(check_anticholinergic_burden(drugs, patient.get("age")))
 
     # 应用动态权重:记录触发次数,附加权重信息
     for risk in all_risks:

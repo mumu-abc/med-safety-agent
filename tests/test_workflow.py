@@ -133,7 +133,7 @@ def test_serotonin_syndrome():
 
 
 def test_all_rules_count():
-    """规则引擎应覆盖 9 类规则。"""
+    """规则引擎应覆盖 10 类规则。"""
     # 测试所有规则类别都能被触发
     drugs = [
         {"id": "warfarin", "name": "华法林"},       # 抗凝
@@ -160,6 +160,45 @@ def test_allergen_cross_check():
     risks = check_allergies(drugs, ["青霉素"])
     assert len(risks) >= 1
     assert risks[0]["severity"] == "critical"
+
+
+def test_anticholinergic_burden_elderly():
+    """老年人抗胆碱能负荷：图谱查不到的累加风险。
+
+    这条规则守护一个关键设计意图 —— 抗胆碱能副作用是**加权累加**的，
+    任意两味之间可能不存在"药物对"级别的相互作用（图谱无覆盖），
+    但三味联用对老年人足以致谵妄/跌倒。必须靠规则层计数兜住。
+    """
+    from app.rules.safety_rules import check_anticholinergic_burden
+
+    # ① 三联强抗胆碱能药 → critical（3+3+3=9分）
+    triple = [
+        {"id": "amitriptyline", "name": "阿米替林"},
+        {"id": "benztropine", "name": "苯扎托品"},
+        {"id": "chlorpheniramine", "name": "氯苯那敏"},
+    ]
+    risks = check_anticholinergic_burden(triple, 72)
+    assert len(risks) == 1, f"三联应触发 1 条，实际 {len(risks)}"
+    assert risks[0]["severity"] == "critical", "三联负荷应判 critical"
+    assert risks[0]["rule"] == "anticholinergic_burden_elderly"
+
+    # ② 年龄门槛：<65 岁不触发
+    assert check_anticholinergic_burden(triple, 30) == [], "年轻人不应触发"
+
+    # ③ 单药强抗胆碱能 → medium（3分），不遗漏但不过度告警
+    single = check_anticholinergic_burden([{"id": "amitriptyline", "name": "阿米替林"}], 70)
+    assert len(single) == 1 and single[0]["severity"] == "medium"
+
+    # ④ 无抗胆碱能药物 → 不触发
+    assert check_anticholinergic_burden([{"id": "metformin", "name": "二甲双胍"}], 70) == []
+
+    # ⑤ 已接入 run_all_rules
+    from app.rules.safety_rules import run_all_rules
+    all_risks = run_all_rules(triple, {"age": 72, "pregnancy": "no",
+                                       "renal_function": "normal", "liver_function": "normal"})
+    assert any(r["rule"] == "anticholinergic_burden_elderly" for r in all_risks), \
+        "新规则未接入 run_all_rules"
+    print(f"✅ 抗胆碱能负荷规则正常: 三联 {len(risks)} 项 critical")
 
 
 def test_allergen_no_match():

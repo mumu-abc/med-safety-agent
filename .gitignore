@@ -43,6 +43,8 @@ data/judge_results.json
 # 本地工具/临时目录
 .trae-html-share-packages/
 agent-project-analysis/
+# 整目录快照式本地备份(如 _backup_before_full_eval_YYYYMMDD/),仅本地留档不入库
+/_backup_*/
 
 # ---- 调试产物白名单式拦截(2026-09-15 清理了 63 个误提交文件)----
 # 根目录的临时输出捕获(我习惯 `xxx > out.txt` 存终端输出,别再 git add -A 卷进来)
